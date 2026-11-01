@@ -1,4 +1,4 @@
-ALPINA RETAIL — Épisode 02 : Cahier des charges informatique
+# ALPINA RETAIL — Épisode 02 : Cahier des charges informatique
 
 > **Statut : conception validée, déploiement non commencé.**  
 > **Nature du projet :** étude de cas fictive et laboratoire personnel TSSR.  

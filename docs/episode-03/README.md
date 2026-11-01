@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 03 : Installation du pare-feu pfSense au siège de Grenoble
 
 > **Date :** 1er novembre 2026  
-> **Statut :** installation, redémarrage et configuration initiale vérifiés ; tests IP et DNS réussis depuis pfSense **et depuis un poste Windows 11 sur le LAN**. Accès à l'administration Web pfSense et changement du mot de passe administrateur confirmés ; navigation HTTPS vers `www.microsoft.com` validée depuis le client Windows ; règles LAN et NAT sortant automatique observés dans l'interface ; vérification des traductions actives et tests de filtrage encore à réaliser.  
+> **Statut :** installation, redémarrage et configuration initiale vérifiés ; tests IP et DNS réussis depuis pfSense **et depuis un poste Windows 11 sur le LAN**. Accès à l'administration Web pfSense et changement du mot de passe administrateur confirmés ; navigation HTTPS vers `www.microsoft.com` validée depuis le client Windows ; règles LAN et NAT sortant automatique examinés ; **traduction NAT/PAT confirmée dans la table des états** ; tests de filtrage autorisé/refusé encore à réaliser.  
 > **Projet :** laboratoire personnel TSSR simulant une entreprise entièrement fictive.
 
 ## 1. Contexte et objectif
@@ -103,6 +103,7 @@ Le service DHCP du LAN sera ultérieurement assuré par Windows Server, conform�
 19. Vérification depuis `PC-TEST-GRE` de l'affichage du site externe `https://www.microsoft.com` dans Microsoft Edge (résultat confirmé par l'auteur ; pas de mesure de performance consignée).
 20. Consultation de **Firewall → Rules → LAN** : règles anti-lockout et autorisations LAN vers toute destination en IPv4 et IPv6 observées, sans modification.
 21. Consultation de **Firewall → NAT → Outbound** : mode **Automatic outbound NAT rule generation** sélectionné ; règles automatiques WAN incluant le réseau `10.10.10.0/24` observées, sans modification.
+22. Consultation de **Diagnostics → States** : observation simultanée des états LAN et WAN, dont une connexion TCP HTTPS établie dont l'adresse source et le port ont été traduits par pfSense (détails en section 5).
 
 ## 5. Tests et résultats observés
 
@@ -124,7 +125,8 @@ Le service DHCP du LAN sera ultérieurement assuré par Windows Server, conform�
 | Remplacement du mot de passe de `admin` | Réussi : message « Password changed for user: admin » dans pfSense |
 | Navigation vers `https://www.microsoft.com` depuis `PC-TEST-GRE` | Réussie, confirmée par l'auteur ; aucune mesure HTTP détaillée fournie |
 | Consultation des règles de filtrage LAN | Anti-lockout, autorisation LAN IPv4 vers toutes destinations, et autorisation LAN IPv6 vers toutes destinations : présentes dans l'interface |
-| Mode NAT sortant | **Automatic outbound NAT rule generation** sélectionné ; règles automatiques WAN visibles pour `10.10.10.0/24`. Traductions effectives par connexion non encore observées |
+| Mode NAT sortant | **Automatic outbound NAT rule generation** sélectionné ; règles automatiques WAN visibles pour `10.10.10.0/24` |
+| Traduction NAT/PAT effectivement observée | **Confirmée** dans Diagnostics → States : `10.10.10.20:54138` (LAN) → `10.50.10.128:26027` (WAN), destination `98.66.133.185:443`, connexion TCP `ESTABLISHED:ESTABLISHED` |
 
 ### Interprétation technique
 
@@ -143,7 +145,8 @@ Les durées et pertes chiffrées ci-dessus proviennent de la capture des sorties
 - **Règles LAN :** la règle anti-lockout préserve les accès d'administration pfSense en HTTP/HTTPS depuis le LAN ; les règles « Default allow LAN to any » et « Default allow LAN IPv6 to any » sont présentes. La politique LAN initiale est permissive ; une segmentation et des règles minimales adaptées aux usages métiers seront étudiées ultérieurement.
 - **NAT sortant :** le mode automatique de pfSense est sélectionné. Les règles automatiques affichées sur le WAN comprennent le réseau LAN `10.10.10.0/24`, avec une règle particulière pour le port 500 et une règle générale vers l'adresse WAN.
 - **Topologie laboratoire :** pfSense réalise la traduction de source vers son WAN privé sur VMware VMnet8 ; VMware NAT assure ensuite l'accès vers le réseau extérieur. Il s'agit d'un scénario de double NAT en environnement virtuel, et non d'une adresse WAN publique pour pfSense.
-- **Limite :** ces captures confirment des **règles configurées** et des **communications fonctionnelles**, mais ne constituent pas une capture du paquet traduit ni une consultation des états en cours pour le client. Aucun test de règle de refus n'a encore été effectué.
+- **Observation directe de NAT/PAT :** la table **Diagnostics → States** affiche une connexion LAN `10.10.10.20:54138 → 98.66.133.185:443` et son état côté WAN `10.50.10.128:26027 (10.10.10.20:54138) → 98.66.133.185:443`. Les deux états sont `ESTABLISHED:ESTABLISHED` et présentent des compteurs de trafic. pfSense a traduit l'IP source privée du poste en son IP WAN privée et modifié le port source : preuve de NAT/PAT actif.
+- **Limites :** les états visibles ne suffisent pas à auditer l'ensemble des politiques de filtrage, ni à prouver un filtrage de refus ; aucun test de règle de refus n'a encore été réalisé. Le second NAT VMware demeure propre à l'architecture de laboratoire.
 
 ## 6. Limites de la validation
 
@@ -151,7 +154,7 @@ Les éléments suivants ne sont pas encore validés :
 
 - Vérification et traitement de l'avertissement de confiance du certificat HTTPS de l'interface Web pfSense (le certificat utilisé n'a pas encore été validé par une autorité de confiance sur Windows).
 - Navigation HTTP vers un site externe (seul HTTPS a été testé explicitement) ; contrôles complémentaires des comportements TLS/certificats selon les besoins.
-- Contrôle des **états actifs / traductions NAT réellement utilisées** pour le client Windows, puis élaboration et tests de règles de filtrage adaptées ; seules les règles configurées ont été examinées.
+- Conception et tests de règles de filtrage adaptées : aucun essai de refus explicite n'a encore été documenté (la traduction NAT/PAT active a été observée).
 - Attribution DHCP par un futur serveur Windows.
 - VPN IPsec entre le siège et les boutiques.
 - Persistance d'autres paramètres de configuration après redémarrage (la persistance des adresses WAN/LAN a été observée).
@@ -170,7 +173,8 @@ Aucun test non réalisé n'est présenté comme réussi.
 - [x] Vérifier la navigation HTTPS vers `https://www.microsoft.com` depuis le LAN.
 - [x] Examiner les règles LAN par défaut sans les modifier.
 - [x] Identifier le mode NAT sortant automatique et les règles WAN générées.
-- [ ] Vérifier les états des connexions/NAT réellement observés depuis le poste Windows, puis réaliser des essais de filtrage autorisé/refusé.
+- [x] Vérifier les états des connexions et une traduction NAT/PAT réellement observés depuis le poste Windows.
+- [ ] Réaliser des essais ciblés de filtrage autorisé/refusé, en préservant l'accès d'administration.
 - [ ] Installer Windows Server et préparer les services AD DS, DNS et DHCP.
 - [ ] Réaliser des tests de filtrage et des scénarios de dépannage.
 - [ ] Préparer les futurs VPN IPsec intersites.

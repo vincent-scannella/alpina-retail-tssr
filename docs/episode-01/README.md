@@ -6,6 +6,16 @@ Projet personnel TSSR — Vincent Scannella
 
 Statut : Organisation validée — 01/11/2026
 
+## Documents de référence — Épisode 01
+
+### Vue synthétique de l'organisation
+
+![Organisation ALPINA RETAIL](IMG_0878.png)
+
+### Dossier complet
+
+[Consulter l'organigramme et le dossier d'organisation (PDF)](Alpina_Retail_Organisation_Episode_01.pdf)
+
 ALPINA RETAIL est une entreprise fictive créée pour simuler un environnement informatique professionnel. Aucune infrastructure technique n’a encore été déployée.
 
 1. Contexte

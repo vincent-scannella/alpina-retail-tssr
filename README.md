@@ -1,4 +1,4 @@
-![Bannière ALPINA RETAIL](IMG_0869.png)
+=![Bannière ALPINA RETAIL](IMG_0869.png)
 
 
 🏢 ALPINA RETAIL — Projet Infrastructure TSSR
@@ -90,8 +90,8 @@ Chaque réalisation sera documentée selon une démarche professionnelle :
 * [x]	Définition de l’entreprise fictive
 * [x]	Choix des quatre implantations
 * [x]	Création du dépôt GitHub
-* [ ]	Organigramme et besoins utilisateurs
-* [ ]	Cahier des charges informatique
+* [x]	Organigramme et besoins utilisateurs
+* [x]	Cahier des charges informatique
 * [ ]	Architecture réseau et systèmes
 * [ ]	Déploiement de l’infrastructure
 * [ ]	Scénarios d’incidents et dépannage

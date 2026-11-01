@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 03 : Installation du pare-feu pfSense au siège de Grenoble
 
 > **Date :** 1er novembre 2026  
-> **Statut :** installation, redémarrage et configuration initiale vérifiés ; tests IP et DNS réussis depuis pfSense **et depuis un poste Windows 11 sur le LAN**. Accès à l'administration Web pfSense et changement du mot de passe administrateur confirmés ; navigation HTTPS vers `www.microsoft.com` validée depuis le client Windows ; règles LAN et NAT sortant automatique examinés ; **traduction NAT/PAT confirmée dans la table des états** ; premier test de blocage ICMP ciblé observé (ping `8.8.8.8` : 100 % de perte après activation). Vérifications HTTPS post-règle et journaux du pare-feu à poursuivre.  
+> **Statut :** installation, redémarrage et configuration initiale vérifiés ; tests IP et DNS réussis depuis pfSense **et depuis un poste Windows 11 sur le LAN**. Accès à l'administration Web pfSense et changement du mot de passe administrateur confirmés ; navigation HTTPS vers `www.microsoft.com` validée depuis le client Windows ; règles LAN et NAT sortant automatique examinés ; **traduction NAT/PAT confirmée dans la table des états** ; premier test de blocage ICMP ciblé observé (ping `8.8.8.8` : 100 % de perte après activation). Navigation HTTPS externe toujours fonctionnelle après application du blocage ICMP (confirmée par l'auteur) ; vérification des journaux du pare-feu à poursuivre.  
 > **Projet :** laboratoire personnel TSSR simulant une entreprise entièrement fictive.
 
 ## 1. Contexte et objectif
@@ -105,7 +105,8 @@ Le service DHCP du LAN sera ultérieurement assuré par Windows Server, conform�
 21. Consultation de **Firewall → NAT → Outbound** : mode **Automatic outbound NAT rule generation** sélectionné ; règles automatiques WAN incluant le réseau `10.10.10.0/24` observées, sans modification.
 22. Consultation de **Diagnostics → States** : observation simultanée des états LAN et WAN, dont une connexion TCP HTTPS établie dont l'adresse source et le port ont été traduits par pfSense (détails en section 5).
 23. Création et application d'une règle `Block` sur l'interface LAN, IPv4, protocole ICMP, sous-type `Echo request`, source `10.10.10.20`, destination `8.8.8.8`, placée **avant** la règle générale `Default allow LAN to any rule`. Règle de test réversible et ciblée.
-24. Exécution d'un nouveau `ping 8.8.8.8` depuis `PC-TEST-GRE` : des expirations de délai sont visibles sur capture et l'auteur confirme **100 % de perte** sur quatre requêtes, alors que le même test réussissait auparavant (4/4 reçues). Aucune vérification de journal de pare-feu ni de navigation HTTPS après application n'est encore consignée.
+24. Exécution d'un nouveau `ping 8.8.8.8` depuis `PC-TEST-GRE` : des expirations de délai sont visibles sur capture et l'auteur confirme **100 % de perte** sur quatre requêtes, alors que le même test réussissait auparavant (4/4 reçues). Aucune vérification des journaux du pare-feu n'est encore consignée.
+25. Après activation de la règle ICMP, réouverture de `https://www.microsoft.com` depuis `PC-TEST-GRE` : navigation HTTPS **toujours fonctionnelle**, résultat confirmé par l'auteur. Cette comparaison démontre le caractère ciblé du blocage dans ce scénario.
 
 ## 5. Tests et résultats observés
 
@@ -130,6 +131,7 @@ Le service DHCP du LAN sera ultérieurement assuré par Windows Server, conform�
 | Mode NAT sortant | **Automatic outbound NAT rule generation** sélectionné ; règles automatiques WAN visibles pour `10.10.10.0/24` |
 | Traduction NAT/PAT effectivement observée | **Confirmée** dans Diagnostics → States : `10.10.10.20:54138` (LAN) → `10.50.10.128:26027` (WAN), destination `98.66.133.185:443`, connexion TCP `ESTABLISHED:ESTABLISHED` |
 | Filtrage ICMP ciblé vers `8.8.8.8` depuis Windows | **Avant :** 4/4 réponses, 0 % de perte. **Après application de la règle :** expirations de délai visibles et **100 % de perte** confirmé par l'auteur. Contrôle des journaux à venir |
+| Navigation HTTPS après application de la règle ICMP | **Réussie :** `https://www.microsoft.com` continue à se charger depuis Windows 11, confirmé par l'auteur. Le blocage ICMP ciblé ne coupe pas les connexions HTTPS de ce test |
 
 ### Interprétation technique
 
@@ -149,7 +151,7 @@ Les durées et pertes chiffrées ci-dessus proviennent de la capture des sorties
 - **NAT sortant :** le mode automatique de pfSense est sélectionné. Les règles automatiques affichées sur le WAN comprennent le réseau LAN `10.10.10.0/24`, avec une règle particulière pour le port 500 et une règle générale vers l'adresse WAN.
 - **Topologie laboratoire :** pfSense réalise la traduction de source vers son WAN privé sur VMware VMnet8 ; VMware NAT assure ensuite l'accès vers le réseau extérieur. Il s'agit d'un scénario de double NAT en environnement virtuel, et non d'une adresse WAN publique pour pfSense.
 - **Observation directe de NAT/PAT :** la table **Diagnostics → States** affiche une connexion LAN `10.10.10.20:54138 → 98.66.133.185:443` et son état côté WAN `10.50.10.128:26027 (10.10.10.20:54138) → 98.66.133.185:443`. Les deux états sont `ESTABLISHED:ESTABLISHED` et présentent des compteurs de trafic. pfSense a traduit l'IP source privée du poste en son IP WAN privée et modifié le port source : preuve de NAT/PAT actif.
-- **Blocage ciblé ICMP :** règle `Block`, interface LAN, IPv4 ICMP `Echo request`, source `10.10.10.20`, destination `8.8.8.8`, placée avant les autorisations générales. Après son application, le ping depuis Windows présente une perte annoncée de 100 %, contre 0 % avant activation : résultat cohérent avec l'effet attendu du filtrage. La confirmation via les journaux, puis le contrôle du maintien de la navigation HTTPS, restent à réaliser.
+- **Blocage ciblé ICMP :** règle `Block`, interface LAN, IPv4 ICMP `Echo request`, source `10.10.10.20`, destination `8.8.8.8`, placée avant les autorisations générales. Après son application, le ping depuis Windows présente une perte annoncée de 100 %, contre 0 % avant activation : résultat cohérent avec l'effet attendu du filtrage. **Le chargement HTTPS de `www.microsoft.com` reste opérationnel après la règle**, ce qui confirme la sélectivité observée de ce test. La confirmation par les journaux pfSense reste à réaliser.
 - **Limites :** la table des états confirme NAT/PAT pour une connexion donnée, et la différence avant/après ICMP est observée, mais cela ne constitue pas un audit complet de la politique de filtrage. Le second NAT VMware demeure propre à l'architecture de laboratoire.
 
 ## 6. Limites de la validation
@@ -158,7 +160,7 @@ Les éléments suivants ne sont pas encore validés :
 
 - Vérification et traitement de l'avertissement de confiance du certificat HTTPS de l'interface Web pfSense (le certificat utilisé n'a pas encore été validé par une autorité de confiance sur Windows).
 - Navigation HTTP vers un site externe (seul HTTPS a été testé explicitement) ; contrôles complémentaires des comportements TLS/certificats selon les besoins.
-- Contrôle de la journalisation effective de la règle ICMP ciblée et vérification que la navigation HTTPS continue après son activation ; la perte de 100 % des requêtes ICMP a été constatée et confirmée.
+- Contrôle de la journalisation effective de la règle ICMP ciblée ; la perte de 100 % des requêtes ICMP et le maintien de la navigation HTTPS ont été confirmés par l'auteur.
 - Attribution DHCP par un futur serveur Windows.
 - VPN IPsec entre le siège et les boutiques.
 - Persistance d'autres paramètres de configuration après redémarrage (la persistance des adresses WAN/LAN a été observée).
@@ -179,7 +181,8 @@ Aucun test non réalisé n'est présenté comme réussi.
 - [x] Identifier le mode NAT sortant automatique et les règles WAN générées.
 - [x] Vérifier les états des connexions et une traduction NAT/PAT réellement observés depuis le poste Windows.
 - [x] Créer et appliquer une règle ICMP ciblée, puis constater l'échec du ping vers `8.8.8.8` (100 % de perte annoncée, contre 0 % avant règle).
-- [ ] Vérifier que la navigation HTTPS externe fonctionne toujours et consulter les logs de la règle ICMP pour corroborer son action.
+- [x] Vérifier que la navigation HTTPS externe fonctionne toujours après le blocage ICMP.
+- [ ] Consulter les logs de la règle ICMP pour corroborer le blocage.
 - [ ] Restaurer ou désactiver la règle temporaire lorsque le test sera terminé, selon le scénario de laboratoire.
 - [ ] Installer Windows Server et préparer les services AD DS, DNS et DHCP.
 - [ ] Réaliser des tests de filtrage et des scénarios de dépannage.

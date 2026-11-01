@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 03 : Installation du pare-feu pfSense au siège de Grenoble
 
 > **Date :** 1er novembre 2026  
-> **Statut :** installation et configuration initiale réalisées ; tests IP et DNS réussis depuis pfSense. Validation depuis le LAN à poursuivre.  
+> **Statut :** installation, redémarrage et configuration initiale vérifiés ; tests IP et DNS réussis depuis pfSense **et depuis un poste Windows 11 sur le LAN**. Administration Web, HTTP/HTTPS et services avancés à vérifier.  
 > **Projet :** laboratoire personnel TSSR simulant une entreprise entièrement fictive.
 
 ## 1. Contexte et objectif
@@ -53,8 +53,8 @@ Les ressources sont adaptées à un laboratoire personnel et ne constituent pas 
        VMnet1 — Host-only
           10.10.10.0/24
                  |
-       Futur client Windows
-        (non encore installé)
+       PC-TEST-GRE — Windows 11 Pro
+          10.10.10.20/24
 ```
 
 ### Configuration WAN
@@ -92,7 +92,12 @@ Le service DHCP du LAN sera ultérieurement assuré par Windows Server, conform�
 8. Configuration du LAN en `10.10.10.1/24`.
 9. Désactivation du DHCP pfSense sur le LAN.
 10. Réalisation des tests de connectivité.
-11. Arrêt propre de la VM après les vérifications.
+11. Arrêt propre de la VM après les premières vérifications.
+12. Redémarrage de pfSense et confirmation de la persistance des adresses WAN `10.50.10.128/24` (adresse observée lors du nouveau démarrage) et LAN `10.10.10.1/24`.
+13. Installation de Windows 11 Professionnel sur `PC-TEST-GRE` (VMnet1, 2 vCPU, 4 Go de RAM, disque virtuel de 64 Go).
+14. Création du compte local de laboratoire `tech.alpina`, sans divulgation du mot de passe.
+15. Configuration IPv4 statique de `PC-TEST-GRE` : `10.10.10.20/24`, passerelle `10.10.10.1`, DNS `10.10.10.1`.
+16. Vérification des communications LAN, WAN et DNS depuis Windows 11.
 
 ## 5. Tests et résultats observés
 
@@ -105,6 +110,11 @@ Le service DHCP du LAN sera ultérieurement assuré par Windows Server, conform�
 | Ping vers `8.8.8.8` depuis pfSense | Réussi |
 | Ping vers `www.google.com` depuis pfSense | Réussi |
 | Arrêt propre du système | Effectué |
+| Redémarrage et maintien des paramètres d'interface WAN/LAN | Réussi (adresses observées à nouveau dans la console) |
+| Installation Windows 11 Pro sur `PC-TEST-GRE` | Réussie |
+| Ping `10.10.10.1` depuis Windows 11 | **4 paquets envoyés, 4 reçus, 0 perdu (0 %) ; minimum 1 ms, maximum 6 ms, moyenne 2 ms** |
+| Ping `8.8.8.8` depuis Windows 11 | **4 paquets envoyés, 4 reçus, 0 perdu (0 %) ; minimum 19 ms, maximum 20 ms, moyenne 19 ms** |
+| `nslookup www.google.fr` depuis Windows 11 | **Réussi ; DNS interrogé : `pfSense.home.arpa` (`10.10.10.1`) ; réponses observées : `172.217.22.131` (IPv4) et `2a00:1450:4007:81b::2003` (IPv6)** |
 
 ### Interprétation technique
 
@@ -112,33 +122,34 @@ Le ping vers `8.8.8.8` confirme une connectivité IP sortante depuis pfSense ver
 
 Le ping vers `www.google.com` confirme également que la résolution DNS et la connectivité ICMP fonctionnaient au moment du test.
 
-**Attention :** ces tests ont été exécutés depuis pfSense et ne démontrent pas encore qu'un poste du LAN peut accéder à Internet à travers le pare-feu.
+**Mise à jour après déploiement du poste client :** les tests précédemment limités à pfSense sont désormais complétés par des vérifications effectuées **depuis Windows 11 sur VMnet1**. Les deux séries de ping depuis Windows ont réussi avec 0 % de perte sur quatre requêtes chacune. Le test DNS montre que la requête adressée au résolveur pfSense (`10.10.10.1`) retourne des adresses IPv4 et IPv6 pour `www.google.fr`.
 
-Aucun temps de réponse, taux de perte ou nombre de paquets n'est présenté, car ces mesures n'ont pas été consignées.
+**Portée :** ces tests attestent l'accessibilité ICMP de la passerelle et d'une destination extérieure ainsi que la résolution DNS au moment des mesures. Ils ne constituent pas un test de navigation HTTP/HTTPS, un audit complet des règles du pare-feu ni une vérification indépendante de la traduction NAT.
+
+Les durées et pertes chiffrées ci-dessus proviennent de la capture des sorties Windows fournie par l'auteur. Aucun secret n'est consigné.
 
 ## 6. Limites de la validation
 
 Les éléments suivants ne sont pas encore validés :
 
-- Connectivité IP depuis un poste client du LAN.
 - Accès à l'interface Web d'administration de pfSense.
 - Navigation HTTP/HTTPS depuis le LAN.
-- Routage et traduction NAT du trafic provenant du LAN.
-- Politique de filtrage et règles de pare-feu.
+- Vérification détaillée des règles de filtrage et de la traduction NAT (la connectivité ICMP externe est confirmée, mais aucun contrôle spécifique des états/NAT n'a été consigné).
 - Attribution DHCP par un futur serveur Windows.
 - VPN IPsec entre le siège et les boutiques.
-- Conservation de la configuration après redémarrage.
+- Persistance d'autres paramètres de configuration après redémarrage (la persistance des adresses WAN/LAN a été observée).
 
 Aucun test non réalisé n'est présenté comme réussi.
 
 ## 7. Prochaines étapes
 
-- [ ] Redémarrer pfSense et vérifier la persistance des paramètres.
-- [ ] Créer un poste client Windows connecté à VMnet1.
-- [ ] Configurer temporairement son adressage IPv4 statique.
-- [ ] Tester la communication avec `10.10.10.1`.
-- [ ] Accéder à l'interface Web de pfSense.
-- [ ] Vérifier la passerelle, la résolution DNS et l'accès Internet depuis le LAN.
+- [x] Redémarrer pfSense et vérifier la persistance de l'adressage WAN/LAN.
+- [x] Créer un poste client Windows 11 sur VMnet1.
+- [x] Configurer temporairement son adressage IPv4 statique (`10.10.10.20/24`).
+- [x] Tester la communication avec `10.10.10.1`.
+- [x] Vérifier la connectivité IP vers `8.8.8.8` et la résolution DNS depuis le LAN.
+- [ ] Accéder à l'interface Web de pfSense sur `https://10.10.10.1`.
+- [ ] Vérifier la navigation HTTP/HTTPS et, séparément, le comportement des règles/NAT depuis le LAN.
 - [ ] Installer Windows Server et préparer les services AD DS, DNS et DHCP.
 - [ ] Réaliser des tests de filtrage et des scénarios de dépannage.
 - [ ] Préparer les futurs VPN IPsec intersites.
@@ -152,7 +163,9 @@ Aucun test non réalisé n'est présenté comme réussi.
 - Adressage IPv4 statique et dynamique.
 - Identification des interfaces WAN et LAN.
 - Diagnostic de connectivité IP avec ICMP.
-- Vérification de la résolution DNS.
+- Vérification de la résolution DNS avec `nslookup` depuis Windows 11.
+- Vérification de la connectivité LAN et WAN depuis un client Windows avec `ping`, relevé du taux de perte et des latences.
+- Validation du redémarrage et de la persistance de l'adressage des interfaces.
 - Documentation technique et traçabilité des tests.
 
 ## 9. Références du projet

@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 03 : Installation du pare-feu pfSense au siège de Grenoble
 
 > **Date :** 1er novembre 2026  
-> **Statut :** installation, redémarrage et configuration initiale vérifiés ; tests IP et DNS réussis depuis pfSense **et depuis un poste Windows 11 sur le LAN**. Administration Web, HTTP/HTTPS et services avancés à vérifier.  
+> **Statut :** installation, redémarrage et configuration initiale vérifiés ; tests IP et DNS réussis depuis pfSense **et depuis un poste Windows 11 sur le LAN**. Accès à l'administration Web pfSense et changement du mot de passe administrateur confirmés ; navigation vers des sites externes, filtrage et services avancés à vérifier.  
 > **Projet :** laboratoire personnel TSSR simulant une entreprise entièrement fictive.
 
 ## 1. Contexte et objectif
@@ -98,6 +98,8 @@ Le service DHCP du LAN sera ultérieurement assuré par Windows Server, conform�
 14. Création du compte local de laboratoire `tech.alpina`, sans divulgation du mot de passe.
 15. Configuration IPv4 statique de `PC-TEST-GRE` : `10.10.10.20/24`, passerelle `10.10.10.1`, DNS `10.10.10.1`.
 16. Vérification des communications LAN, WAN et DNS depuis Windows 11.
+17. Accès depuis `PC-TEST-GRE` à la page de connexion Web pfSense sur `https://10.10.10.1`.
+18. Connexion réussie à l'administration pfSense et remplacement du mot de passe initial du compte `admin`, confirmé par le message de succès de l'interface. **Aucun mot de passe n'est stocké dans le dépôt.**
 
 ## 5. Tests et résultats observés
 
@@ -115,6 +117,8 @@ Le service DHCP du LAN sera ultérieurement assuré par Windows Server, conform�
 | Ping `10.10.10.1` depuis Windows 11 | **4 paquets envoyés, 4 reçus, 0 perdu (0 %) ; minimum 1 ms, maximum 6 ms, moyenne 2 ms** |
 | Ping `8.8.8.8` depuis Windows 11 | **4 paquets envoyés, 4 reçus, 0 perdu (0 %) ; minimum 19 ms, maximum 20 ms, moyenne 19 ms** |
 | `nslookup www.google.fr` depuis Windows 11 | **Réussi ; DNS interrogé : `pfSense.home.arpa` (`10.10.10.1`) ; réponses observées : `172.217.22.131` (IPv4) et `2a00:1450:4007:81b::2003` (IPv6)** |
+| Interface d'administration `https://10.10.10.1` depuis le client Windows | Page de connexion affichée, puis session authentifiée confirmée |
+| Remplacement du mot de passe de `admin` | Réussi : message « Password changed for user: admin » dans pfSense |
 
 ### Interprétation technique
 
@@ -132,8 +136,8 @@ Les durées et pertes chiffrées ci-dessus proviennent de la capture des sorties
 
 Les éléments suivants ne sont pas encore validés :
 
-- Accès à l'interface Web d'administration de pfSense.
-- Navigation HTTP/HTTPS depuis le LAN.
+- Vérification et traitement de l'avertissement de confiance du certificat HTTPS de l'interface Web pfSense (le certificat utilisé n'a pas encore été validé par une autorité de confiance sur Windows).
+- Navigation HTTP/HTTPS **vers des sites externes** depuis le LAN.
 - Vérification détaillée des règles de filtrage et de la traduction NAT (la connectivité ICMP externe est confirmée, mais aucun contrôle spécifique des états/NAT n'a été consigné).
 - Attribution DHCP par un futur serveur Windows.
 - VPN IPsec entre le siège et les boutiques.
@@ -148,7 +152,8 @@ Aucun test non réalisé n'est présenté comme réussi.
 - [x] Configurer temporairement son adressage IPv4 statique (`10.10.10.20/24`).
 - [x] Tester la communication avec `10.10.10.1`.
 - [x] Vérifier la connectivité IP vers `8.8.8.8` et la résolution DNS depuis le LAN.
-- [ ] Accéder à l'interface Web de pfSense sur `https://10.10.10.1`.
+- [x] Accéder à l'interface Web de pfSense sur `https://10.10.10.1` et se connecter.
+- [x] Remplacer le mot de passe d'origine du compte `admin` (aucun secret publié).
 - [ ] Vérifier la navigation HTTP/HTTPS et, séparément, le comportement des règles/NAT depuis le LAN.
 - [ ] Installer Windows Server et préparer les services AD DS, DNS et DHCP.
 - [ ] Réaliser des tests de filtrage et des scénarios de dépannage.
@@ -163,6 +168,7 @@ Aucun test non réalisé n'est présenté comme réussi.
 - Adressage IPv4 statique et dynamique.
 - Identification des interfaces WAN et LAN.
 - Diagnostic de connectivité IP avec ICMP.
+- Administration Web de pfSense en HTTPS et sécurisation de l'accès `admin`.
 - Vérification de la résolution DNS avec `nslookup` depuis Windows 11.
 - Vérification de la connectivité LAN et WAN depuis un client Windows avec `ping`, relevé du taux de perte et des latences.
 - Validation du redémarrage et de la persistance de l'adressage des interfaces.

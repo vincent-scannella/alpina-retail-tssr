@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 03 : Installation du pare-feu pfSense au siège de Grenoble
 
 > **Date :** 1er novembre 2026  
-> **Statut :** installation, redémarrage et configuration initiale vérifiés ; tests IP et DNS réussis depuis pfSense **et depuis un poste Windows 11 sur le LAN**. Accès à l'administration Web pfSense et changement du mot de passe administrateur confirmés ; navigation HTTPS vers `www.microsoft.com` validée depuis le client Windows ; filtrage, règles NAT et services avancés à vérifier.  
+> **Statut :** installation, redémarrage et configuration initiale vérifiés ; tests IP et DNS réussis depuis pfSense **et depuis un poste Windows 11 sur le LAN**. Accès à l'administration Web pfSense et changement du mot de passe administrateur confirmés ; navigation HTTPS vers `www.microsoft.com` validée depuis le client Windows ; règles LAN et NAT sortant automatique observés dans l'interface ; vérification des traductions actives et tests de filtrage encore à réaliser.  
 > **Projet :** laboratoire personnel TSSR simulant une entreprise entièrement fictive.
 
 ## 1. Contexte et objectif
@@ -100,7 +100,9 @@ Le service DHCP du LAN sera ultérieurement assuré par Windows Server, conform�
 16. Vérification des communications LAN, WAN et DNS depuis Windows 11.
 17. Accès depuis `PC-TEST-GRE` à la page de connexion Web pfSense sur `https://10.10.10.1`.
 18. Connexion réussie à l'administration pfSense et remplacement du mot de passe initial du compte `admin`, confirmé par le message de succès de l'interface. **Aucun mot de passe n'est stocké dans le dépôt.**
-19. Vérification depuis `PC-TEST-GRE` de l'affichage du site externe `https://www.microsoft.com` dans Microsoft Edge (résultat confirmé par l'auteur ; pas de mesure de performance consignées).
+19. Vérification depuis `PC-TEST-GRE` de l'affichage du site externe `https://www.microsoft.com` dans Microsoft Edge (résultat confirmé par l'auteur ; pas de mesure de performance consignée).
+20. Consultation de **Firewall → Rules → LAN** : règles anti-lockout et autorisations LAN vers toute destination en IPv4 et IPv6 observées, sans modification.
+21. Consultation de **Firewall → NAT → Outbound** : mode **Automatic outbound NAT rule generation** sélectionné ; règles automatiques WAN incluant le réseau `10.10.10.0/24` observées, sans modification.
 
 ## 5. Tests et résultats observés
 
@@ -121,6 +123,8 @@ Le service DHCP du LAN sera ultérieurement assuré par Windows Server, conform�
 | Interface d'administration `https://10.10.10.1` depuis le client Windows | Page de connexion affichée, puis session authentifiée confirmée |
 | Remplacement du mot de passe de `admin` | Réussi : message « Password changed for user: admin » dans pfSense |
 | Navigation vers `https://www.microsoft.com` depuis `PC-TEST-GRE` | Réussie, confirmée par l'auteur ; aucune mesure HTTP détaillée fournie |
+| Consultation des règles de filtrage LAN | Anti-lockout, autorisation LAN IPv4 vers toutes destinations, et autorisation LAN IPv6 vers toutes destinations : présentes dans l'interface |
+| Mode NAT sortant | **Automatic outbound NAT rule generation** sélectionné ; règles automatiques WAN visibles pour `10.10.10.0/24`. Traductions effectives par connexion non encore observées |
 
 ### Interprétation technique
 
@@ -134,13 +138,20 @@ Le ping vers `www.google.com` confirme également que la résolution DNS et la c
 
 Les durées et pertes chiffrées ci-dessus proviennent de la capture des sorties Windows fournie par l'auteur. Aucun secret n'est consigné.
 
+### Observation du filtrage et du NAT (sans modification)
+
+- **Règles LAN :** la règle anti-lockout préserve les accès d'administration pfSense en HTTP/HTTPS depuis le LAN ; les règles « Default allow LAN to any » et « Default allow LAN IPv6 to any » sont présentes. La politique LAN initiale est permissive ; une segmentation et des règles minimales adaptées aux usages métiers seront étudiées ultérieurement.
+- **NAT sortant :** le mode automatique de pfSense est sélectionné. Les règles automatiques affichées sur le WAN comprennent le réseau LAN `10.10.10.0/24`, avec une règle particulière pour le port 500 et une règle générale vers l'adresse WAN.
+- **Topologie laboratoire :** pfSense réalise la traduction de source vers son WAN privé sur VMware VMnet8 ; VMware NAT assure ensuite l'accès vers le réseau extérieur. Il s'agit d'un scénario de double NAT en environnement virtuel, et non d'une adresse WAN publique pour pfSense.
+- **Limite :** ces captures confirment des **règles configurées** et des **communications fonctionnelles**, mais ne constituent pas une capture du paquet traduit ni une consultation des états en cours pour le client. Aucun test de règle de refus n'a encore été effectué.
+
 ## 6. Limites de la validation
 
 Les éléments suivants ne sont pas encore validés :
 
 - Vérification et traitement de l'avertissement de confiance du certificat HTTPS de l'interface Web pfSense (le certificat utilisé n'a pas encore été validé par une autorité de confiance sur Windows).
 - Navigation HTTP vers un site externe (seul HTTPS a été testé explicitement) ; contrôles complémentaires des comportements TLS/certificats selon les besoins.
-- Vérification détaillée des règles de filtrage et de la traduction NAT (la connectivité ICMP externe est confirmée, mais aucun contrôle spécifique des états/NAT n'a été consigné).
+- Contrôle des **états actifs / traductions NAT réellement utilisées** pour le client Windows, puis élaboration et tests de règles de filtrage adaptées ; seules les règles configurées ont été examinées.
 - Attribution DHCP par un futur serveur Windows.
 - VPN IPsec entre le siège et les boutiques.
 - Persistance d'autres paramètres de configuration après redémarrage (la persistance des adresses WAN/LAN a été observée).
@@ -157,7 +168,9 @@ Aucun test non réalisé n'est présenté comme réussi.
 - [x] Accéder à l'interface Web de pfSense sur `https://10.10.10.1` et se connecter.
 - [x] Remplacer le mot de passe d'origine du compte `admin` (aucun secret publié).
 - [x] Vérifier la navigation HTTPS vers `https://www.microsoft.com` depuis le LAN.
-- [ ] Examiner les règles du pare-feu sur le LAN et vérifier les traductions NAT ; réaliser des essais de filtrage autorisé/refusé.
+- [x] Examiner les règles LAN par défaut sans les modifier.
+- [x] Identifier le mode NAT sortant automatique et les règles WAN générées.
+- [ ] Vérifier les états des connexions/NAT réellement observés depuis le poste Windows, puis réaliser des essais de filtrage autorisé/refusé.
 - [ ] Installer Windows Server et préparer les services AD DS, DNS et DHCP.
 - [ ] Réaliser des tests de filtrage et des scénarios de dépannage.
 - [ ] Préparer les futurs VPN IPsec intersites.
@@ -172,6 +185,7 @@ Aucun test non réalisé n'est présenté comme réussi.
 - Identification des interfaces WAN et LAN.
 - Diagnostic de connectivité IP avec ICMP.
 - Administration Web de pfSense en HTTPS et sécurisation de l'accès `admin`.
+- Lecture des règles de pare-feu IPv4/IPv6 et reconnaissance du NAT sortant automatique dans une architecture double NAT de laboratoire.
 - Vérification de la résolution DNS avec `nslookup` depuis Windows 11.
 - Vérification de la connectivité LAN et WAN depuis un client Windows avec `ping`, relevé du taux de perte et des latences.
 - Validation du redémarrage et de la persistance de l'adressage des interfaces.

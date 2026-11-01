@@ -9,6 +9,12 @@ Projet personnel de Vincent Scannella — Technicien Supérieur Systèmes et Ré
 
 ⚠️ ALPINA RETAIL est une entreprise entièrement fictive, créée dans un objectif de formation, de mise en pratique et de démonstration de compétences professionnelles.
 
+## 📚 Journal de bord
+
+- **Épisode 00 — Lancement du projet** : présentation générale (cette page).
+- **Épisode 01 — Organisation et organigramme** : [Consulter les livrables](docs/episode-01/README.md).
+- **Épisode 02 — Cahier des charges informatique** : à venir.
+
 🎯 Présentation du projet
 
 ALPINA RETAIL est une enseigne fictive spécialisée dans le prêt-à-porter et les accessoires.

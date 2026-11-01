@@ -1,3 +1,6 @@
+![Bannière ALPINA RETAIL](IMG_0869.png)
+
+
 🏢 ALPINA RETAIL — Projet Infrastructure TSSR
 
 Conception, déploiement et administration d’une infrastructure informatique multisite.

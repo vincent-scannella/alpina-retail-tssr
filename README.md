@@ -13,7 +13,7 @@ Projet personnel de Vincent Scannella — Technicien Supérieur Systèmes et Ré
 
 - **Épisode 00 — Lancement du projet** : présentation générale (cette page).
 - **Épisode 01 — Organisation et organigramme** : [Consulter les livrables](docs/episode-01/README.md).
-- **Épisode 02 — Cahier des charges informatique** : à venir.
+- **Épisode 02 — Cahier des charges informatique** : [Consulter les livrables](docs/episode-02/README.md).
 
 🎯 Présentation du projet
 

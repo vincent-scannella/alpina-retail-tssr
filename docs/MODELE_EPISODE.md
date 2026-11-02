@@ -20,7 +20,7 @@
 
 **Sommaire :** insérer des liens vers les sections réellement présentes après vérification de leurs ancres sur GitHub.
 
-**Navigation :** [Accueil](../../README.md) · [Épisode précédent : XX](../episode-XX/README.md) · [Épisode suivant : XX, uniquement après sa création]
+**Navigation à adapter après copie :** ajouter des liens vers l'accueil (`../../README.md`), l'épisode précédent (`../episode-NN/README.md`) et l'épisode suivant uniquement après sa création. *Aucun lien de remplacement ne doit rester actif dans le gabarit.*
 
 ## 1. Besoin et objectif
 
@@ -92,10 +92,10 @@ Préciser le lien entre les tâches réellement documentées et les compétences
 
 ## 9. Références et navigation
 
-- [Retour à l'accueil du portfolio](../../README.md)
-- [Épisode précédent, si son document existe]
-- [Épisode suivant, seulement s'il existe déjà]
-- [Inventaire des captures, si créé]
+- Accueil : utiliser le chemin `../../README.md` **après copie dans le dossier d'épisode**.
+- Épisode précédent : lien Markdown uniquement si son README existe.
+- Épisode suivant : lien Markdown uniquement si l'épisode est effectivement créé.
+- Inventaire des captures : lier `images/README.md` lorsqu'il est publié.
 
 ---
 

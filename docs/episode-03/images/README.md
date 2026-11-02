@@ -2,7 +2,7 @@
 
 Les fichiers de ce dossier distinguent **captures authentiques**, **schémas explicatifs** et **photos en attente de publication**. Aucun diagramme n'est présenté comme une capture pfSense.
 
-## 5 captures authentiques déjà publiées
+## 5 captures authentiques — sauvegarde pfSense
 
 | Fichier présent | Preuve réellement visible |
 |---|---|
@@ -23,18 +23,18 @@ Ces cinq captures sont **présentes dans GitHub** et insérées dans [le README 
 
 **Ces deux SVG sont des schémas rédigés à partir des observations déjà consignées. Ils ne constituent pas des captures d'écran ni une nouvelle mesure du laboratoire.**
 
-## 3 photos authentiques récupérées — téléversement en attente
+## 3 captures authentiques supplémentaires — NAT/PAT et filtrage ICMP
 
-Les écrans d'origine ont été retrouvés **dans le carrousel LinkedIn local de l'épisode 03** et recadrés sur la zone technique sans modification des résultats affichés :
+Ces écrans proviennent des captures authentiques sélectionnées pour le carrousel LinkedIn de l'épisode 03 et sont intégrés au suivi technique sans modification de leurs résultats :
 
-| Nom prévu après téléversement | Limite de la preuve |
+| Fichier publié | Limite de la preuve |
 |---|---|
 | `08-pfsense-diagnostics-states-nat-pat.png` | Vue réelle `Diagnostics → States` avec la connexion TCP et les deux ports source |
 | `09-pfsense-regle-icmp-avant-application.png` | Règle `Block` visible sur le LAN, **avant `Apply Changes`** : ne prouve pas à elle seule son activation |
 | `10-windows11-ping-icmp-bloque.png` | Invite Windows avec plusieurs expirations du ping `8.8.8.8` ; le compteur final de perte n'est pas visible sur ce recadrage |
 
-**Ces trois PNG ne sont pas encore présents dans GitHub et ne sont donc pas intégrés comme images au README principal.**
+**Ces trois PNG sont maintenant présents dans GitHub et intégrés dans le [README principal](../README.md), accompagnés de légendes adaptées à leurs limites.**
 
-Pour les ajouter : extraire les **trois PNG** de l'archive fournie dans la conversation, ouvrir ce dossier sur GitHub, puis **Add file → Upload files → Commit changes**. Après contrôle de leur présence, les insérer dans l'[épisode 03](../README.md) près des schémas correspondants, avec une légende fidèle à ce qu'elles montrent.
+**État documentaire :** 8 captures PNG authentiques et 2 diagrammes SVG pédagogiques sont présents dans ce dossier et intégrés au [README de l'épisode 03](../README.md). Les images 09 et 10 documentent respectivement une règle avant son application et des expirations de ping, mais ne suffisent pas à établir une preuve par journal du pare-feu.
 
 **Sécurité :** ne jamais publier la sauvegarde XML de pfSense, son mot de passe, des cookies, des secrets d'administration ou des données privées.

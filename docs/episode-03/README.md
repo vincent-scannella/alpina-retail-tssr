@@ -293,8 +293,10 @@ Aucun test non réalisé n'est présenté comme réussi.
 
 ## 9. Références du projet
 
+- [Retour au portfolio ALPINA RETAIL](../../README.md)
 - [Épisode 02 — Cahier des charges informatique](../episode-02/README.md)
-- [Retour à la présentation générale](../../README.md)
+- [Épisode 04 — Windows Server 2025, AD DS, DNS et DHCP](../episode-04/README.md)
+- [Inventaire des captures réelles et des schémas de cet épisode](images/README.md)
 
 ---
 

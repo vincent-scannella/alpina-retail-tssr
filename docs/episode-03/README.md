@@ -8,14 +8,14 @@
 
 | Compétence | Résultat effectivement rapporté | Preuve disponible |
 |---|---|---|
-| Réseau LAN / WAN | WAN DHCP sur VMware NAT, LAN pfSense `10.10.10.1/24`, communication Windows 11 et Internet vérifiées | Sorties et résultats consignés dans cette documentation ; captures réseau d'origine à compléter sur GitHub |
-| NAT/PAT | Translation TCP HTTPS `10.10.10.20:54138` → `10.50.10.128:26027` constatée dans la table des états | Relevé documenté et [schéma explicatif](images/06-schema-nat-pat-observe.svg) ; photographie authentique récupérée, en attente de dépôt |
-| Filtrage ICMP | Ping vers `8.8.8.8` : réussi initialement, échec après règle `Block`, puis retour du ping après suppression ; HTTPS encore accessible pendant le test | [Chronologie illustrée](images/07-schema-filtrage-icmp-avant-apres.svg) ; photos de la règle et du ping récupérées, en attente de dépôt ; aucune trace de journal confirmée |
+| Réseau LAN / WAN | WAN DHCP sur VMware NAT, LAN pfSense `10.10.10.1/24`, communication Windows 11 et Internet vérifiées | Sorties et résultats consignés dans cette documentation ; les captures NAT/PAT et ICMP figurent plus bas |
+| NAT/PAT | Translation TCP HTTPS `10.10.10.20:54138` → `10.50.10.128:26027` constatée dans la table des états | [Capture authentique des états](images/08-pfsense-diagnostics-states-nat-pat.png) et [schéma explicatif](images/06-schema-nat-pat-observe.svg) |
+| Filtrage ICMP | Ping vers `8.8.8.8` : réussi initialement, échec après règle `Block`, puis retour du ping après suppression ; HTTPS encore accessible pendant le test | [Capture de la règle](images/09-pfsense-regle-icmp-avant-application.png), [ping en échec](images/10-windows11-ping-icmp-bloque.png) et [schéma de chronologie](images/07-schema-filtrage-icmp-avant-apres.svg) ; aucune trace de journal confirmée |
 | Sauvegarde pfSense | Export XML avec chiffrement activé, copie sur le PC hôte | **5 captures authentiques déjà présentes** dans la section sauvegarde ; intégrité et restauration non testées |
 
 **Accès rapide :** [Architecture](#3-architecture-réseau) · [Installation](#4-installation-et-configuration-réalisées) · [Résultats](#5-tests-et-résultats-observés) · [Limites](#6-limites-de-la-validation) · [Suite du projet](../episode-04/README.md)
 
-**À lire :** les deux schémas vectoriels sont des **représentations pédagogiques des résultats notés**, pas des captures de pfSense. Les photographies authentiques récupérées de l'ancien carrousel n'ont pas encore été déposées dans GitHub ; seules les cinq captures de sauvegarde y figurent actuellement.
+**À lire :** les deux schémas vectoriels sont des **représentations pédagogiques** des résultats notés, pas des captures d'écran. Les **8 PNG authentiques** (5 sur la sauvegarde, 3 sur NAT/PAT et ICMP) sont désormais publiés dans le dépôt et contextualisés plus bas.
 
 ## 1. Contexte et objectif
 
@@ -191,7 +191,27 @@ Les durées et pertes chiffrées ci-dessus proviennent de la capture des sorties
 
 *Schéma explicatif, **pas une capture d'écran**. Avant la règle : 0 % de perte sur 4 requêtes. Pendant : 100 % de perte confirmé par l'auteur ; une photographie montre des expirations de délai, sans compteur final complet. Après suppression : ping rétabli, mais sans relevé chiffré. La navigation HTTPS restait disponible pendant le filtrage.*
 
-**Photographies authentiques complémentaires récupérées pour publication :** une vue de `Diagnostics → States` (NAT/PAT), une vue des règles LAN **avant clic sur « Apply Changes »**, et une invite de commandes Windows avec les messages de délai dépassé. Ces trois fichiers seront insérés ici **uniquement après vérification de leur téléversement** dans `images/`. La vue des règles avant application ne constitue pas à elle seule la preuve de l'activation de la règle ; le résultat du test ICMP est décrit séparément.
+#### Captures authentiques du laboratoire — NAT/PAT et ICMP
+
+**1. Traduction NAT/PAT effectivement observée dans pfSense**
+
+![Capture réelle de Diagnostics States : session TCP et adresses/ports source LAN et WAN](images/08-pfsense-diagnostics-states-nat-pat.png)
+
+*Capture authentique — `Diagnostics → States` : la connexion TCP HTTPS documentée montre les côtés LAN et WAN de la traduction de source. Les ports précis et l'état de la connexion sont détaillés dans le tableau de résultats ci-dessus. L'image ne permet pas de démontrer à elle seule le second NAT réalisé par VMware.*
+
+**2. Règle de blocage ICMP préparée sur le LAN**
+
+![Capture réelle pfSense Firewall Rules : règle Block ICMP sur l'interface LAN avant application des modifications](images/09-pfsense-regle-icmp-avant-application.png)
+
+*Capture authentique — règle ciblée `Block` destinée aux requêtes ICMP Echo de `10.10.10.20` vers `8.8.8.8`. L'écran a été capturé **avant validation par « Apply Changes »** : il documente la règle préparée, pas son application effective.*
+
+**3. Ping Windows 11 en échec après activation de la règle**
+
+![Capture réelle de l'invite de commandes Windows 11 : expirations de délai sur ping 8.8.8.8](images/10-windows11-ping-icmp-bloque.png)
+
+*Capture authentique — `PC-TEST-GRE` affiche plusieurs délais d'attente lors du ping vers `8.8.8.8`. La capture recadrée **ne montre pas le compteur final des pertes** ; le bilan de 100 % de perte sur quatre requêtes provient de la confirmation donnée durant la manipulation. Le ping a été déclaré rétabli après la suppression de la règle, sans capture chiffrée de ce dernier contre-test.*
+
+**Portée des preuves :** ces trois PNG complètent les deux schémas pédagogiques. Aucune trace de journal du blocage n'a été capturée ; il ne faut donc pas prétendre que le mécanisme a été confirmé dans les logs du pare-feu.
 
 ### Sauvegarde de configuration — conservation hors dépôt public
 
@@ -272,7 +292,7 @@ Aucun test non réalisé n'est présenté comme réussi.
 - [ ] Préparer les futurs VPN IPsec intersites.
 - [x] Ajouter cinq captures authentiques et contextualisées du scénario de sauvegarde pfSense.
 - [x] Créer deux schémas pédagogiques fondés sur les données observées : traduction NAT/PAT et scénario ICMP avant/pendant/après.
-- [ ] Téléverser les trois photographies authentiques récupérées (états NAT/PAT, règle ICMP avant application et ping bloqué) puis les intégrer avec des légendes précisant leur portée.
+- [x] Téléverser et intégrer les trois captures authentiques NAT/PAT, règle ICMP avant application et ping bloqué, chacune avec une légende précisant la portée de la preuve.
 - [ ] Ajouter ultérieurement les autres captures d'installation, de connectivité et de tests réseau si les originaux sont disponibles et sans données sensibles.
 
 ## 8. Compétences TSSR mobilisées

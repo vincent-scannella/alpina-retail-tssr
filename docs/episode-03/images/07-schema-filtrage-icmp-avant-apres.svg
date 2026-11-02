@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="647" viewBox="0 0 1240 647" role="img" aria-labelledby="tit desc">
+<title id="tit">Filtrage ICMP : test réversible</title><desc id="desc">Comparaison des résultats du poste Windows avant, pendant et après la règle pfSense</desc>
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#071422"/><stop offset=".5" stop-color="#12283e"/><stop offset="1" stop-color="#0b1a2b"/></linearGradient><style>text{font-family:"Segoe UI",Arial,sans-serif;letter-spacing:.12px}</style><marker id="arrow" markerWidth="13" markerHeight="13" refX="10" refY="6" orient="auto"><path d="M2 2 L11 6 L2 10" stroke="#5fd2e2" fill="none" stroke-width="2"/></marker></defs>
+<rect width="1240" height="647" fill="url(#bg)"/><rect x="0" y="0" width="1240" height="6" fill="#40d2e8"/>
+<text x="52" y="50" fill="#56d9eb" font-size="16" font-weight="750" text-anchor="start">ALPINA RETAIL  /  ÉPISODE 03 · PFSENSE</text>
+<text x="52" y="101" fill="#f4fdff" font-size="34" font-weight="750" text-anchor="start">Filtrage ICMP : test réversible</text>
+<text x="52" y="136" fill="#aac7d8" font-size="17" font-weight="450" text-anchor="start">Comparaison des résultats du poste Windows avant, pendant et après la règle pfSense</text>
+<line x1="52" y1="159" x2="1188" y2="159" stroke="#2c4d65" stroke-width="1.5"/>
+
+<rect x="50" y="220" width="356" height="244" rx="18" fill="#143149" stroke="#437b95" stroke-width="2"/>
+<text x="75" y="262" fill="#66dae9" font-size="18" font-weight="720" text-anchor="start">01  ·  AVANT LA RÈGLE</text>
+<text x="75" y="320" fill="#f5faff" font-size="28" font-weight="760" text-anchor="start">PING AUTORISÉ</text>
+<text x="75" y="363" fill="#ecf7ff" font-size="18" font-weight="500" text-anchor="start">8.8.8.8 depuis PC-TEST-GRE</text>
+<text x="75" y="406" fill="#9ae6d0" font-size="23" font-weight="700" text-anchor="start">4 / 4 réponses</text>
+<text x="75" y="436" fill="#9ae6d0" font-size="21" font-weight="650" text-anchor="start">0 % de perte</text>
+<path d="M411 342 H438" stroke="#58d3e5" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="443" y="220" width="356" height="244" rx="18" fill="#3a2b2c" stroke="#a46a64" stroke-width="2"/>
+<text x="469" y="262" fill="#ffd49c" font-size="18" font-weight="720" text-anchor="start">02  ·  RÈGLE BLOCK ICMP</text>
+<text x="469" y="320" fill="#fcf9f6" font-size="28" font-weight="760" text-anchor="start">PING BLOQUÉ</text>
+<text x="469" y="362" fill="#ecf7ff" font-size="18" font-weight="500" text-anchor="start">Source .20 vers 8.8.8.8</text>
+<text x="469" y="405" fill="#ffc48c" font-size="23" font-weight="700" text-anchor="start">100 % de perte</text>
+<text x="469" y="435" fill="#dbede7" font-size="18" font-weight="560" text-anchor="start">HTTPS externe toujours OK</text>
+<path d="M807 342 H837" stroke="#58d3e5" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="843" y="220" width="345" height="244" rx="18" fill="#143149" stroke="#437b95" stroke-width="2"/>
+<text x="868" y="262" fill="#66dae9" font-size="18" font-weight="720" text-anchor="start">03  ·  RÈGLE SUPPRIMÉE</text>
+<text x="868" y="320" fill="#f5faff" font-size="28" font-weight="760" text-anchor="start">PING RÉTABLI</text>
+<text x="868" y="365" fill="#ecf7ff" font-size="17" font-weight="500" text-anchor="start">Nouvelle vérification positive</text>
+<text x="868" y="405" fill="#9ae6d0" font-size="22" font-weight="700" text-anchor="start">Succès confirmé</text>
+<text x="868" y="435" fill="#bacfdf" font-size="16" font-weight="470" text-anchor="start">Sans compteur détaillé fourni</text>
+<rect x="50" y="494" width="1138" height="91" rx="16" fill="#172e41" stroke="#3c5e73" stroke-width="2"/>
+<text x="76" y="528" fill="#edf7ff" font-size="19" font-weight="570" text-anchor="start">Règle testée : LAN · IPv4 ICMP Echo request · source 10.10.10.20 · destination 8.8.8.8</text>
+<text x="76" y="560" fill="#e8cfa1" font-size="17" font-weight="540" text-anchor="start">Limite : pas de journal de blocage confirmé, car la journalisation de la règle n'avait pas été activée.</text>
+
+<text x="52" y="619" fill="#e8ce98" font-size="15" font-weight="600" text-anchor="start">SCHÉMA EXPLICATIF issu des observations documentées · CE N'EST PAS UNE CAPTURE D'ÉCRAN</text>
+</svg>

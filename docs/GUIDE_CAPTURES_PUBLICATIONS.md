@@ -18,12 +18,12 @@
 - Privilégier quelques captures réellement utiles plutôt que de nombreuses images redondantes.
 - Conserver la documentation textuelle, les commandes et les conclusions : **une capture ne remplace pas une explication**.
 
-Exemple d'intégration, après ajout effectif du fichier image :
+Exemple de syntaxe basé sur un fichier **réellement présent** dans notre dépôt (dans ce cas, depuis le dossier `docs/`) :
 
 ```md
-![Résultat du test DNS depuis Windows 11](images/win11-test-dns.png)
+![Options d'étendue DHCP 003, 006 et 015 sur DC1](episode-04/images/22-dhcp-options-passerelle-dns-domaine.png)
 
-*PC-TEST-GRE — résolution DNS effectuée à travers le résolveur pfSense du LAN.*
+*DC1-GRE-SIEGE — passerelle 10.10.10.1, DNS 10.10.10.10 et suffixe ironman.test vérifiés dans la console DHCP.*
 ```
 
 ## 3. LinkedIn : sélection pédagogique
@@ -74,3 +74,48 @@ Cette règle s'applique **à chaque futur épisode**, y compris pendant les phas
 **Calendrier :** la publication pfSense/Windows 11 de l'épisode 03 est déjà programmée pour le **10 novembre 2026 à 12 h 15**. Pour l'épisode 04, ne fixer une nouvelle date que lorsque le contenu, les preuves visuelles et le diagnostic auront été validés ; éviter un chevauchement inutile avec la publication programmée.
 
 **Images de l'épisode 04 :** **23 captures authentiques** vérifiées dans `docs/episode-04/images/` et toutes intégrées dans le README de l'épisode, dont les comparaisons DNS avant/après et la configuration de l'étendue DHCP. La prochaine preuve attendue est l'obtention d'un bail DHCP par `PC-TEST-GRE`, puis les tests de domaine côté client.
+
+## 7. Standard permanent de mise en page — tous les prochains épisodes
+
+Le **modèle de référence**, à copier puis adapter, est [`docs/MODELE_EPISODE.md`](MODELE_EPISODE.md). **Ne jamais modifier un épisode historique simplement pour lui ajouter une fonction encore non testée :** les évolutions doivent être horodatées et rattachées au bon épisode.
+
+### Structure éditoriale commune
+
+1. **Un seul titre principal `#`** : `ALPINA RETAIL — Épisode XX : [sujet]`, sans promesse marketing.
+2. **En-tête court** : date des opérations, périmètre du laboratoire, statut réellement atteint. Ne pas coller une longue chronologie dans le bloc de statut.
+3. **Section « En bref »** immédiatement après : tableau *service / résultat réel / limite ou test restant*. La première lecture doit permettre à un recruteur de comprendre le périmètre en moins d'une page.
+4. **Sommaire avec ancres vérifiées**, puis **navigation** vers l'accueil, l'épisode précédent et le suivant **seulement s'il existe**.
+5. **Corps technique** : besoin → architecture → configuration chronologique → commandes ou tests → diagnostic/contre-test → limites → captures → prochaines étapes.
+6. **Tableaux Markdown réels**, titres hiérarchisés, listes de longueur raisonnable, commandes en blocs de code et vocabulaire technique clair. Préférer une synthèse avant un journal détaillé quand la documentation devient longue.
+7. **Navigation finale** et liens directs vers les captures, la documentation précédente et les références pertinentes.
+
+### Différencier trois types de visuels
+
+- **Capture réelle** : preuve de configuration ou de résultat, issue du laboratoire. Nom descriptif, légende fidèle et localisation près du test concerné.
+- **Schéma explicatif** : SVG/diagramme créé pour aider à comprendre un réseau, une procédure ou un incident. La légende mentionne qu'il ne prouve **pas** qu'un service a été exécuté.
+- **Capture préparée ou transmise** : ne devient une image « publiée » **qu'après** vérification de son existence dans la branche `main`. Avant cela, écrire **« capture en attente »**.
+
+Par exemple, **« étendue DHCP active »** ne signifie pas **« bail DHCP attribué au client »** ; de même, **« règle ICMP visible avant Apply Changes »** ne démontre pas son application.
+
+### Journal de publication et maintenance
+
+- Mettre à jour la documentation **au moment d'un jalon technique vérifié** ; éviter les commits trompeurs pour chaque clic dans un assistant.
+- Ajouter, corriger ou compléter les pages déjà publiées sans supprimer l'historique des résultats réellement observés, ni masquer une panne.
+- Lorsqu'un épisode a évolué après sa date initiale, distinguer **l'état à l'époque** et **les validations ultérieures** ; ne pas rétroprojeter un nouveau serveur ou un nouveau réseau dans la topologie passée.
+- Pour les publications LinkedIn : choisir **2 à 4 captures techniques pertinentes**, vérifier leur lisibilité et leur fidélité, et publier à un jalon significatif sans chevaucher les publications déjà programmées.
+- Les liens personnels ou externes peuvent changer ; les vérifier avant réutilisation dans des posts ou documents de candidature.
+
+## 8. Liste de contrôle qualité avant chaque publication GitHub
+
+- [ ] **Exactitude** : date, nom de VM, interfaces, réseau, rôles et commandes conformes aux observations.
+- [ ] **Tests** : chaque succès mentionné possède un résultat identifiable ; les étapes « configuré », « actif », « vérifié côté client » sont distinguées.
+- [ ] **Diagnostic** : lorsqu'une panne est décrite, hypothèse, fait constaté, correction et contre-test ne sont pas confondus.
+- [ ] **Confidentialité** : aucun secret, mot de passe, jeton, export de configuration ou donnée personnelle dans le README, le code, les captures et les éventuelles métadonnées.
+- [ ] **Images** : aucun lien vers une image manquante ; captures authentiques et schémas pédagogiques clairement distingués ; légendes exactes.
+- [ ] **Lisibilité** : un titre `#`, sommaire utilisable, tableau « En bref », titres cohérents, commandes formatées, navigation.
+- [ ] **Liens** : vérifier que toutes les images/PDF et les cibles Markdown internes existent sur `main` ; contrôler les ancres.
+- [ ] **Synchronisation** : mise à jour du README de l'épisode, de l'inventaire `images/README.md` et du portfolio d'accueil si le statut ou le nombre de preuves change.
+- [ ] **Publication** : procéder au commit, **relire le document après enregistrement** et signaler honnêtement toute vérification de rendu non réalisée.
+- [ ] **Continuité** : inscrire le prochain test concret et l'état des preuves pour une reprise sans ambiguïté.
+
+**Règle du projet :** appliquer ces critères à **chaque nouvel épisode**. Tout écart volontaire doit être justifié dans le compte rendu, plutôt que de sacrifier l'exactitude pour le visuel.

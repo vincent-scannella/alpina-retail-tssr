@@ -1,8 +1,21 @@
 # ALPINA RETAIL — Épisode 03 : Installation du pare-feu pfSense au siège de Grenoble
 
-> **Date :** 1er novembre 2026  
-> **Statut :** installation, redémarrage et configuration initiale vérifiés ; tests IP et DNS réussis depuis pfSense **et depuis un poste Windows 11 sur le LAN**. Accès à l'administration Web pfSense et changement du mot de passe administrateur confirmés ; navigation HTTPS vers `www.microsoft.com` validée depuis le client Windows ; règles LAN et NAT sortant automatique examinés ; **traduction NAT/PAT confirmée dans la table des états** ; premier test de blocage ICMP ciblé observé (ping `8.8.8.8` : 100 % de perte après activation). Navigation HTTPS externe toujours fonctionnelle après blocage ICMP, puis **rétablissement du ping après suppression de la règle temporaire** (confirmé par l'auteur) ; aucune preuve par journal de cette règle, faute d'activation de la journalisation. Sauvegarde pfSense chiffrée téléchargée le 2 novembre 2026, puis copiée de la VM Windows 11 vers l'hôte Windows physique ; présence et taille apparente contrôlées, restauration non testée.  
-> **Projet :** laboratoire personnel TSSR simulant une entreprise entièrement fictive.
+> **Période des manipulations :** 1er et 2 novembre 2026  
+> **État :** pfSense CE 2.9.0 configuré au siège ; LAN/WAN, connectivité Windows 11, DNS, HTTPS et NAT/PAT contrôlés. Filtrage ICMP ciblé testé puis supprimé. Export XML chiffré conservé hors dépôt, restauration non testée.  
+> **Nature du projet :** laboratoire TSSR personnel représentant une entreprise entièrement fictive.
+
+## Synthèse en 30 secondes
+
+| Compétence | Résultat effectivement rapporté | Preuve disponible |
+|---|---|---|
+| Réseau LAN / WAN | WAN DHCP sur VMware NAT, LAN pfSense `10.10.10.1/24`, communication Windows 11 et Internet vérifiées | Sorties et résultats consignés dans cette documentation ; captures réseau d'origine à compléter sur GitHub |
+| NAT/PAT | Translation TCP HTTPS `10.10.10.20:54138` → `10.50.10.128:26027` constatée dans la table des états | Relevé documenté et [schéma explicatif](images/06-schema-nat-pat-observe.svg) ; photographie authentique récupérée, en attente de dépôt |
+| Filtrage ICMP | Ping vers `8.8.8.8` : réussi initialement, échec après règle `Block`, puis retour du ping après suppression ; HTTPS encore accessible pendant le test | [Chronologie illustrée](images/07-schema-filtrage-icmp-avant-apres.svg) ; photos de la règle et du ping récupérées, en attente de dépôt ; aucune trace de journal confirmée |
+| Sauvegarde pfSense | Export XML avec chiffrement activé, copie sur le PC hôte | **5 captures authentiques déjà présentes** dans la section sauvegarde ; intégrité et restauration non testées |
+
+**Accès rapide :** [Architecture](#3-architecture-réseau) · [Installation](#4-installation-et-configuration-réalisées) · [Résultats](#5-tests-et-résultats-observés) · [Limites](#6-limites-de-la-validation) · [Suite du projet](../episode-04/README.md)
+
+**À lire :** les deux schémas vectoriels sont des **représentations pédagogiques des résultats notés**, pas des captures de pfSense. Les photographies authentiques récupérées de l'ancien carrousel n'ont pas encore été déposées dans GitHub ; seules les cinq captures de sauvegarde y figurent actuellement.
 
 ## 1. Contexte et objectif
 
@@ -80,7 +93,7 @@ L'adresse WAN est une adresse privée, attribuée dynamiquement. Elle peut chang
 - DHCP pfSense : désactivé
 - DHCP VMware sur VMnet1 : désactivé et vérifié
 
-Le service DHCP du LAN sera ultérieurement assuré par Windows Server, conformément au cahier des charges.
+**Contexte chronologique :** lors de cette étape, le DHCP Windows Server n'était pas encore déployé. Il a depuis été configuré et son étendue activée dans l'[épisode 04](../episode-04/README.md), mais **aucune attribution de bail à un client n'a encore été validée**.
 
 ## 4. Installation et configuration réalisées
 
@@ -164,6 +177,22 @@ Les durées et pertes chiffrées ci-dessus proviennent de la capture des sorties
 - **Blocage ciblé ICMP :** règle `Block`, interface LAN, IPv4 ICMP `Echo request`, source `10.10.10.20`, destination `8.8.8.8`, placée avant les autorisations générales. Après son application, le ping depuis Windows présente une perte annoncée de 100 %, contre 0 % avant activation : résultat cohérent avec l'effet attendu du filtrage. **Le chargement HTTPS de `www.microsoft.com` reste opérationnel après la règle**, ce qui confirme la sélectivité observée de ce test. La journalisation de cette règle n'a pas été activée et aucune preuve par log n'est revendiquée. Après suppression de cette règle par l'auteur, le ping vers `8.8.8.8` fonctionne de nouveau : **retour au comportement initial confirmé**.
 - **Limites :** la table des états confirme NAT/PAT pour une connexion donnée, et la différence avant/après ICMP est observée, mais cela ne constitue pas un audit complet de la politique de filtrage. Le second NAT VMware demeure propre à l'architecture de laboratoire.
 
+### Visualisations techniques — NAT/PAT et filtrage ICMP
+
+#### NAT/PAT : comprendre la traduction de source observée
+
+![Schéma pédagogique de la traduction source TCP depuis PC-TEST-GRE vers le WAN pfSense lors d'une connexion HTTPS](images/06-schema-nat-pat-observe.svg)
+
+*Schéma explicatif, **pas une capture d'écran**. Les adresses et ports `10.10.10.20:54138` et `10.50.10.128:26027` sont issus du relevé de `Diagnostics → States` consigné ci-dessus. Le second NAT assuré par VMware n'est pas détaillé faute de relevé correspondant.*
+
+#### Filtrage ICMP : avant, pendant, après
+
+![Schéma pédagogique comparant le ping initial, le blocage par règle LAN et le rétablissement après sa suppression](images/07-schema-filtrage-icmp-avant-apres.svg)
+
+*Schéma explicatif, **pas une capture d'écran**. Avant la règle : 0 % de perte sur 4 requêtes. Pendant : 100 % de perte confirmé par l'auteur ; une photographie montre des expirations de délai, sans compteur final complet. Après suppression : ping rétabli, mais sans relevé chiffré. La navigation HTTPS restait disponible pendant le filtrage.*
+
+**Photographies authentiques complémentaires récupérées pour publication :** une vue de `Diagnostics → States` (NAT/PAT), une vue des règles LAN **avant clic sur « Apply Changes »**, et une invite de commandes Windows avec les messages de délai dépassé. Ces trois fichiers seront insérés ici **uniquement après vérification de leur téléversement** dans `images/`. La vue des règles avant application ne constitue pas à elle seule la preuve de l'activation de la règle ; le résultat du test ICMP est décrit séparément.
+
 ### Sauvegarde de configuration — conservation hors dépôt public
 
 Le fichier de sauvegarde de configuration pfSense a été exporté depuis l'interface Web avec **chiffrement activé** puis copié de `PC-TEST-GRE` vers le PC Windows physique. Il reste **exclusivement local** : le fichier XML et son mot de passe ne doivent pas être versés sur GitHub. La concordance des tailles affichées constitue un premier contrôle du transfert, mais **ne remplace pas un contrôle d'intégrité par empreinte ni un essai de restauration**. Conserver une copie de secours supplémentaire sur un support protégé constitue une étape de résilience future.
@@ -212,7 +241,7 @@ Les éléments suivants ne sont pas encore validés :
 - Vérification et traitement de l'avertissement de confiance du certificat HTTPS de l'interface Web pfSense (le certificat utilisé n'a pas encore été validé par une autorité de confiance sur Windows).
 - Navigation HTTP vers un site externe (seul HTTPS a été testé explicitement) ; contrôles complémentaires des comportements TLS/certificats selon les besoins.
 - **Journalisation du blocage ICMP :** non réalisée, la journalisation de la règle de test n'ayant pas été activée. Si une nouvelle campagne de tests de filtrage est organisée, activer et contrôler les logs avant le test.
-- Attribution DHCP par un futur serveur Windows.
+- **Attribution d'un bail DHCP au client :** le serveur Windows et son étendue sont désormais configurés dans l'épisode 04, mais le passage de `PC-TEST-GRE` en DHCP, la réception d'une adresse et la durée du bail ne sont pas encore validés.
 - VPN IPsec entre le siège et les boutiques.
 - Persistance d'autres paramètres de configuration après redémarrage (la persistance des adresses WAN/LAN a été observée).
 - Intégrité cryptographique de la copie de sauvegarde et **test de restauration pfSense** : non réalisés. Le fichier est visible sur le PC hôte avec une taille cohérente, sans que cela garantisse sa restaurabilité.
@@ -238,11 +267,13 @@ Aucun test non réalisé n'est présenté comme réussi.
 - [x] Retirer la règle temporaire (supprimée par l'auteur) et **vérifier le rétablissement du ping** vers `8.8.8.8`.
 - [x] Exporter une sauvegarde `.xml` avec **Encryption** activée et en conserver une copie sur le PC physique hors dépôt GitHub.
 - [ ] Contrôler si nécessaire les empreintes des deux copies et tester ultérieurement la procédure de restauration sur un environnement de test, sans modifier le pfSense de production du laboratoire.
-- [ ] Installer Windows Server et préparer les services AD DS, DNS et DHCP.
+- [x] Poursuivre dans l'[épisode 04](../episode-04/README.md) : installation de Windows Server, configuration AD DS/DNS et activation de l'étendue DHCP au siège (attribution client encore à tester).
 - [ ] Réaliser des tests de filtrage et des scénarios de dépannage.
 - [ ] Préparer les futurs VPN IPsec intersites.
 - [x] Ajouter cinq captures authentiques et contextualisées du scénario de sauvegarde pfSense.
-- [ ] Ajouter d'autres captures et preuves techniques (installation, NAT/PAT, tests réseau) après vérification et anonymisation.
+- [x] Créer deux schémas pédagogiques fondés sur les données observées : traduction NAT/PAT et scénario ICMP avant/pendant/après.
+- [ ] Téléverser les trois photographies authentiques récupérées (états NAT/PAT, règle ICMP avant application et ping bloqué) puis les intégrer avec des légendes précisant leur portée.
+- [ ] Ajouter ultérieurement les autres captures d'installation, de connectivité et de tests réseau si les originaux sont disponibles et sans données sensibles.
 
 ## 8. Compétences TSSR mobilisées
 

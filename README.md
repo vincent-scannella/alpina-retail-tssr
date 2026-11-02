@@ -54,7 +54,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **03** | [Pare-feu pfSense et poste Windows 11](docs/episode-03/README.md) | Installation, adressage, NAT/PAT, filtrage ICMP, tests réseau et sauvegarde chiffrée |
 | **04** | [Windows Server, AD DS, DNS et DHCP](docs/episode-04/README.md) | Déploiement de DC1, diagnostic DNS avant/après, contrôles AD et étendue DHCP ; tests clients en attente |
 
-**Preuves visuelles :** [captures pfSense (épisode 03)](docs/episode-03/images/README.md) · [23 captures authentiques Windows Server / DNS / DHCP (épisode 04)](docs/episode-04/images/README.md).
+**Preuves visuelles :** [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 23 captures authentiques de Windows Server / AD DS / DNS / DHCP](docs/episode-04/images/README.md).
 
 ## Vue d'ensemble de l'entreprise fictive
 

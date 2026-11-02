@@ -44,8 +44,9 @@ Exemple d'intégration, après ajout effectif du fichier image :
 ## 5. Application au projet
 
 - **Épisodes 00, 01 et 02 — conception :** schémas explicatifs vectoriels, clairement identifiés comme *entreprise fictive* et *architecture cible*, sans les présenter comme des captures d'un système fonctionnel. Le dépôt comprend une vue multisite en épisode 00, l'organigramme et la répartition des effectifs en épisode 01, et deux schémas prévisionnels en épisode 02.
-- **Épisode 03 — pfSense et Windows 11 :** choisir des captures authentiques de l'architecture VMware, des paramètres LAN, du poste client et des tests réseau/NAT/PAT, si elles sont disponibles. Les résultats ICMP avant/après et HTTPS ont été confirmés, mais **aucune preuve de log pour la règle de test n'a été produite** ; ne pas en inventer.
-- **Épisodes suivants — Windows Server, AD DS, DNS, DHCP, dépannage :** préparer systématiquement les captures pendant chaque manipulation et chaque contrôle réussi ou échoué.
+- **Épisode 03 — pfSense et Windows 11 :** **8 captures PNG authentiques** publiées (dont la traduction NAT/PAT, la règle ICMP avant application, les expirations du ping et la sauvegarde), complétées par **2 schémas SVG pédagogiques**. Les tests ICMP avant/pendant/après et HTTPS sont documentés, mais **aucune preuve de journal de filtrage** n'a été obtenue ; ne jamais en inventer. Des captures complémentaires LAN/WAN ou de connectivité pourront être ajoutées si leurs originaux sont disponibles.
+- **Épisode 04 — Windows Server, AD DS, DNS et DHCP :** **23 captures PNG authentiques** publiées, dont le dépannage DNS avant/après, les diagnostics AD/DNS et les options/plages DHCP. L'attribution DHCP côté Windows 11, l'authentification au domaine et les GPO **restent à vérifier**.
+- **Épisodes techniques ultérieurs :** préparer les captures au moment de chaque manipulation et contrôle, en indiquant si les résultats sont validés ou en attente.
 
 **Principe :** des captures réelles, contextualisées, lisibles et expurgées de toute information sensible renforcent la crédibilité d'un laboratoire professionnel.
 
@@ -66,7 +67,9 @@ Cette règle s'applique **à chaque futur épisode**, y compris pendant les phas
 
 **Déjà vérifié le 2 novembre 2026 :** VM créée ; adressage IP statique ; connectivité pfSense et Internet en IPv4 ; promotion du domaine ; `dcdiag /test:Advertising` réussi ; enregistrement SRV LDAP retourné ; zone inversée et PTR créés ; disparition du message `Server: UnKnown` au contre-test ; `dcdiag /test:DNS` réussi dans les résultats visibles ; résolution du nom externe `www.microsoft.com` via DC1 réussie.
 
-**Encore utile pour une publication de déploiement plus complète :** contrôler les partages `SYSVOL` et `NETLOGON`, puis idéalement déployer et vérifier le serveur DHCP et la jonction du poste `PC-TEST-GRE` au domaine, avec une connexion utilisateur de test. Si cette suite prend du temps, une publication autonome centrée sur **la création du domaine et le dépannage DNS documenté** peut déjà être justifiée après les contrôles AD complémentaires.
+**Déjà ajouté depuis les premiers diagnostics :** les partages `SYSVOL` et `NETLOGON` ont été observés dans `net share`, `dcdiag /test:Services` a réussi et l'étendue `DHCP-GRE-SIEGE` est configurée et active ; les options 003/006/015 et la plage `10.10.10.100–199` sont vérifiées dans la console.
+
+**Encore utile pour la publication :** vérifier la durée du bail, l'attribution DHCP réelle à `PC-TEST-GRE` via `ipconfig /all`, puis la jonction au domaine et l'ouverture d'une session de test. **Ne pas présenter comme validés** l'accès client à `SYSVOL`/`NETLOGON`, les GPO ou l'authentification tant que les essais ne sont pas réalisés.
 
 **Calendrier :** la publication pfSense/Windows 11 de l'épisode 03 est déjà programmée pour le **10 novembre 2026 à 12 h 15**. Pour l'épisode 04, ne fixer une nouvelle date que lorsque le contenu, les preuves visuelles et le diagnostic auront été validés ; éviter un chevauchement inutile avec la publication programmée.
 

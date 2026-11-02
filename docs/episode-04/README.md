@@ -13,7 +13,7 @@
 | **DNS** | SRV LDAP résolu, zone inversée et PTR ajoutés ; `nslookup` vérifié après correction ; `dcdiag /test:DNS` et résolution de nom Internet réussis | Pas d'audit DNS exhaustif |
 | **DHCP** | Service autorisé dans AD, étendue `DHCP-GRE-SIEGE` active, options 003/006/015 et plage `10.10.10.100–199` vérifiées | Bail et paramètres effectivement reçus sur `PC-TEST-GRE` à tester |
 
-**Sommaire :** [Architecture](#1-objectif-et-architecture) · [VM Windows Server](#2-machine-virtuelle) · [Journal des manipulations](#3-installation-et-configuration-réellement-effectuées) · [Configuration IPv4](#4-configuration-ipv4-confirmée-depuis-ipconfig-all) · [Tests réseau](#5-tests-réseau-et-résultats) · [Contrôles AD DS/DNS](#6-contrôleur-de-domaine--validations-ad-ds-et-dns) · [Captures](#7-preuves-visuelles-publiées) · [Suite](#8-étapes-restantes)
+**Sommaire :** [Architecture](#1-objectif-et-architecture) · [VM Windows Server](#2-machine-virtuelle) · [Journal des manipulations](#3-installation-et-configuration-réellement-effectuées) · [Configuration IPv4](#4-configuration-ipv4-confirmée-depuis-ipconfig-all) · [Tests réseau](#5-tests-réseau-et-résultats) · [Contrôles AD DS/DNS](#6-validations-ad-ds-et-dns) · [Captures](#7-preuves-visuelles-publiées) · [Suite](#8-étapes-restantes)
 
 **Navigation :** [Accueil / épisode 00](../../README.md) · [Épisode précédent : 03 — pfSense](../episode-03/README.md) · [Inventaire des 23 captures](images/README.md)
 
@@ -212,7 +212,7 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 
 *Capture — Connectivité IP vers la passerelle et vers `8.8.8.8` : 0 % de perte dans les deux tests.*
 
-## 6. Contrôleur de domaine — validations AD DS et DNS
+## 6. Validations AD DS et DNS
 
 | Élément | Résultat |
 |---|---|

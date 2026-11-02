@@ -104,6 +104,8 @@ Ce dépôt accueillera progressivement les schémas d’architecture, les script
 
 Les réalisations seront publiées au fur et à mesure de leur mise en œuvre et de leur vérification.
 
+📸 **Preuves visuelles :** les futures documentations GitHub et publications LinkedIn seront accompagnées de captures réelles du laboratoire, contextualisées et nettoyées de toute donnée sensible. Voir le [guide des captures et publications](docs/GUIDE_CAPTURES_PUBLICATIONS.md).
+
 ⸻
 
 Auteur : Vincent Scannella

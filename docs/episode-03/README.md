@@ -4,7 +4,7 @@
 > **État :** pfSense CE 2.9.0 configuré au siège ; LAN/WAN, connectivité Windows 11, DNS, HTTPS et NAT/PAT contrôlés. Filtrage ICMP ciblé testé puis supprimé. Export XML chiffré conservé hors dépôt, restauration non testée.  
 > **Nature du projet :** laboratoire TSSR personnel représentant une entreprise entièrement fictive.
 
-## Synthèse en 30 secondes
+## En bref
 
 | Compétence | Résultat effectivement rapporté | Preuve disponible |
 |---|---|---|
@@ -13,7 +13,9 @@
 | Filtrage ICMP | Ping vers `8.8.8.8` : réussi initialement, échec après règle `Block`, puis retour du ping après suppression ; HTTPS encore accessible pendant le test | [Capture de la règle](images/09-pfsense-regle-icmp-avant-application.png), [ping en échec](images/10-windows11-ping-icmp-bloque.png) et [schéma de chronologie](images/07-schema-filtrage-icmp-avant-apres.svg) ; aucune trace de journal confirmée |
 | Sauvegarde pfSense | Export XML avec chiffrement activé, copie sur le PC hôte | **5 captures authentiques déjà présentes** dans la section sauvegarde ; intégrité et restauration non testées |
 
-**Accès rapide :** [Architecture](#3-architecture-réseau) · [Installation](#4-installation-et-configuration-réalisées) · [Résultats](#5-tests-et-résultats-observés) · [Limites](#6-limites-de-la-validation) · [Suite du projet](../episode-04/README.md)
+**Sommaire :** [Contexte](#1-contexte-et-objectif) · [Laboratoire](#2-environnement-de-laboratoire) · [Architecture](#3-architecture-réseau) · [Installation](#4-installation-et-configuration-réalisées) · [Résultats et preuves](#5-tests-et-résultats-observés) · [Limites](#6-limites-de-la-validation) · [Travaux à poursuivre](#7-prochaines-étapes) · [Compétences TSSR](#8-compétences-tssr-mobilisées)
+
+**Navigation :** [Accueil / épisode 00](../../README.md) · [Épisode précédent : 02](../episode-02/README.md) · [Épisode suivant : 04](../episode-04/README.md)
 
 **À lire :** les deux schémas vectoriels sont des **représentations pédagogiques** des résultats notés, pas des captures d'écran. Les **8 PNG authentiques** (5 sur la sauvegarde, 3 sur NAT/PAT et ICMP) sont désormais publiés dans le dépôt et contextualisés plus bas.
 
@@ -323,3 +325,5 @@ Aucun test non réalisé n'est présenté comme réussi.
 **Auteur :** Vincent Scannella — Technicien Supérieur Systèmes et Réseaux (TSSR).
 
 **ALPINA RETAIL est une entreprise fictive. Ce laboratoire personnel a pour objectif la mise en pratique et la démonstration de compétences techniques.**
+
+[Retour à l'accueil](../../README.md) · [Épisode 02 — Conception](../episode-02/README.md) · [Épisode 04 — Windows Server](../episode-04/README.md)

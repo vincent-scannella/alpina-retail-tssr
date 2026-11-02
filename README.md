@@ -92,4 +92,4 @@ Les compétences travaillées comprennent l'administration Windows Server, AD DS
 
 Ce dépôt est un **portfolio de mise en pratique** destiné à montrer une méthode de travail : installer, vérifier, diagnostiquer et produire une documentation exploitable. Les données, utilisateurs et sites de l'entreprise sont fictifs ; les captures de laboratoire sont authentiques et sélectionnées pour ne pas divulguer de secrets.
 
-[Guide des preuves visuelles et du suivi des publications](docs/GUIDE_CAPTURES_PUBLICATIONS.md) · [Profil LinkedIn](https://fr.linkedin.com/in/vincent-scannella)
+[Règles de documentation et de publication](docs/GUIDE_CAPTURES_PUBLICATIONS.md) · [Modèle de README pour les futurs épisodes](docs/MODELE_EPISODE.md) · [Profil LinkedIn](https://fr.linkedin.com/in/vincent-scannella)

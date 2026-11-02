@@ -1,8 +1,23 @@
-# ALPINA RETAIL — Épisode 04 : Déploiement de Windows Server 2025 au siège de Grenoble
+# ALPINA RETAIL — Épisode 04 : Windows Server 2025, Active Directory, DNS et DHCP
 
 > **Date des opérations :** 2 novembre 2026  
-> **Statut :** Windows Server installé, renommé et adressé en IPv4 statique ; connectivité vers pfSense et vers `8.8.8.8` **testée avec succès**. **Rôle AD DS installé, promotion de `DC1-GRE-SIEGE` vers la nouvelle forêt `ironman.test` engagée et redémarrage suivi d'une connexion au domaine `IRONMAN` confirmés. L'identité de domaine apparaît dans « Serveur local ». Le diagnostic ciblé `dcdiag /test:Advertising` a réussi (tests Connectivity et Advertising) ; une requête DNS SRV de découverte LDAP a réussi et renvoie `dc1-gre-siege.ironman.test` / `10.10.10.10` (port 389). Une résolution directe explicite avait retourné `10.10.10.10` mais avec un délai initial et `Server: UnKnown`. Une zone de recherche inversée intégrée à AD et un PTR ont ensuite été créés ; `nslookup 10.10.10.10 10.10.10.10` retourne désormais `dc1-gre-siege.ironman.test` sans message de délai d'attente. La répétition exacte de la recherche directe `nslookup dc1-gre-siege.ironman.test 10.10.10.10` après la correction affiche désormais le nom du DNS et la bonne adresse, sans timeout visible. Le test `dcdiag /test:DNS` a ensuite affiché une réussite pour le contrôleur `DC1-GRE-SIEGE` et pour le domaine `ironman.test`, avec Connectivity réussi. Une requête `nslookup www.microsoft.com 10.10.10.10` a depuis réussi et renvoyé des adresses IPv4/IPv6 externes ; le rôle DHCP est désormais accessible dans sa console et son autorisation AD est confirmée par l'option contextuelle « Interdire » ; l'étendue `DHCP-GRE-SIEGE` est maintenant créée et affichée « Actif » dans la console ; les options d'étendue 003/006/015 et la plage `10.10.10.100` à `10.10.10.199` sont désormais contrôlées dans la console ; la durée du bail et l'attribution réelle de baux aux clients restent à vérifier. La commande `net share` a également confirmé les partages `SYSVOL` et `NETLOGON`. La vérification ciblée `dcdiag /test:Services` est également réussie. L'accès aux partages depuis un client, l'authentification et les GPO restent à tester.**  
-> **Contexte :** laboratoire personnel TSSR simulant une entreprise entièrement fictive.
+> **Statut :** DC1 installé, domaine `ironman.test` créé, services AD DS et DNS contrôlés, dépannage DNS documenté et étendue DHCP active. **Attribution d'un bail client et jonction au domaine non encore validées.**  
+> **Périmètre :** laboratoire TSSR personnel au siège fictif de Grenoble.
+
+## En bref
+
+| Domaine technique | Résultat observé | Limite de la validation |
+|---|---|---|
+| **Windows Server 2025** | VM `DC1-GRE-SIEGE` créée, IPv4 `10.10.10.10/24`, accès à pfSense et ping Internet vérifiés | Performances et résilience non évaluées |
+| **Active Directory** | Forêt `ironman.test` créée ; promotion confirmée ; `dcdiag /test:Advertising` et `/test:Services` réussis ; partages `SYSVOL` et `NETLOGON` présents | Authentification et application des GPO depuis un poste client encore à tester |
+| **DNS** | SRV LDAP résolu, zone inversée et PTR ajoutés ; `nslookup` vérifié après correction ; `dcdiag /test:DNS` et résolution de nom Internet réussis | Pas d'audit DNS exhaustif |
+| **DHCP** | Service autorisé dans AD, étendue `DHCP-GRE-SIEGE` active, options 003/006/015 et plage `10.10.10.100–199` vérifiées | Bail et paramètres effectivement reçus sur `PC-TEST-GRE` à tester |
+
+**Sommaire :** [Architecture](#1-objectif-et-architecture) · [VM Windows Server](#2-machine-virtuelle) · [Journal des manipulations](#3-installation-et-configuration-réellement-effectuées) · [Configuration IPv4](#4-configuration-ipv4-confirmée-depuis-ipconfig-all) · [Tests réseau](#5-tests-réseau-et-résultats) · [Contrôles AD DS/DNS](#6-contrôleur-de-domaine--validations-ad-ds-et-dns) · [Captures](#7-preuves-visuelles-publiées) · [Suite](#8-étapes-restantes)
+
+**Navigation :** [Accueil / épisode 00](../../README.md) · [Épisode précédent : 03 — pfSense](../episode-03/README.md) · [Inventaire des 23 captures](images/README.md)
+
+**Dépannage marquant :** un test `nslookup` obtenait l'adresse de DC1, mais affichait initialement `Server: UnKnown` et un délai d'attente. Une zone inversée et un enregistrement PTR ont été créés ; les contre-tests ont ensuite retrouvé le nom du serveur sans les messages initiaux. Les captures **avant / correction / après** sont intégrées dans le journal technique.
 
 ## 1. Objectif et architecture
 
@@ -37,6 +52,10 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 
 ## 3. Installation et configuration réellement effectuées
 
+Ce journal conserve les **manipulations réellement effectuées et leurs observations**, dans l'ordre. Les images placées à proximité illustrent les preuves disponibles ; chaque test non réalisé reste signalé.
+
+### 3.1. Préparer Windows Server et le réseau
+
 1. Création de `DC1-GRE-SIEGE` dans VMware Workstation.
 2. Sélection du système `Windows Server 2025` et association de son ISO.
 3. Configuration de **4 Go RAM, 2 vCPU, 80 Go NVMe et réseau VMnet1**.
@@ -53,6 +72,8 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 10. Configuration manuelle de l'interface `Ethernet0` en IPv4 statique.
 11. Vérification des paramètres avec `ipconfig /all`.
 12. Démarrage de pfSense, puis tests `ping` vers la passerelle et vers une destination extérieure, avec résultats complets consignés ci-dessous.
+### 3.2. Installer AD DS et promouvoir le contrôleur de domaine
+
 13. Lancement de **Gestionnaire de serveur → Gérer → Ajouter des rôles et fonctionnalités** ; sélection de l'installation basée sur un rôle et du serveur `DC1-GRE-SIEGE` (`10.10.10.10`).
 14. Sélection du rôle **Services de domaine Active Directory (AD DS)** et des fonctionnalités d'administration associées, puis lancement de l'installation.
 15. **Installation du rôle AD DS réussie**, attestée par la notification du Gestionnaire de serveur : « Configuration requise. Installation réussie sur DC1-GRE-SIEGE ». L'assistant propose alors **« Promouvoir ce serveur en contrôleur de domaine »**.
@@ -72,6 +93,8 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 21. Promotion lancée, puis **redémarrage de Windows Server**. L'écran de connexion affiche **`IRONMAN\Administrateur`** ; ouverture de session effectuée par l'auteur.
 22. Dans **Gestionnaire de serveur → Serveur local**, observation du nom **`DC1-GRE-SIEGE`**, du **domaine `ironman.test`**, de l'adresse **`10.10.10.10`** et du profil de pare-feu **Domaine : actif**. Ces preuves confirment le rattachement à la nouvelle forêt après promotion, **sans valider encore l'ensemble des services AD DS et DNS**.
 23. Exécution de **`dcdiag /test:Advertising`** depuis une invite de commandes sur DC1 : l'outil trouve le serveur associé, reconnaît la forêt AD et affiche **« Le test Connectivity de DC1-GRE-SIEGE a réussi »**, puis **« Le test Advertising de DC1-GRE-SIEGE a réussi »**. Aucun échec dans le résultat visible de ce test ciblé ; il ne s'agit pas d'un diagnostic exhaustif du DNS ou de l'annuaire.
+### 3.3. Vérifier et dépanner le DNS
+
 24. Exécution de **`nslookup -type=SRV _ldap._tcp.dc._msdcs.ironman.test`** : la réponse contient un enregistrement SRV de priorité `0`, poids `100`, port **`389`**, cible **`dc1-gre-siege.ironman.test`** et l'adresse IPv4 **`10.10.10.10`**. `nslookup` indique `Server: UnKnown` / `Address: ::1` : le nom du serveur interrogé n'est pas affiché, mais la requête SRV a bien obtenu la réponse attendue. La résolution externe et les diagnostics DNS complets restent à vérifier.
 25. Exécution de **`nslookup dc1-gre-siege.ironman.test 10.10.10.10`** : le serveur interrogé est affiché comme `Server: UnKnown`, `Address: 10.10.10.10`, précédé de `DNS request timed out` (délai 2 secondes), puis la réponse indique **`Nom: dc1-gre-siege.ironman.test` / `Address: 10.10.10.10`**. La résolution directe demandée est donc obtenue, mais le délai initial et l'absence de nom du serveur DNS nécessitent une vérification, notamment de la zone de recherche inversée et d'un éventuel enregistrement PTR. **À ce stade, la cause n'était pas démontrée.**
 26. Inspection de **Gestionnaire DNS → Zones de recherche inversée** : dossier initialement vide. Création de la zone principale IPv4 **`10.10.10.in-addr.arpa`**, intégrée à Active Directory, avec réplication prévue vers les serveurs DNS des contrôleurs de domaine de **`ironman.test`**. La zone apparaît avec l'état **En cours d'exécution**, puis seuls SOA et NS sont observés.
@@ -127,6 +150,8 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 ![Diagnostic dcdiag Services réussi sur le contrôleur](images/12-dcdiag-services-reussi.png)
 
 *Le test ciblé `dcdiag /test:Services` réussit, ainsi que son prérequis Connectivity.*
+
+### 3.4. Installer et paramétrer le serveur DHCP
 
 34. Sélection et lancement de l'installation du rôle **Serveur DHCP** sur `DC1-GRE-SIEGE.ironman.test`. La console DHCP s'ouvre ensuite avec les arborescences IPv4 et IPv6, **sans étendue IPv4 créée à ce stade**.
 35. Dans la console DHCP, le menu contextuel du serveur propose **« Interdire »** et non « Autoriser » : cette observation indique que le serveur **est déjà autorisé dans Active Directory**. **Aucune distribution de bail DHCP n'a encore été vérifiée** depuis `PC-TEST-GRE`.
@@ -187,7 +212,7 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 
 *Capture — Connectivité IP vers la passerelle et vers `8.8.8.8` : 0 % de perte dans les deux tests.*
 
-## 5 bis. Promotion en contrôleur de domaine : état observé
+## 6. Contrôleur de domaine — validations AD DS et DNS
 
 | Élément | Résultat |
 |---|---|
@@ -226,7 +251,7 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 
 *Capture — Avant correction : la recherche directe aboutit, mais `nslookup` affiche un délai initial et `Server: UnKnown`. Une zone inversée et un PTR ont depuis été créés ; le test inverse après correction est décrit dans le tableau ci-dessus.*
 
-## 6. Preuves visuelles publiées
+## 7. Preuves visuelles publiées
 
 Les **23 captures authentiques** sont maintenant vérifiées dans `docs/episode-04/images/` et **intégrées dans ce README avec leurs légendes** :
 
@@ -242,7 +267,7 @@ Les **23 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 
 **Confidentialité :** aucun mot de passe administrateur ou DSRM ni export de configuration pfSense n'est publié.
 
-## 7. Étapes restantes
+## 8. Étapes restantes
 
 - [x] Créer la VM `DC1-GRE-SIEGE`.
 - [x] Installer Windows Server 2025 Standard Evaluation avec interface graphique.
@@ -269,11 +294,11 @@ Les **23 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Vérifier dans la console la plage DHCP enregistrée : `10.10.10.100` à `10.10.10.199` (100 adresses).
 - [ ] Contrôler la durée du bail puis tester l'attribution réelle d'une adresse DHCP à `PC-TEST-GRE`.
 - [ ] Vérifier la jonction d'un poste Windows 11 au domaine, l'authentification et les politiques de groupe.
-- [x] Ajouter et intégrer dans le README les 10 captures réelles de déploiement et de vérification.
+- [x] Publier et intégrer les **23 captures réelles** dans ce README, avec des légendes et leurs limites.
 
 **Aucun test ou service non réalisé n'est présenté comme réussi.**
 
 ---
 
-**Auteur :** Vincent Scannella — TSSR.  
-[Revenir au dépôt du projet](../../README.md) · [Épisode 03 — pfSense](../episode-03/README.md)
+**Auteur :** Vincent Scannella — Technicien Supérieur Systèmes et Réseaux (TSSR).  
+[Retour à l'accueil](../../README.md) · [Épisode 03 — pfSense](../episode-03/README.md) · [Inventaire des captures](images/README.md)

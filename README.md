@@ -15,6 +15,7 @@ Projet personnel de Vincent Scannella — Technicien Supérieur Systèmes et Ré
 - **Épisode 01 — Organisation et organigramme** : [Consulter les livrables](docs/episode-01/README.md).
 - **Épisode 02 — Cahier des charges informatique** : [Consulter les livrables](docs/episode-02/README.md).
 - **Épisode 03 — Installation du pare-feu pfSense au siège de Grenoble** : [Consulter la documentation](docs/episode-03/README.md).
+- **Épisode 04 — Windows Server 2025 au siège de Grenoble (en cours)** : [Installation, adressage et tests réseau vérifiés](docs/episode-04/README.md).
 
 🎯 Présentation du projet
 

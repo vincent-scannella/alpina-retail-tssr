@@ -1,6 +1,6 @@
 # Preuves visuelles — ALPINA RETAIL, épisode 04
 
-## 10 captures déjà téléversées et insérées dans le README
+## Captures 01 à 10 — Déploiement initial
 
 Ces fichiers existent dans le dépôt et sont illustrés dans [l'épisode 04](../README.md).
 
@@ -17,11 +17,11 @@ Ces fichiers existent dans le dépôt et sont illustrés dans [l'épisode 04](..
 | `09-dns-srv-ldap.png` | Enregistrement SRV LDAP présent |
 | `10-dns-nslookup-avertissement.png` | Anomalie `nslookup` initiale |
 
-## 13 captures complémentaires préparées, NON encore téléversées
+## Captures 11 à 23 — Vérifications et dépannage DNS / DHCP
 
-Ces captures réelles ont été sélectionnées lors du laboratoire du **2 novembre 2026**. L'archive locale à déposer sur GitHub contient les PNG suivants :
+Ces **13 captures complémentaires sont désormais téléversées et intégrées avec des légendes** dans [l'épisode 04](../README.md). Elles ont été réalisées lors du laboratoire du **2 novembre 2026** :
 
-| Fichier à ajouter | Preuve observée |
+| Fichier publié | Preuve observée |
 |---|---|
 | `11-net-share-sysvol-netlogon.png` | Partages essentiels à AD DS |
 | `12-dcdiag-services-reussi.png` | Services et connectivité réussis |
@@ -37,8 +37,6 @@ Ces captures réelles ont été sélectionnées lors du laboratoire du **2 novem
 | `22-dhcp-options-passerelle-dns-domaine.png` | Options 003, 006, 015 |
 | `23-dhcp-plage-100-199.png` | Plage IPv4 contrôlée |
 
-**Procédure de dépôt :** décompresser l'archive `ALPINA_RETAIL_Episode04_13_Captures_A_Ajouter_GitHub.zip`, ouvrir le dossier `docs/episode-04/images/` sur GitHub, sélectionner **Add file → Upload files**, ajouter les **13 PNG uniquement** et valider **Commit changes**. Après vérification de la présence des fichiers, intégrer les liens d'images et leurs légendes dans le README principal.
-
-**Important :** ce tableau est un inventaire de travaux et ne prouve pas que les fichiers 11 à 23 soient déjà téléversés. Ne pas insérer de liens Markdown d'images inexistantes.
+**Statut vérifié :** les 23 images PNG ci-dessus sont présentes dans ce dossier GitHub et sont toutes intégrées au README principal. Leurs légendes précisent les résultats observés et leurs limites. Le bail DHCP depuis un poste client et la jonction au domaine restent à vérifier.
 
 Ne pas publier de mots de passe, secrets, configuration pfSense complète ni données personnelles.

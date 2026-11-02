@@ -20,5 +20,5 @@
 <text x="925" y="243" font-size="16" fill="#f4cd84" font-weight="750" >CIBLE</text>
 <text x="925" y="267" font-size="14" fill="#f4cd84" font-weight="700" >NON DÉPLOYÉE</text>
 <text x="600" y="493" font-size="15" fill="#b8d8ee" font-weight="550" text-anchor="middle">VPN intersites prévus</text>
-<text x="70" y="721" font-size="17" fill="#b6ccda" font-weight="450" >Schéma logique de conception : il ne représente ni un état de production ni des tests réalisés.</text>
+<text x="70" y="703" font-size="17" fill="#b6ccda" font-weight="450" >Schéma logique de conception : il ne représente ni un état de production ni des tests réalisés.</text>
 <text x="58" y="731" font-size="14" fill="#7e9bb7" font-weight="600" >LABORATOIRE TSSR · ENTREPRISE ENTIÈREMENT FICTIVE</text></svg>

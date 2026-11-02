@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 03 : Installation du pare-feu pfSense au siège de Grenoble
 
 > **Date :** 1er novembre 2026  
-> **Statut :** installation, redémarrage et configuration initiale vérifiés ; tests IP et DNS réussis depuis pfSense **et depuis un poste Windows 11 sur le LAN**. Accès à l'administration Web pfSense et changement du mot de passe administrateur confirmés ; navigation HTTPS vers `www.microsoft.com` validée depuis le client Windows ; règles LAN et NAT sortant automatique examinés ; **traduction NAT/PAT confirmée dans la table des états** ; premier test de blocage ICMP ciblé observé (ping `8.8.8.8` : 100 % de perte après activation). Navigation HTTPS externe toujours fonctionnelle après blocage ICMP, puis **rétablissement du ping après suppression de la règle temporaire** (confirmé par l'auteur) ; aucune preuve par journal de cette règle, faute d'activation de la journalisation.  
+> **Statut :** installation, redémarrage et configuration initiale vérifiés ; tests IP et DNS réussis depuis pfSense **et depuis un poste Windows 11 sur le LAN**. Accès à l'administration Web pfSense et changement du mot de passe administrateur confirmés ; navigation HTTPS vers `www.microsoft.com` validée depuis le client Windows ; règles LAN et NAT sortant automatique examinés ; **traduction NAT/PAT confirmée dans la table des états** ; premier test de blocage ICMP ciblé observé (ping `8.8.8.8` : 100 % de perte après activation). Navigation HTTPS externe toujours fonctionnelle après blocage ICMP, puis **rétablissement du ping après suppression de la règle temporaire** (confirmé par l'auteur) ; aucune preuve par journal de cette règle, faute d'activation de la journalisation. Sauvegarde pfSense chiffrée téléchargée le 2 novembre 2026, puis copiée de la VM Windows 11 vers l'hôte Windows physique ; présence et taille apparente contrôlées, restauration non testée.  
 > **Projet :** laboratoire personnel TSSR simulant une entreprise entièrement fictive.
 
 ## 1. Contexte et objectif
@@ -109,6 +109,9 @@ Le service DHCP du LAN sera ultérieurement assuré par Windows Server, conform�
 25. Après activation de la règle ICMP, réouverture de `https://www.microsoft.com` depuis `PC-TEST-GRE` : navigation HTTPS **toujours fonctionnelle**, résultat confirmé par l'auteur. Cette comparaison démontre le caractère ciblé du blocage dans ce scénario.
 26. Ouverture de **Status → System Logs → Firewall** ; aucune entrée ICMP précise de cette règle n'a pu être établie. L'auteur indique ne pas avoir activé sa journalisation.
 27. Suppression de la règle temporaire par l'auteur (au lieu de sa désactivation prévue), suivie d'un nouveau `ping 8.8.8.8` **réussi** depuis `PC-TEST-GRE`. Le retour de la connectivité ICMP après retrait de la règle est donc validé. Aucun résultat chiffré après retrait n'a été transmis.
+28. Le **2 novembre 2026**, dans **Diagnostics → Backup & Restore**, sélection de `Backup area: All`, données RRD exclues, informations sur les packages non exclues, clés hôte SSH incluses, données supplémentaires non incluses. Activation de **Encrypt this configuration file**, avec saisie et confirmation d'un mot de passe non communiqué.
+29. Téléchargement du fichier `config-pfSense.home.arpa-20261102052901.xml` dans le dossier Téléchargements de `PC-TEST-GRE`, affiché avec une taille arrondie de **17 Ko** dans l'Explorateur Windows.
+30. Copie du fichier XML chiffré par le presse-papiers VMware depuis la VM Windows 11 vers le **PC hôte Windows physique**, dans le dossier `ALPINA_RETAIL_BACKUP\pfSense` (chemin de dossier observé dans la capture, sans nom de disque). Une capture du dossier hôte confirme un fichier XML de **17 Ko** (valeur arrondie), avec **16,2 Ko** indiqué dans la barre d'état pour l'élément sélectionné. Aucun secret ni fichier de sauvegarde n'a été publié.
 
 ## 5. Tests et résultats observés
 
@@ -135,6 +138,8 @@ Le service DHCP du LAN sera ultérieurement assuré par Windows Server, conform�
 | Filtrage ICMP ciblé vers `8.8.8.8` depuis Windows | **Avant :** 4/4 réponses, 0 % de perte. **Après application de la règle :** expirations de délai visibles et **100 % de perte** confirmé par l'auteur. Aucune preuve par logs, journalisation non activée |
 | Rétablissement après suppression de la règle temporaire | **Réussi :** `ping 8.8.8.8` de nouveau fonctionnel depuis `PC-TEST-GRE`, confirmé par l'auteur (sans compteurs détaillés) |
 | Navigation HTTPS après application de la règle ICMP | **Réussie :** `https://www.microsoft.com` continue à se charger depuis Windows 11, confirmé par l'auteur. Le blocage ICMP ciblé ne coupe pas les connexions HTTPS de ce test |
+| Export de la configuration pfSense (02/11/2026) | Téléchargement du fichier `.xml` confirmé ; option **Encryption** cochée au moment de l'export ; mot de passe non publié |
+| Copie de sauvegarde sur le PC physique | Fichier `.xml` présent dans `ALPINA_RETAIL_BACKUP\pfSense`, taille affichée **17 Ko** (16,2 Ko en barre d'état) ; capture à l'appui. **Pas de comparaison d'empreintes ni de restauration testée** |
 
 ### Interprétation technique
 
@@ -157,6 +162,10 @@ Les durées et pertes chiffrées ci-dessus proviennent de la capture des sorties
 - **Blocage ciblé ICMP :** règle `Block`, interface LAN, IPv4 ICMP `Echo request`, source `10.10.10.20`, destination `8.8.8.8`, placée avant les autorisations générales. Après son application, le ping depuis Windows présente une perte annoncée de 100 %, contre 0 % avant activation : résultat cohérent avec l'effet attendu du filtrage. **Le chargement HTTPS de `www.microsoft.com` reste opérationnel après la règle**, ce qui confirme la sélectivité observée de ce test. La journalisation de cette règle n'a pas été activée et aucune preuve par log n'est revendiquée. Après suppression de cette règle par l'auteur, le ping vers `8.8.8.8` fonctionne de nouveau : **retour au comportement initial confirmé**.
 - **Limites :** la table des états confirme NAT/PAT pour une connexion donnée, et la différence avant/après ICMP est observée, mais cela ne constitue pas un audit complet de la politique de filtrage. Le second NAT VMware demeure propre à l'architecture de laboratoire.
 
+### Sauvegarde de configuration — conservation hors dépôt public
+
+Le fichier de sauvegarde de configuration pfSense a été exporté depuis l'interface Web avec **chiffrement activé** puis copié de `PC-TEST-GRE` vers le PC Windows physique. Il reste **exclusivement local** : le fichier XML et son mot de passe ne doivent pas être versés sur GitHub. La concordance des tailles affichées constitue un premier contrôle du transfert, mais **ne remplace pas un contrôle d'intégrité par empreinte ni un essai de restauration**. Conserver une copie de secours supplémentaire sur un support protégé constitue une étape de résilience future.
+
 ## 6. Limites de la validation
 
 Les éléments suivants ne sont pas encore validés :
@@ -167,6 +176,7 @@ Les éléments suivants ne sont pas encore validés :
 - Attribution DHCP par un futur serveur Windows.
 - VPN IPsec entre le siège et les boutiques.
 - Persistance d'autres paramètres de configuration après redémarrage (la persistance des adresses WAN/LAN a été observée).
+- Intégrité cryptographique de la copie de sauvegarde et **test de restauration pfSense** : non réalisés. Le fichier est visible sur le PC hôte avec une taille cohérente, sans que cela garantisse sa restaurabilité.
 
 Aucun test non réalisé n'est présenté comme réussi.
 
@@ -187,6 +197,8 @@ Aucun test non réalisé n'est présenté comme réussi.
 - [x] Vérifier que la navigation HTTPS externe fonctionne toujours après le blocage ICMP.
 - [x] Consulter la page des journaux Firewall ; **trace liée à la règle ICMP non vérifiable**, journalisation de cette règle non activée. À prévoir lors d'un futur test instrumenté.
 - [x] Retirer la règle temporaire (supprimée par l'auteur) et **vérifier le rétablissement du ping** vers `8.8.8.8`.
+- [x] Exporter une sauvegarde `.xml` avec **Encryption** activée et en conserver une copie sur le PC physique hors dépôt GitHub.
+- [ ] Contrôler si nécessaire les empreintes des deux copies et tester ultérieurement la procédure de restauration sur un environnement de test, sans modifier le pfSense de production du laboratoire.
 - [ ] Installer Windows Server et préparer les services AD DS, DNS et DHCP.
 - [ ] Réaliser des tests de filtrage et des scénarios de dépannage.
 - [ ] Préparer les futurs VPN IPsec intersites.

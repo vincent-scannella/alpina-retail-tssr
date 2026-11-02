@@ -89,16 +89,80 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 27. Création d'un enregistrement **PTR** associant **`10.10.10.10`** à **`dc1-gre-siege.ironman.test`** dans cette zone. Sa présence est confirmée par la capture du Gestionnaire DNS (enregistrements SOA, NS et PTR).
 28. Vérification par **`nslookup 10.10.10.10 10.10.10.10`** : le résultat affiche **`Server: dc1-gre-siege.ironman.test`**, **`Address: 10.10.10.10`**, puis **`Nom: dc1-gre-siege.ironman.test`** et **`Address: 10.10.10.10`**, **sans délai d'attente signalé**. La résolution inverse testée fonctionne après la correction. L'absence du timeout sur ce test ne garantit pas qu'il ne puisse jamais réapparaître.
 29. **Contre-test du symptôme initial**, avec exactement **`nslookup dc1-gre-siege.ironman.test 10.10.10.10`** : le résultat affiche **`Serveur : dc1-gre-siege.ironman.test`**, **`Address : 10.10.10.10`**, puis **`Nom : dc1-gre-siege.ironman.test`**, **`Address : 10.10.10.10`**. **Ni `Server: UnKnown` ni `DNS request timed out`** dans la sortie observée. Ce résultat confirme la disparition du symptôme initial dans ce nouveau test, après ajout de la zone inversée et du PTR.
+### Dépannage DNS — preuves avant/après
+
+**Constat et analyse initiale**
+
+![Gestionnaire DNS sans zone de recherche inversée](images/13-dns-zone-inversee-absente.png)
+
+*Avant — Dossier des zones de recherche inversée vide ; la résolution inverse n'est pas configurée.*
+
+![Zone DNS inversée créée sans enregistrement PTR](images/14-dns-zone-inversee-avant-ptr.png)
+
+*Configuration intermédiaire — La zone `10.10.10.in-addr.arpa` est créée ; seuls les enregistrements SOA et NS sont visibles.*
+
+**Correction et contre-tests**
+
+![Création du PTR de 10.10.10.10 vers le contrôleur de domaine](images/15-dns-ptr-enregistre.png)
+
+*Correction — PTR présent, associant `10.10.10.10` à `dc1-gre-siege.ironman.test`.*
+
+![Résolution DNS inverse réussie depuis DC1 après ajout du PTR](images/16-dns-nslookup-inverse-reussi.png)
+
+*Contrôle 1 — `nslookup 10.10.10.10 10.10.10.10` retrouve le nom du serveur sans avertissement visible.*
+
+![Résolution DNS directe réussie sans le timeout initial](images/17-dns-nslookup-direct-apres-correction.png)
+
+*Contrôle 2 — Nouvelle exécution de la commande directe initialement en anomalie, avec résolution correcte et sans `Server: UnKnown` dans la sortie.*
+
 30. Exécution de **`dcdiag /test:DNS`** : le résultat communiqué indique **`Connectivity` réussi**, puis **`DNS` réussi pour `DC1-GRE-SIEGE`** et **`DNS` réussi pour le domaine `ironman.test`**. Le diagnostic DNS ciblé passe dans les résultats visibles ; ce test ne constitue pas à lui seul une preuve de résolution DNS des noms Internet, qui sera contrôlée séparément.
 31. Exécution de **`nslookup www.microsoft.com 10.10.10.10`** : le résolveur est identifié comme **`dc1-gre-siege.ironman.test`** à l'adresse **`10.10.10.10`**. La réponse **non autoritaire** renvoie l'alias `www.microsoft.com-c-3.edgekey.net`, le nom canonique `e13678.dscb.akamaiedge.net`, l'adresse IPv4 **`23.200.213.221`** et plusieurs adresses IPv6. **La résolution DNS externe demandée est réussie**. Le mécanisme exact de récursion (redirecteur ou indications de racine) n'a pas encore été déterminé ; aucun ajout de redirecteur n'est nécessaire pour résoudre cette requête précise.
+### Contrôles complémentaires DNS
+
+![Diagnostic dcdiag DNS validé pour le contrôleur et le domaine](images/18-dcdiag-dns-reussi.png)
+
+*Le diagnostic ciblé `dcdiag /test:DNS` affiche une réussite pour DC1 et `ironman.test`.*
+
+![Requête DNS externe vers Microsoft résolue par DC1](images/19-dns-externe-microsoft-reussi.png)
+
+*Le serveur DNS `10.10.10.10` résout `www.microsoft.com` et renvoie des adresses externes ; cela ne démontre pas à lui seul l'accessibilité HTTP.*
+
 32. Exécution de **`net share`** sur `DC1-GRE-SIEGE` : présence des partages administratifs `C$`, `IPC$` et `ADMIN$` ainsi que de **`NETLOGON`** (`C:\WINDOWS\SYSVOL\sysvol\ironman.test\SCRIPTS`) et **`SYSVOL`** (`C:\WINDOWS\SYSVOL\sysvol`). La commande s'est terminée correctement. **La publication locale des partages est vérifiée** ; leur accessibilité depuis un poste client et l'application des GPO n'ont pas encore été testées.
 33. Exécution de **`dcdiag /test:Services`** : l'outil affiche **« Le test Connectivity de DC1-GRE-SIEGE a réussi »** et **« Le test Services de DC1-GRE-SIEGE a réussi »**. Aucun échec n'apparaît dans les résultats visibles du diagnostic ciblé. Ce contrôle ne remplace pas l'ensemble des tests Active Directory ni les tests d'authentification depuis un client.
+### Contrôles AD DS et partages
+
+![Liste des partages SYSVOL et NETLOGON par net share](images/11-net-share-sysvol-netlogon.png)
+
+*`net share` confirme que SYSVOL et NETLOGON sont publiés sur DC1 ; leur accès depuis un poste client reste à tester.*
+
+![Diagnostic dcdiag Services réussi sur le contrôleur](images/12-dcdiag-services-reussi.png)
+
+*Le test ciblé `dcdiag /test:Services` réussit, ainsi que son prérequis Connectivity.*
+
 34. Sélection et lancement de l'installation du rôle **Serveur DHCP** sur `DC1-GRE-SIEGE.ironman.test`. La console DHCP s'ouvre ensuite avec les arborescences IPv4 et IPv6, **sans étendue IPv4 créée à ce stade**.
 35. Dans la console DHCP, le menu contextuel du serveur propose **« Interdire »** et non « Autoriser » : cette observation indique que le serveur **est déjà autorisé dans Active Directory**. **Aucune distribution de bail DHCP n'a encore été vérifiée** depuis `PC-TEST-GRE`.
 36. Création de l'étendue IPv4 **`DHCP-GRE-SIEGE`** sur le réseau **`10.10.10.0/24`**. Paramètres saisis via l'assistant : plage annoncée **`10.10.10.100` à `10.10.10.199`**, masque `/24`, aucune exclusion supplémentaire, retard DHCP `0 ms`, bail prévu de `8 jours`, passerelle `10.10.10.1`, DNS `10.10.10.10`, suffixe DNS `ironman.test`, pas de serveur WINS.
 37. La console DHCP montre **« Étendue [10.10.10.0] DHCP-GRE-SIEGE »** avec le statut **« Actif »**. La délivrance effective d'un bail client n'a **pas encore été vérifiée**.
 38. Inspection de **DHCP → IPv4 → Étendue [10.10.10.0] → Options d'étendue** : les options observées sont **003 Routeur = `10.10.10.1`**, **006 Serveurs DNS = `10.10.10.10`** et **015 Nom de domaine DNS = `ironman.test`**. Aucun changement nécessaire sur ces trois options ; le bail et les paramètres effectivement reçus par `PC-TEST-GRE` restent à contrôler.
 39. Inspection de **DHCP → IPv4 → Étendue [10.10.10.0] → Pool d'adresses** : la plage d'attribution affichée démarre à **`10.10.10.100`** et se termine à **`10.10.10.199`**, soit **100 adresses IPv4**. La plage est bien enregistrée ; **aucun bail client ni succès de renouvellement DHCP n'a encore été démontré**. La durée de bail de 8 jours, choisie dans l'assistant, sera contrôlée dans les propriétés de l'étendue lors de la reprise.
+
+### Preuves de configuration du serveur DHCP
+
+![Menu DHCP indiquant Interdire sur le serveur de domaine](images/20-dhcp-serveur-autorise-ad.png)
+
+*Autorisation AD — Le menu contextuel propose « Interdire », ce qui indique que le serveur DHCP est actuellement autorisé.*
+
+![Étendue DHCP Grenoble active dans la console](images/21-dhcp-etendue-active.png)
+
+*Activation — L'étendue `DHCP-GRE-SIEGE` du réseau `10.10.10.0/24` est visible avec l'état « Actif ».*
+
+![Options DHCP 003 routeur, 006 DNS et 015 domaine](images/22-dhcp-options-passerelle-dns-domaine.png)
+
+*Options — Routeur `10.10.10.1`, DNS `10.10.10.10` et suffixe de domaine `ironman.test`.*
+
+![Plage DHCP de 10.10.10.100 à 10.10.10.199](images/23-dhcp-plage-100-199.png)
+
+*Pool — `10.10.10.100` à `10.10.10.199` (100 adresses IPv4). Aucun bail effectivement attribué n'est encore prouvé.*
 
 ## 4. Configuration IPv4 confirmée depuis `ipconfig /all`
 
@@ -175,27 +239,19 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 
 ## 6. Preuves visuelles publiées
 
-Les **10 captures authentiques** figurent directement dans les sections techniques précédentes, chacune accompagnée d'une légende et replacée dans la chronologie de la manipulation. Elles couvrent :
+Les **23 captures authentiques** sont maintenant vérifiées dans `docs/episode-04/images/` et **intégrées dans ce README avec leurs légendes** :
 
-- la VM VMware et le renommage de DC1 ;
-- l'adressage IPv4 et les tests de connectivité ;
-- l'installation du rôle AD DS et les prérequis de promotion ;
-- la présence du domaine `ironman.test`, le diagnostic `dcdiag` et les recherches DNS **avant création de la zone inverse**.
+- **01 à 10 — installation et promotion :** paramètres VMware, renommage, réseau, rôle AD DS, domaine, premières requêtes DNS ;
+- **11 et 12 — services Active Directory :** partages `SYSVOL` et `NETLOGON`, diagnostic `dcdiag /test:Services` ;
+- **13 à 17 — dépannage DNS avant/après :** zone inversée absente, zone créée, ajout du PTR, résolutions inverse et directe après correction ;
+- **18 et 19 — validation DNS :** diagnostic `dcdiag /test:DNS`, résolution d'un domaine externe ;
+- **20 à 23 — configuration DHCP :** autorisation dans AD, étendue active, options 003/006/015 et plage enregistrée.
 
+[Parcourir le dossier d'images et son inventaire](images/README.md).
 
-### Lot de preuves visuelles préparé, en attente de dépôt
+**Limites des preuves :** la création de l'étendue et la présence des paramètres ne prouvent pas qu'un client a reçu un bail DHCP. La durée du bail, l'obtention d'une adresse par `PC-TEST-GRE`, son accès aux partages et la jonction au domaine restent à vérifier.
 
-La session du 2 novembre 2026 a fourni **13 captures supplémentaires authentiques**, nommées de `11-net-share-sysvol-netlogon.png` à `23-dhcp-plage-100-199.png`. Elles couvrent les tests AD DS, le scénario de dépannage DNS avant/après, le diagnostic DNS et la configuration DHCP.
-
-**État : ces 13 images ne sont pas encore présentes dans le dépôt GitHub ; elles ont été préparées dans une archive locale pour téléversement.** Elles ne doivent pas être insérées dans le README comme preuves publiées avant vérification de leur présence dans `docs/episode-04/images/`.
-
-**Point de reprise après la pause :** vérifier la durée de bail de l'étendue DHCP, démarrer `PC-TEST-GRE`, basculer sa carte réseau du mode statique au mode DHCP, puis confirmer avec `ipconfig /all` l'adresse obtenue, la passerelle, le DNS, le suffixe, le bail et le serveur DHCP. Ensuite : tests de connectivité, DNS et jonction au domaine `ironman.test`.
-
-**Captures supplémentaires à intégrer ultérieurement :** zone inversée initialement vide, zone créée, enregistrement PTR, sorties réussies de `nslookup` après correction, résultat de `dcdiag /test:DNS`, résolution externe de `www.microsoft.com`, sortie `net share` montrant SYSVOL/NETLOGON et résultat de `dcdiag /test:Services`, sélection et configuration du rôle DHCP et menu « Interdire » confirmant l'autorisation AD, puis étendue DHCP affichée « Actif », écran d'options 003/006/015 et pool d'adresses `10.10.10.100–10.10.10.199`. Ces images ont été transmises dans le suivi du laboratoire, mais **ne figurent pas encore dans ce dépôt** ; elles doivent être téléversées après contrôle de confidentialité.
-
-[Ouvrir le dossier des images sources](images/README.md).
-
-**Confidentialité :** les captures publiées ne contiennent pas les mots de passe administrateur ou DSRM. Les exports de configuration pfSense restent stockés hors GitHub. Les images documentent uniquement ce qui a été réellement observé.
+**Confidentialité :** aucun mot de passe administrateur ou DSRM ni export de configuration pfSense n'est publié.
 
 ## 7. Étapes restantes
 

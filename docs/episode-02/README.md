@@ -1,8 +1,19 @@
 # ALPINA RETAIL — Épisode 02 : Cahier des charges informatique
 
-> **Statut : conception validée, déploiement non commencé.**  
-> **Nature du projet :** étude de cas fictive et laboratoire personnel TSSR.  
-> **Environnement réel :** VMware Workstation, PC Windows 11, 16 Go de RAM, budget supplémentaire de 0 €.
+> **Statut de l'épisode :** cahier des charges de conception validé ; aucun système n'a été déployé **dans cette étape de conception**.  
+> **Évolution du projet :** les premières mises en œuvre ont ensuite été documentées dans l'[épisode 03 — pfSense](../episode-03/README.md) et l'[épisode 04 — Windows Server](../episode-04/README.md).  
+> **Nature du projet :** entreprise fictive et laboratoire TSSR personnel.  
+> **Contraintes de l'étude :** VMware Workstation sur Windows 11, 16 Go de RAM, budget supplémentaire prévu de 0 €.
+
+## En bref
+
+| Entreprise de référence | Contenu de cet épisode | Réalisation technique |
+|---|---|---|
+| **4 sites · 75 utilisateurs simulés** | Architecture cible, droits d'accès, inventaire, continuité et périmètre d'une maquette | **Aucune validation technique revendiquée dans l'épisode 02** ; voir les épisodes 03 et 04 pour les réalisations ultérieures |
+
+**Sommaire :** [Contexte](#1-contexte-et-objectif) · [Besoins](#2-besoins-informatiques-retenus) · [Architecture cible](#3-architecture-cible-de-lentreprise-prévisionnelle) · [Habilitations](#4-politique-daccès-aux-fichiers) · [Inventaire](#5-inventaire-métier-simulé) · [Laboratoire 16 Go](#6-périmètre-réellement-réalisable-avec-16-go-de-ram) · [Méthode de validation](#7-méthode-de-validation-tssr)
+
+**Navigation :** [Accueil / épisode 00](../../README.md) · [Épisode précédent : 01](../episode-01/README.md) · [Épisode suivant : 03](../episode-03/README.md)
 
 ## 1. Contexte et objectif
 
@@ -88,7 +99,7 @@ Cet inventaire représente **l'entreprise fictive**, pas le nombre de machines v
 
 Le laboratoire utilisera **VMware Workstation**, sans achat ni abonnement obligatoire. Nous simulerons les quatre sites **progressivement**, sans allumer tous les serveurs et postes simultanément.
 
-**Premier lot de mise en œuvre :**
+**Premier lot envisagé lors de la conception :**
 
 1. Préparer le plan IP, les sous-réseaux et les interfaces VMware/pfSense.
 2. Installer et configurer `DC1` (Windows Server, AD DS, DNS).
@@ -96,6 +107,8 @@ Le laboratoire utilisera **VMware Workstation**, sans achat ni abonnement obliga
 4. Valider connectivité, résolution DNS, jonction au domaine et authentification.
 5. Ajouter ensuite `DC2`, `FS1`, les GPO, les groupes et les permissions, **un service à la fois**.
 6. Étendre progressivement les exercices au VPN intersites, à Linux, GLPI, Centreon et aux sauvegardes selon les ressources disponibles.
+
+*Précision chronologique :* les étapes réelles ont ensuite commencé par [pfSense et Windows 11](../episode-03/README.md), puis [DC1, AD DS, DNS et DHCP](../episode-04/README.md). Cet ordre d'exécution diffère de l'ordre de la liste prévisionnelle ci-dessus ; les validations réelles figurent dans leurs épisodes respectifs.
 
 **Hors du périmètre initial du laboratoire :** déployer 75 postes, développer un logiciel de caisse, reproduire une infrastructure bancaire, garantir une vraie haute disponibilité matérielle ou utiliser un stockage cloud payant. Ces éléments restent des besoins métier ou des simulations encadrées.
 
@@ -105,10 +118,14 @@ Pour chaque réalisation : **besoin → configuration → vérification → pann
 
 Les livrables futurs comprendront, selon les étapes : plan IP, schémas réseau, extraits de configuration sans secrets, commandes de vérification, captures d'écran anonymisées, tickets GLPI fictifs et résultats de tests de restauration.
 
-**État actuel :** cahier des charges élaboré ; **aucun déploiement ni test technique de l'épisode 02 n'est encore revendiqué**.
+**Bilan de l'épisode 02 :** les exigences métier, l'architecture cible et le périmètre du laboratoire ont été définis. **Ce document est un livrable de conception, pas un procès-verbal de mise en service.**
+
+**Suivi de la réalisation :** pfSense, le premier contrôleur de domaine, DNS et une étendue DHCP ont ensuite fait l'objet de travaux documentés dans les épisodes 03 et 04. Les VPN intersites, les ressources complètes des boutiques et les autres serveurs de l'architecture cible **ne sont pas revendiqués comme opérationnels** ici.
 
 ---
 
 **Auteur :** Vincent Scannella — Technicien Supérieur Systèmes et Réseaux (TSSR).  
 **Dépôt du projet :** https://github.com/vincent-scannella/alpina-retail-tssr  
 **Usage :** projet pédagogique fictif, documentation publique sans mots de passe, secrets ni données personnelles.
+
+[Retour à l'accueil](../../README.md) · [Épisode 01 — Organisation](../episode-01/README.md) · [Épisode 03 — pfSense](../episode-03/README.md)

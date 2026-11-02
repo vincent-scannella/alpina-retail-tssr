@@ -1,4 +1,4 @@
-# Modèle de documentation — Nouvel épisode ALPINA RETAIL
+**MODÈLE DE DOCUMENTATION — NOUVEL ÉPISODE ALPINA RETAIL**
 
 > **Gabarit interne, non publié comme réalisation technique.** Copier sa structure dans `docs/episode-XX/README.md` pour chaque nouvel épisode. **Remplacer les champs entre crochets** par des observations réelles ; ne jamais présenter ce modèle comme un test effectué.  
 > **Standard de référence :** [Guide des captures et des publications](GUIDE_CAPTURES_PUBLICATIONS.md).

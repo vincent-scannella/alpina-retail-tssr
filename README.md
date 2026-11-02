@@ -31,8 +31,6 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 
 *Schéma de synthèse au 2 novembre 2026 — équipement du laboratoire réellement créé. Le DHCP Windows est configuré, mais **le bail client et la jonction au domaine ne sont pas encore testés**. [Ouvrir le schéma vectoriel en grand](docs/topologie-laboratoire-siege.svg).*
 
-``
-
 *L'adresse `10.10.10.20` est la configuration **statique utilisée lors des premiers tests** du poste client. Son passage en DHCP et l'obtention d'un bail réel restent à vérifier. Les trois VM ne sont pas nécessairement allumées simultanément, compte tenu des 16 Go de RAM disponibles.*
 
 ### Repères d'adressage du siège

@@ -43,6 +43,7 @@ Exemple d'intégration, après ajout effectif du fichier image :
 
 ## 5. Application au projet
 
+- **Épisodes 00, 01 et 02 — conception :** schémas explicatifs vectoriels, clairement identifiés comme *entreprise fictive* et *architecture cible*, sans les présenter comme des captures d'un système fonctionnel. Le dépôt comprend une vue multisite en épisode 00, l'organigramme et la répartition des effectifs en épisode 01, et deux schémas prévisionnels en épisode 02.
 - **Épisode 03 — pfSense et Windows 11 :** choisir des captures authentiques de l'architecture VMware, des paramètres LAN, du poste client et des tests réseau/NAT/PAT, si elles sont disponibles. Les résultats ICMP avant/après et HTTPS ont été confirmés, mais **aucune preuve de log pour la règle de test n'a été produite** ; ne pas en inventer.
 - **Épisodes suivants — Windows Server, AD DS, DNS, DHCP, dépannage :** préparer systématiquement les captures pendant chaque manipulation et chaque contrôle réussi ou échoué.
 
@@ -69,4 +70,4 @@ Cette règle s'applique **à chaque futur épisode**, y compris pendant les phas
 
 **Calendrier :** la publication pfSense/Windows 11 de l'épisode 03 est déjà programmée pour le **10 novembre 2026 à 12 h 15**. Pour l'épisode 04, ne fixer une nouvelle date que lorsque le contenu, les preuves visuelles et le diagnostic auront été validés ; éviter un chevauchement inutile avec la publication programmée.
 
-**Images de l'épisode 04 :** les dix premières captures sont présentes dans `docs/episode-04/images/` et incluses au README. **Les captures supplémentaires** du dépannage PTR, de ses contre-tests et des validations DNS ultérieures ont été partagées dans la conversation, mais devront être vérifiées et téléversées avant toute intégration Markdown.
+**Images de l'épisode 04 :** **23 captures authentiques** vérifiées dans `docs/episode-04/images/` et toutes intégrées dans le README de l'épisode, dont les comparaisons DNS avant/après et la configuration de l'étendue DHCP. La prochaine preuve attendue est l'obtention d'un bail DHCP par `PC-TEST-GRE`, puis les tests de domaine côté client.

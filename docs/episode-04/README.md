@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 04 : Déploiement de Windows Server 2025 au siège de Grenoble
 
 > **Date des opérations :** 2 novembre 2026  
-> **Statut :** Windows Server installé, renommé et adressé en IPv4 statique ; connectivité vers pfSense et vers `8.8.8.8` **testée avec succès**. **Active Directory, DNS et DHCP ne sont pas encore installés ni validés.**  
+> **Statut :** Windows Server installé, renommé et adressé en IPv4 statique ; connectivité vers pfSense et vers `8.8.8.8` **testée avec succès**. **Le rôle AD DS est installé avec succès, mais la promotion en contrôleur de domaine et la création du domaine restent à effectuer. Les services DNS et DHCP ne sont pas encore validés.**  
 > **Contexte :** laboratoire personnel TSSR simulant une entreprise entièrement fictive.
 
 ## 1. Objectif et architecture
@@ -56,6 +56,9 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 10. Configuration manuelle de l'interface `Ethernet0` en IPv4 statique.
 11. Vérification des paramètres avec `ipconfig /all`.
 12. Démarrage de pfSense, puis tests `ping` vers la passerelle et vers une destination extérieure, avec résultats complets consignés ci-dessous.
+13. Lancement de **Gestionnaire de serveur → Gérer → Ajouter des rôles et fonctionnalités** ; sélection de l'installation basée sur un rôle et du serveur `DC1-GRE-SIEGE` (`10.10.10.10`).
+14. Sélection du rôle **Services de domaine Active Directory (AD DS)** et des fonctionnalités d'administration associées, puis lancement de l'installation.
+15. **Installation du rôle AD DS réussie**, attestée par la notification du Gestionnaire de serveur : « Configuration requise. Installation réussie sur DC1-GRE-SIEGE ». L'assistant propose désormais **« Promouvoir ce serveur en contrôleur de domaine »**. **Aucune promotion n'a encore été effectuée.**
 
 ## 4. Configuration IPv4 confirmée depuis `ipconfig /all`
 
@@ -87,6 +90,7 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 
 Des captures authentiques ont été prises pendant les manipulations :
 - récapitulatif de création de la VM ;
+- notification de réussite d'installation du rôle AD DS (promotion encore à faire) ;
 - premier démarrage et Gestionnaire de serveur ;
 - renommage confirmé après redémarrage ;
 - sortie `ipconfig /all` ;
@@ -102,8 +106,8 @@ Des captures authentiques ont été prises pendant les manipulations :
 - [x] Configurer et vérifier l'adresse `10.10.10.10/24`.
 - [x] Tester le ping vers la passerelle `10.10.10.1` avec 0 % de perte.
 - [x] Tester le ping vers `8.8.8.8` avec 0 % de perte.
-- [ ] Installer le rôle **AD DS**.
-- [ ] Promouvoir DC1 en contrôleur de domaine et configurer DNS.
+- [x] Installer le rôle **AD DS** : notification de réussite du Gestionnaire de serveur observée le 02/11/2026.
+- [ ] Promouvoir DC1 en contrôleur de domaine, créer la forêt Active Directory et configurer DNS (non encore réalisés).
 - [ ] Vérifier les services AD/DNS, la zone de recherche et les enregistrements.
 - [ ] Configurer ensuite DHCP, conformément à l'architecture de laboratoire.
 - [ ] Vérifier la jonction d'un poste Windows 11 au domaine, l'authentification et les politiques de groupe.

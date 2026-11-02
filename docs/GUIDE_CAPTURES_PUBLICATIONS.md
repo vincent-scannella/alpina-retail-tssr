@@ -47,3 +47,26 @@ Exemple d'intégration, après ajout effectif du fichier image :
 - **Épisodes suivants — Windows Server, AD DS, DNS, DHCP, dépannage :** préparer systématiquement les captures pendant chaque manipulation et chaque contrôle réussi ou échoué.
 
 **Principe :** des captures réelles, contextualisées, lisibles et expurgées de toute information sensible renforcent la crédibilité d'un laboratoire professionnel.
+
+## 6. Règle de suivi : captures et jalons LinkedIn
+
+Cette règle s'applique **à chaque futur épisode**, y compris pendant les phases de dépannage :
+
+1. Avant ou juste après chaque manipulation importante, **indiquer à l'auteur quelle capture réaliser** (écran de paramétrage, état initial, erreur, test, correction, test final).
+2. Après une vérification réussie ou un diagnostic utile, **actualiser le README technique** avec la commande complète, la configuration observée et les limites du résultat.
+3. **Vérifier la présence réelle du PNG dans GitHub avant d'ajouter son lien Markdown.** Si un fichier image n'est pas encore téléversé, signaler « capture en attente » et accompagner l'auteur pour son ajout, plutôt que d'annoncer son intégration.
+4. Conserver, pour un incident, des captures **avant / après**, sans confondre une hypothèse de panne avec une cause démontrée.
+5. **Signaler explicitement quand un nouveau jalon mérite une publication LinkedIn**, sans multiplier les posts pour des opérations intermédiaires. Le projet doit présenter des réalisations techniques démontrées, pas seulement une installation.
+6. Avant toute publication, confronter son texte aux preuves réellement obtenues, joindre un carrousel de captures authentiques et vérifier la date déjà programmée pour éviter les doublons.
+
+### Prochain jalon éditorial envisagé — Épisode 04
+
+**Sujet :** Windows Server 2025, domaine Active Directory `ironman.test`, DNS et dépannage de la résolution inverse.
+
+**Déjà vérifié le 2 novembre 2026 :** VM créée ; adressage IP statique ; connectivité pfSense et Internet en IPv4 ; promotion du domaine ; `dcdiag /test:Advertising` réussi ; enregistrement SRV LDAP retourné ; zone inversée et PTR créés ; disparition du message `Server: UnKnown` au contre-test ; `dcdiag /test:DNS` réussi dans les résultats visibles ; résolution du nom externe `www.microsoft.com` via DC1 réussie.
+
+**Encore utile pour une publication de déploiement plus complète :** contrôler les partages `SYSVOL` et `NETLOGON`, puis idéalement déployer et vérifier le serveur DHCP et la jonction du poste `PC-TEST-GRE` au domaine, avec une connexion utilisateur de test. Si cette suite prend du temps, une publication autonome centrée sur **la création du domaine et le dépannage DNS documenté** peut déjà être justifiée après les contrôles AD complémentaires.
+
+**Calendrier :** la publication pfSense/Windows 11 de l'épisode 03 est déjà programmée pour le **10 novembre 2026 à 12 h 15**. Pour l'épisode 04, ne fixer une nouvelle date que lorsque le contenu, les preuves visuelles et le diagnostic auront été validés ; éviter un chevauchement inutile avec la publication programmée.
+
+**Images de l'épisode 04 :** les dix premières captures sont présentes dans `docs/episode-04/images/` et incluses au README. **Les captures supplémentaires** du dépannage PTR, de ses contre-tests et des validations DNS ultérieures ont été partagées dans la conversation, mais devront être vérifiées et téléversées avant toute intégration Markdown.

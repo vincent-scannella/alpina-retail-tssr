@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 04 : Déploiement de Windows Server 2025 au siège de Grenoble
 
 > **Date des opérations :** 2 novembre 2026  
-> **Statut :** Windows Server installé, renommé et adressé en IPv4 statique ; connectivité vers pfSense et vers `8.8.8.8` **testée avec succès**. **Rôle AD DS installé, promotion de `DC1-GRE-SIEGE` vers la nouvelle forêt `ironman.test` engagée et redémarrage suivi d'une connexion au domaine `IRONMAN` confirmés. L'identité de domaine apparaît dans « Serveur local ». Le diagnostic ciblé `dcdiag /test:Advertising` a réussi (tests Connectivity et Advertising) ; le fonctionnement DNS, la santé globale d'AD DS et DHCP restent à vérifier.**  
+> **Statut :** Windows Server installé, renommé et adressé en IPv4 statique ; connectivité vers pfSense et vers `8.8.8.8` **testée avec succès**. **Rôle AD DS installé, promotion de `DC1-GRE-SIEGE` vers la nouvelle forêt `ironman.test` engagée et redémarrage suivi d'une connexion au domaine `IRONMAN` confirmés. L'identité de domaine apparaît dans « Serveur local ». Le diagnostic ciblé `dcdiag /test:Advertising` a réussi (tests Connectivity et Advertising) ; une requête DNS SRV de découverte LDAP a réussi et renvoie `dc1-gre-siege.ironman.test` / `10.10.10.10` (port 389). La santé globale du DNS et d'AD DS ainsi que DHCP restent à vérifier.**  
 > **Contexte :** laboratoire personnel TSSR simulant une entreprise entièrement fictive.
 
 ## 1. Objectif et architecture
@@ -67,6 +67,7 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 21. Promotion lancée, puis **redémarrage de Windows Server**. L'écran de connexion affiche **`IRONMAN\Administrateur`** ; ouverture de session effectuée par l'auteur.
 22. Dans **Gestionnaire de serveur → Serveur local**, observation du nom **`DC1-GRE-SIEGE`**, du **domaine `ironman.test`**, de l'adresse **`10.10.10.10`** et du profil de pare-feu **Domaine : actif**. Ces preuves confirment le rattachement à la nouvelle forêt après promotion, **sans valider encore l'ensemble des services AD DS et DNS**.
 23. Exécution de **`dcdiag /test:Advertising`** depuis une invite de commandes sur DC1 : l'outil trouve le serveur associé, reconnaît la forêt AD et affiche **« Le test Connectivity de DC1-GRE-SIEGE a réussi »**, puis **« Le test Advertising de DC1-GRE-SIEGE a réussi »**. Aucun échec dans le résultat visible de ce test ciblé ; il ne s'agit pas d'un diagnostic exhaustif du DNS ou de l'annuaire.
+24. Exécution de **`nslookup -type=SRV _ldap._tcp.dc._msdcs.ironman.test`** : la réponse contient un enregistrement SRV de priorité `0`, poids `100`, port **`389`**, cible **`dc1-gre-siege.ironman.test`** et l'adresse IPv4 **`10.10.10.10`**. `nslookup` indique `Server: UnKnown` / `Address: ::1` : le nom du serveur interrogé n'est pas affiché, mais la requête SRV a bien obtenu la réponse attendue. La résolution externe et les diagnostics DNS complets restent à vérifier.
 
 ## 4. Configuration IPv4 confirmée depuis `ipconfig /all`
 
@@ -106,7 +107,8 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 | Redémarrage après promotion | Effectué ; session `IRONMAN\Administrateur` ouverte |
 | Domaine visible dans Serveur local | **`ironman.test`** |
 | Tests ciblés AD DS | **`dcdiag /test:Advertising` : Connectivity et Advertising réussis** sur `DC1-GRE-SIEGE` |
-| DNS et autres services AD DS | **Non encore vérifiés** par un diagnostic DNS et des tests de résolution |
+| Recherche SRV du contrôleur de domaine | **Réussie :** `_ldap._tcp.dc._msdcs.ironman.test` → `dc1-gre-siege.ironman.test`, port `389`, IPv4 `10.10.10.10` |
+| Diagnostic DNS complet et autres services AD DS | **Non encore vérifiés** ; `Server: UnKnown` sur `::1` ne remet pas en cause la réponse SRV observée |
 
 ## 6. Preuves visuelles à publier
 
@@ -119,7 +121,8 @@ Des captures authentiques ont été prises pendant les manipulations :
 - renommage confirmé après redémarrage ;
 - sortie `ipconfig /all` ;
 - commandes de ping et statistiques ;
-- sortie `dcdiag /test:Advertising` confirmant la réussite des tests Connectivity et Advertising.
+- sortie `dcdiag /test:Advertising` confirmant la réussite des tests Connectivity et Advertising ;
+- sortie `nslookup` du SRV LDAP avec l'hôte et le port annoncés.
 
 **À faire :** déposer les captures sélectionnées, après vérification de confidentialité, dans un futur dossier `images/`, puis les intégrer en Markdown à proximité des vérifications qu'elles étayent. **Aucune image non déposée n'est présentée comme publiée.**
 
@@ -135,7 +138,8 @@ Des captures authentiques ont été prises pendant les manipulations :
 - [x] Lancer et achever la promotion de DC1 en premier contrôleur de domaine de la nouvelle forêt `ironman.test` : redémarrage et identité de domaine confirmés visuellement.
 - [x] Réaliser un premier diagnostic AD DS ciblé : `dcdiag /test:Advertising`, tests Connectivity et Advertising réussis.
 - [ ] Vérifier la santé globale des services AD DS, le rôle DNS et la résolution DNS après promotion (non encore validés).
-- [ ] Vérifier la présence et l'intégrité des zones et enregistrements DNS AD, ainsi que les services d'annuaire.
+- [x] Vérifier un enregistrement SRV AD DNS : recherche `_ldap._tcp.dc._msdcs.ironman.test` réussie, cible et port LDAP confirmés.
+- [ ] Vérifier plus largement les zones DNS AD, la résolution directe et externe et les services d'annuaire.
 - [ ] Configurer ensuite DHCP, conformément à l'architecture de laboratoire.
 - [ ] Vérifier la jonction d'un poste Windows 11 au domaine, l'authentification et les politiques de groupe.
 - [ ] Ajouter des captures authentiques contrôlées dans la documentation.

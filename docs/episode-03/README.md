@@ -166,6 +166,43 @@ Les durées et pertes chiffrées ci-dessus proviennent de la capture des sorties
 
 Le fichier de sauvegarde de configuration pfSense a été exporté depuis l'interface Web avec **chiffrement activé** puis copié de `PC-TEST-GRE` vers le PC Windows physique. Il reste **exclusivement local** : le fichier XML et son mot de passe ne doivent pas être versés sur GitHub. La concordance des tailles affichées constitue un premier contrôle du transfert, mais **ne remplace pas un contrôle d'intégrité par empreinte ni un essai de restauration**. Conserver une copie de secours supplémentaire sur un support protégé constitue une étape de résilience future.
 
+#### Preuves visuelles — sauvegarde pfSense du 2 novembre 2026
+
+Les cinq captures suivantes proviennent du **laboratoire réel**. Elles illustrent la préparation de l'export, l'activation du chiffrement, la présence du fichier dans la VM et sa copie sur le PC hôte. **Le fichier de sauvegarde XML lui-même n'est pas publié.**
+
+**1. Préparation des paramètres de sauvegarde**
+
+![Interface pfSense Backup & Restore, options de sauvegarde avant activation du chiffrement](images/01-pfsense-parametres-sauvegarde.png)
+
+*pfSense — menu Diagnostics → Backup & Restore : sélection du périmètre complet et des options d'export avant chiffrement.*
+
+**2. Activation du chiffrement de la configuration**
+
+![Option Encrypt this configuration file cochée dans pfSense, champs de mot de passe vides](images/02-pfsense-chiffrement-active.png)
+
+*pfSense — option « Encrypt this configuration file » activée. Les champs de mot de passe sont vides sur cette capture, réalisée avant leur saisie ; les secrets ne sont pas exposés.*
+
+**3. Téléchargement du fichier de sauvegarde dans la VM Windows 11**
+
+![Fichier de configuration pfSense téléchargé dans le dossier Téléchargements de PC-TEST-GRE](images/03-sauvegarde-xml-vm.png)
+
+*PC-TEST-GRE — présence du fichier de configuration dans Téléchargements ; taille d'environ 17 Ko affichée dans l'Explorateur.*
+
+**4. Vérification de l'extension du fichier**
+
+![Extension .xml visible pour la sauvegarde de configuration pfSense dans Windows 11](images/04-extension-xml-verifiee.png)
+
+*PC-TEST-GRE — affichage de l'extension `.xml` dans l'Explorateur Windows ; le contenu de la sauvegarde n'est pas affiché.*
+
+**5. Copie de la sauvegarde sur le PC hôte physique**
+
+![Sauvegarde pfSense copiée dans ALPINA_RETAIL_BACKUP sur le PC Windows physique](images/05-copie-sauvegarde-hote.png)
+
+*Windows 11 hôte — fichier XML présent dans `ALPINA_RETAIL_BACKUP\\pfSense`, avec une taille affichée de 17 Ko (16,2 Ko dans la barre d'état). Ce contrôle ne remplace pas la comparaison d'empreintes ni un test de restauration.*
+
+**Bilan :** export chiffré effectué et copie locale hors de la VM observée. **Aucune restauration n'a encore été testée.**
+
+
 ## 6. Limites de la validation
 
 Les éléments suivants ne sont pas encore validés :
@@ -202,7 +239,8 @@ Aucun test non réalisé n'est présenté comme réussi.
 - [ ] Installer Windows Server et préparer les services AD DS, DNS et DHCP.
 - [ ] Réaliser des tests de filtrage et des scénarios de dépannage.
 - [ ] Préparer les futurs VPN IPsec intersites.
-- [ ] Ajouter des captures et preuves techniques après vérification et anonymisation.
+- [x] Ajouter cinq captures authentiques et contextualisées du scénario de sauvegarde pfSense.
+- [ ] Ajouter d'autres captures et preuves techniques (installation, NAT/PAT, tests réseau) après vérification et anonymisation.
 
 ## 8. Compétences TSSR mobilisées
 
@@ -217,7 +255,8 @@ Aucun test non réalisé n'est présenté comme réussi.
 - Vérification de la résolution DNS avec `nslookup` depuis Windows 11.
 - Vérification de la connectivité LAN et WAN depuis un client Windows avec `ping`, relevé du taux de perte et des latences.
 - Validation du redémarrage et de la persistance de l'adressage des interfaces.
-- Documentation technique et traçabilité des tests.
+- Sauvegarde chiffrée et conservation d'un export de configuration pfSense hors de la machine virtuelle.
+- Documentation technique et traçabilité des tests, avec captures d'écran authentiques.
 
 ## 9. Références du projet
 

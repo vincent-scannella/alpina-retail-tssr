@@ -1,4 +1,4 @@
-=![Bannière ALPINA RETAIL](IMG_0869.png)
+![Bannière ALPINA RETAIL](IMG_0869.png)
 
 
 🏢 ALPINA RETAIL — Projet Infrastructure TSSR
@@ -16,6 +16,12 @@ Projet personnel de Vincent Scannella — Technicien Supérieur Systèmes et Ré
 - **Épisode 02 — Cahier des charges informatique** : [Consulter les livrables](docs/episode-02/README.md).
 - **Épisode 03 — Installation du pare-feu pfSense au siège de Grenoble** : [Consulter la documentation](docs/episode-03/README.md).
 - **Épisode 04 — Windows Server 2025 au siège de Grenoble (en cours)** : [Installation, adressage et tests réseau vérifiés](docs/episode-04/README.md).
+
+## Épisode 00 — Vue d'ensemble des quatre sites
+
+![Schéma de présentation du projet ALPINA RETAIL : siège de Grenoble et trois boutiques](docs/episode-00/images/vue-ensemble-multisite.svg)
+
+*Schéma explicatif — entreprise fictive de 75 collaborateurs répartis sur quatre implantations. Les liaisons entre sites sont des objectifs de conception, non des connexions déjà déployées.*
 
 🎯 Présentation du projet
 

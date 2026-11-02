@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1010" viewBox="0 0 1440 1010" role="img" aria-labelledby="title desc">
+<title id="title">Topologie actuelle du laboratoire ALPINA RETAIL au siège de Grenoble</title>
+<desc id="desc">Internet, NAT VMware VMnet8, pare-feu pfSense avec LAN 10.10.10.1, VMnet1 Host-only, serveur DC1-GRE-SIEGE 10.10.10.10 avec Active Directory, DNS et DHCP, et client Windows 11 PC-TEST-GRE 10.10.10.20 configuré initialement en statique. Les tests DHCP client et jonction Active Directory restent à effectuer.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#07121f"/><stop offset=".55" stop-color="#0f2235"/><stop offset="1" stop-color="#0a1928"/></linearGradient>
+  <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2cc7de"/><stop offset="1" stop-color="#70afff"/></linearGradient>
+  <linearGradient id="node" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a364c"/><stop offset="1" stop-color="#13293d"/></linearGradient>
+  <marker id="arr" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><path d="M2 2 L10 6 L2 10" fill="none" stroke="#55ccdf" stroke-width="2"/></marker>
+  <style>text { font-family: Inter, "Segoe UI", Arial, sans-serif; letter-spacing: .13px; } .muted{fill:#adc4d8} .route{fill:none;stroke:#4fcfe1;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round} .dash{stroke-dasharray:8 7}</style>
+</defs>
+<rect width="1440" height="1010" fill="url(#bg)"/>
+<rect x="0" y="0" width="1440" height="8" fill="url(#accent)"/>
+<rect x="54" y="43" width="7" height="80" rx="3.5" fill="url(#accent)"/>
+<text x="82" y="69" fill="#48d4e6" font-size="19" font-weight="750" text-anchor="start">ALPINA RETAIL  /  LABORATOIRE TSSR</text>
+<text x="82" y="111" fill="#fbfdff" font-size="39" font-weight="760" text-anchor="start">Topologie réseau réellement mise en place</text>
+<text x="82" y="153" fill="#adc4d8" font-size="19" font-weight="450" text-anchor="start">Grenoble — Siège pilote  •  État documenté au 2 novembre 2026</text>
+<rect x="1117" y="57" width="129" height="29" rx="14.5" fill="#123d3c" stroke="#60e1c6" stroke-opacity=".48" /><text x="1181.5" y="76.7" fill="#60e1c6" font-size="13" font-weight="700" text-anchor="middle">TESTÉ</text>
+<rect x="1259" y="57" width="124" height="29" rx="14.5" fill="#403522" stroke="#ffd38c" stroke-opacity=".48" /><text x="1321" y="76.7" fill="#ffd38c" font-size="13" font-weight="700" text-anchor="middle">À VÉRIFIER</text>
+<rect x="347" y="191" width="1030" height="697" rx="26" fill="#10253a" stroke="#3c607b" stroke-width="1.8" />
+<text x="384" y="229" fill="#69def3" font-size="17" font-weight="700" text-anchor="start">POSTE PHYSIQUE : WINDOWS 11</text>
+<text x="384" y="256" fill="#adc5d9" font-size="17" font-weight="480" text-anchor="start">VMware Workstation Pro 17  ·  16 Go RAM hôte</text>
+<rect x="50" y="320" width="260" height="142" rx="18" fill="#172b43" stroke="#49839a" stroke-width="1.8" />
+<text x="79" y="359" fill="#f8fdff" font-size="28" font-weight="740" text-anchor="start">INTERNET</text>
+<text x="79" y="391" fill="#d2e8f5" font-size="18" font-weight="540" text-anchor="start">Sortie IPv4 vérifiée</text>
+<text x="79" y="421" fill="#a7c3d7" font-size="16" font-weight="460" text-anchor="start">HTTPS testé depuis Win11</text>
+<rect x="77" y="432" width="95" height="29" rx="14.5" fill="#123d3c" stroke="#60e1c6" stroke-opacity=".48" /><text x="124.5" y="451.7" fill="#60e1c6" font-size="13" font-weight="700" text-anchor="middle">TESTÉ</text>
+<path class="route" d="M310 391 H398" marker-end="url(#arr)"/>
+<rect x="409" y="310" width="332" height="167" rx="20" fill="url(#node)" stroke="#4a7990" stroke-width="1.8" />
+<text x="441" y="351" fill="#fcfeff" font-size="27" font-weight="740" text-anchor="start">VMnet8</text>
+<text x="441" y="382" fill="#d0e4f1" font-size="18" font-weight="510" text-anchor="start">NAT VMware  ·  10.50.10.0/24</text>
+<text x="441" y="410" fill="#b9d2e2" font-size="17" font-weight="450" text-anchor="start">DHCP côté WAN pfSense</text>
+<rect x="439" y="430" width="122" height="29" rx="14.5" fill="#123d3c" stroke="#60e1c6" stroke-opacity=".48" /><text x="500" y="449.7" fill="#60e1c6" font-size="13" font-weight="700" text-anchor="middle">NAT ACTIVÉ</text>
+<path class="route" d="M741 391 H815" marker-end="url(#arr)"/>
+<rect x="831" y="281" width="502" height="213" rx="21" fill="#14344a" stroke="#54bbd2" stroke-width="1.8" />
+<text x="864" y="325" fill="#fbffff" font-size="31" font-weight="750" text-anchor="start">pfSense-GRE-SIEGE</text>
+<text x="864" y="356" fill="#cce5f3" font-size="18" font-weight="480" text-anchor="start">pfSense CE 2.9.0  ·  Pare-feu / NAT</text>
+<text x="864" y="391" fill="#dcecf6" font-size="18" font-weight="530" text-anchor="start">WAN em0 : DHCP (10.50.10.128 observé)</text>
+<text x="864" y="422" fill="#f1faff" font-size="20" font-weight="630" text-anchor="start">LAN em1 : 10.10.10.1/24</text>
+<rect x="863" y="447" width="155" height="29" rx="14.5" fill="#123d3c" stroke="#60e1c6" stroke-opacity=".48" /><text x="940.5" y="466.7" fill="#60e1c6" font-size="13" font-weight="700" text-anchor="middle">NAT/PAT TESTÉ</text>
+<rect x="1029" y="447" width="248" height="29" rx="14.5" fill="#403522" stroke="#ffd38c" stroke-opacity=".48" /><text x="1153" y="466.7" fill="#ffd38c" font-size="13" font-weight="700" text-anchor="middle">TEST ICMP RETIRÉ</text>
+<path class="route" d="M1080 494 V534" marker-end="url(#arr)"/>
+<rect x="419" y="546" width="914" height="108" rx="19" fill="#1a3d4e" stroke="#489bae" stroke-width="1.8" />
+<text x="459" y="585" fill="#f4fdff" font-size="24" font-weight="720" text-anchor="start">VMnet1 — Réseau LAN interne</text>
+<text x="459" y="614" fill="#c9e5ed" font-size="18" font-weight="470" text-anchor="start">10.10.10.0/24  ·  Host-only  ·  DHCP VMware et pfSense désactivés</text>
+<rect x="1178" y="571" width="120" height="29" rx="14.5" fill="#123d3c" stroke="#60e1c6" stroke-opacity=".48" /><text x="1238" y="590.7" fill="#60e1c6" font-size="13" font-weight="700" text-anchor="middle">CONFIGURÉ</text>
+<path class="route" d="M875 654 V677 H630 V697" marker-end="url(#arr)"/>
+<path class="route" d="M875 677 H1112 V697" marker-end="url(#arr)"/>
+<rect x="417" y="711" width="423" height="171" rx="18" fill="url(#node)" stroke="#4b8aa4" stroke-width="1.8" />
+<text x="448" y="751" fill="#fbffff" font-size="28" font-weight="735" text-anchor="start">DC1-GRE-SIEGE</text>
+<text x="448" y="782" fill="#cce5f3" font-size="17" font-weight="500" text-anchor="start">Windows Server 2025  ·  10.10.10.10</text>
+<text x="448" y="814" fill="#cfeeea" font-size="18" font-weight="550" text-anchor="start">AD DS + DNS : diagnostics réussis</text>
+<text x="448" y="844" fill="#ffd7a0" font-size="16" font-weight="480" text-anchor="start">DHCP : étendue active, pas de bail testé</text>
+<rect x="860" y="711" width="473" height="171" rx="18" fill="url(#node)" stroke="#4b8aa4" stroke-width="1.8" />
+<text x="893" y="751" fill="#fbffff" font-size="28" font-weight="735" text-anchor="start">PC-TEST-GRE</text>
+<text x="893" y="782" fill="#cce5f3" font-size="17" font-weight="500" text-anchor="start">Windows 11 Pro  ·  IP statique initiale</text>
+<text x="893" y="814" fill="#cfeeea" font-size="17" font-weight="540" text-anchor="start">10.10.10.20  ·  Ping / DNS / HTTPS testés</text>
+<text x="893" y="844" fill="#ffd7a0" font-size="17" font-weight="500" text-anchor="start">Bail DHCP et jonction AD : à tester</text>
+<rect x="56" y="921" width="1328" height="45" rx="12" fill="#152b3e" stroke="#2b5367" stroke-width="1.5"/>
+<text x="78" y="950" fill="#d0e3f1" font-size="18" font-weight="530" text-anchor="start">PÉRIMÈTRE : seules les VM du siège sont déployées. Les trois boutiques et les VPN intersites restent prévisionnels.</text>
+<text x="58" y="991" fill="#96b6c9" font-size="14" font-weight="430" text-anchor="start">Document d'architecture pédagogique · Résultats détaillés et captures authentiques disponibles dans les épisodes 03 et 04.</text>
+</svg>

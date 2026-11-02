@@ -27,29 +27,11 @@ Je conçois, déploie et dépanne progressivement une infrastructure informatiqu
 
 La topologie suivante décrit les composants **créés dans VMware**, et non les futurs réseaux de toutes les boutiques.
 
-```text
-                          Internet
-                             │
-                     Hôte Windows 11
-                             │
-                   VMnet8 — NAT VMware
-                             │
-                  WAN pfSense : DHCP
-                             │
-                    pfSense-GRE-SIEGE
-                  LAN : 10.10.10.1/24
-                             │
-                   VMnet1 — Host-only
-                      10.10.10.0/24
-                             │
-            ┌────────────────┴────────────────┐
-            │                                 │
-    DC1-GRE-SIEGE                        PC-TEST-GRE
-    Windows Server 2025                  Windows 11 Pro
-    10.10.10.10/24                       10.10.10.20/24*
-    AD DS / DNS / DHCP                   Poste de validation
-    Domaine : ironman.test               Jonction AD à tester
-```
+![Topologie réelle du laboratoire du siège de Grenoble : Internet, VMware NAT VMnet8, pfSense, VMnet1, DC1 Windows Server et PC-TEST-GRE](docs/topologie-laboratoire-siege.svg)
+
+*Schéma de synthèse au 2 novembre 2026 — équipement du laboratoire réellement créé. Le DHCP Windows est configuré, mais **le bail client et la jonction au domaine ne sont pas encore testés**. [Ouvrir le schéma vectoriel en grand](docs/topologie-laboratoire-siege.svg).*
+
+``
 
 *L'adresse `10.10.10.20` est la configuration **statique utilisée lors des premiers tests** du poste client. Son passage en DHCP et l'obtention d'un bail réel restent à vérifier. Les trois VM ne sont pas nécessairement allumées simultanément, compte tenu des 16 Go de RAM disponibles.*
 

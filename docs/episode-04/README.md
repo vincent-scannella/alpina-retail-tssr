@@ -44,7 +44,7 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 
 ![Récapitulatif VMware de DC1-GRE-SIEGE : 4 Go de RAM, 2 vCPU, 80 Go et VMnet1](images/01-vmware-configuration-dc1.png)
 
-*Figure 1 — Machine virtuelle DC1 créée dans VMware, avant son premier démarrage.*
+*Capture — Machine virtuelle DC1 créée dans VMware, avant son premier démarrage.*
 
 ## 3. Installation et configuration réellement effectuées
 
@@ -78,15 +78,15 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 
 ![Serveur Windows renommé DC1-GRE-SIEGE dans le Gestionnaire de serveur](images/02-windows-server-renommage.png)
 
-*Figure 2 — Nom Windows DC1-GRE-SIEGE confirmé après redémarrage, avant la promotion AD DS.*
+*Capture — Nom Windows DC1-GRE-SIEGE confirmé après redémarrage, avant la promotion AD DS.*
 
 ![Notification du Gestionnaire de serveur : rôle AD DS installé avec succès](images/05-role-ad-ds-installe.png)
 
-*Figure 5 — Installation du rôle AD DS réussie ; la promotion en contrôleur de domaine restait à effectuer à cet instant.*
+*Capture — Installation du rôle AD DS réussie ; la promotion en contrôleur de domaine restait à effectuer à cet instant.*
 
 ![Vérification des prérequis de promotion Active Directory validée](images/06-promotion-prerequis-reussis.png)
 
-*Figure 6 — Vérifications préalables satisfaites, avec avertissement non bloquant de délégation DNS pour la nouvelle forêt.*
+*Capture — Vérifications préalables satisfaites, avec avertissement non bloquant de délégation DNS pour la nouvelle forêt.*
 
 ## 4. Configuration IPv4 confirmée depuis `ipconfig /all`
 
@@ -105,7 +105,7 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 
 ![Résultat ipconfig /all : adresse IPv4 statique 10.10.10.10, passerelle 10.10.10.1 et DNS 10.10.10.10](images/03-ipconfig-ipv4-statique.png)
 
-*Figure 3 — Configuration IPv4 de DC1 vérifiée par `ipconfig /all` avant l'installation d'AD DS.*
+*Capture — Configuration IPv4 de DC1 vérifiée par `ipconfig /all` avant l'installation d'AD DS.*
 
 ## 5. Tests réseau et résultats
 
@@ -120,7 +120,7 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 
 ![Tests ping depuis Windows Server vers pfSense et Internet, quatre réponses pour chaque destination](images/04-ping-pfsense-internet.png)
 
-*Figure 4 — Connectivité IP vers la passerelle et vers `8.8.8.8` : 0 % de perte dans les deux tests.*
+*Capture — Connectivité IP vers la passerelle et vers `8.8.8.8` : 0 % de perte dans les deux tests.*
 
 ## 5 bis. Promotion en contrôleur de domaine : état observé
 
@@ -142,28 +142,28 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 
 ![Gestionnaire de serveur : DC1-GRE-SIEGE rejoint le domaine ironman.test après promotion](images/07-serveur-domaine-ironman.png)
 
-*Figure 7 — Après promotion et redémarrage, le Gestionnaire de serveur affiche le domaine `ironman.test` et l'adresse `10.10.10.10`.*
+*Capture — Après promotion et redémarrage, le Gestionnaire de serveur affiche le domaine `ironman.test` et l'adresse `10.10.10.10`.*
 
 ![Diagnostic dcdiag : tests Connectivity et Advertising réussis](images/08-dcdiag-advertising.png)
 
-*Figure 8 — `dcdiag /test:Advertising` : les tests ciblés Connectivity et Advertising réussissent.*
+*Capture — `dcdiag /test:Advertising` : les tests ciblés Connectivity et Advertising réussissent.*
 
 ![Requête DNS SRV LDAP : dc1-gre-siege.ironman.test, port 389, IP 10.10.10.10](images/09-dns-srv-ldap.png)
 
-*Figure 9 — Découverte du contrôleur de domaine : enregistrement SRV LDAP résolu vers DC1 (port 389).* 
+*Capture — Découverte du contrôleur de domaine : enregistrement SRV LDAP résolu vers DC1 (port 389).* 
 
 ![Résolution nslookup de DC1 réussie malgré un délai DNS initial et Server UnKnown](images/10-dns-nslookup-avertissement.png)
 
-*Figure 10 — Recherche DNS directe réussie ; un délai initial et `Server: UnKnown` restent à investiguer, sans diagnostic définitif à ce stade.*
+*Capture — Recherche DNS directe réussie ; un délai initial et `Server: UnKnown` restent à investiguer, sans diagnostic définitif à ce stade.*
 
 ## 6. Preuves visuelles publiées
 
 Les **10 captures authentiques** figurent directement dans les sections techniques précédentes, chacune accompagnée d'une légende et replacée dans la chronologie de la manipulation. Elles couvrent :
 
-- la VM VMware et le renommage de DC1 (figures 1 et 2) ;
-- l'adressage IPv4 et les tests de connectivité (figures 3 et 4) ;
-- l'installation du rôle AD DS et les prérequis de promotion (figures 5 et 6) ;
-- la présence du domaine `ironman.test`, le diagnostic `dcdiag` et les recherches DNS (figures 7 à 10).
+- la VM VMware et le renommage de DC1 ;
+- l'adressage IPv4 et les tests de connectivité ;
+- l'installation du rôle AD DS et les prérequis de promotion ;
+- la présence du domaine `ironman.test`, le diagnostic `dcdiag` et les recherches DNS.
 
 [Ouvrir le dossier des images sources](images/README.md).
 

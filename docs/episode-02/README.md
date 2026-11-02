@@ -30,6 +30,10 @@ L'objectif est de concevoir une infrastructure multisite cohérente, puis d'en *
 
 ## 3. Architecture cible de l'entreprise (prévisionnelle)
 
+![Architecture cible : siège et trois boutiques reliés par des VPN IPsec autour de pfSense](images/architecture-cible.svg)
+
+*Schéma logique **prévisionnel** — les serveurs `DC1`, `DC2`, `FS1`, `BKP1`, les VPN intersites et les ressources des boutiques sont des choix de conception. Cette image ne prouve aucun déploiement ni aucune liaison VPN opérationnelle.*
+
 | Domaine | Décisions de conception |
 |---|---|
 | Identités | Domaine Active Directory commun aux quatre sites ; deux contrôleurs `DC1` et `DC2` au siège avec DNS et réplication |
@@ -77,6 +81,10 @@ Une **matrice détaillée d'habilitations** sera publiée séparément avant la 
 Cet inventaire représente **l'entreprise fictive**, pas le nombre de machines virtuelles à démarrer.
 
 ## 6. Périmètre réellement réalisable avec 16 Go de RAM
+
+![Périmètre prévisionnel du laboratoire TSSR : VMware, pfSense, Windows Server et Windows 11](images/laboratoire-16go.svg)
+
+*Schéma de dimensionnement et de progression — laboratoire imaginé sur un poste Windows 11 de 16 Go de RAM, sans prétendre que toutes les machines virtuelles sont simultanément actives.*
 
 Le laboratoire utilisera **VMware Workstation**, sans achat ni abonnement obligatoire. Nous simulerons les quatre sites **progressivement**, sans allumer tous les serveurs et postes simultanément.
 

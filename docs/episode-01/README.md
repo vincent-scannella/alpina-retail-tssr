@@ -35,6 +35,12 @@ SITE-03	Voiron — Boutique	15
 SITE-04	Chambéry — Boutique	15
 TOTAL	4 sites	75
 
+### Répartition des collaborateurs par site
+
+![Répartition des 75 collaborateurs simulés dans quatre sites et huit services du siège](images/repartition-effectifs.svg)
+
+*Schéma de conception — effectifs simulés par site et répartition des 30 collaborateurs du siège. Il ne représente pas des salariés réels ni des comptes AD déjà créés.*
+
 3. Organisation du siège
 
 Service	Collaborateurs

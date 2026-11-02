@@ -57,6 +57,8 @@ Les ressources sont adaptées à un laboratoire personnel et ne constituent pas 
           10.10.10.20/24
 ```
 
+**Schéma d'ensemble actualisé :** [visualiser la topologie graphique du laboratoire au 2 novembre 2026](../topologie-laboratoire-siege.svg). Cette vue est **postérieure aux premières manipulations pfSense** : elle intègre également le serveur Windows et le DHCP configurés dans l'épisode 04. Elle ne constitue donc pas une preuve que ces services existaient dès l'installation initiale du pare-feu.
+
 ### Configuration WAN
 
 - Interface pfSense : `em0`

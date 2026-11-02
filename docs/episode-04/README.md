@@ -42,6 +42,10 @@ La liaison entre la VM Windows et pfSense est assurée par **VMnet1 (Host-only)*
 
 Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille de 60 Go avait été évoquée en préparation, mais elle n'est pas celle retenue dans la VM créée.
 
+![Récapitulatif VMware de DC1-GRE-SIEGE : 4 Go de RAM, 2 vCPU, 80 Go et VMnet1](images/01-vmware-configuration-dc1.png)
+
+*Figure 1 — Machine virtuelle DC1 créée dans VMware, avant son premier démarrage.*
+
 ## 3. Installation et configuration réellement effectuées
 
 1. Création de `DC1-GRE-SIEGE` dans VMware Workstation.
@@ -70,6 +74,20 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 24. Exécution de **`nslookup -type=SRV _ldap._tcp.dc._msdcs.ironman.test`** : la réponse contient un enregistrement SRV de priorité `0`, poids `100`, port **`389`**, cible **`dc1-gre-siege.ironman.test`** et l'adresse IPv4 **`10.10.10.10`**. `nslookup` indique `Server: UnKnown` / `Address: ::1` : le nom du serveur interrogé n'est pas affiché, mais la requête SRV a bien obtenu la réponse attendue. La résolution externe et les diagnostics DNS complets restent à vérifier.
 25. Exécution de **`nslookup dc1-gre-siege.ironman.test 10.10.10.10`** : le serveur interrogé est affiché comme `Server: UnKnown`, `Address: 10.10.10.10`, précédé de `DNS request timed out` (délai 2 secondes), puis la réponse indique **`Nom: dc1-gre-siege.ironman.test` / `Address: 10.10.10.10`**. La résolution directe demandée est donc obtenue, mais le délai initial et l'absence de nom du serveur DNS nécessitent une vérification, notamment de la zone de recherche inversée et d'un éventuel enregistrement PTR. **Aucune cause unique n'est encore démontrée.**
 
+### Preuves de l'installation et de la promotion AD DS
+
+![Serveur Windows renommé DC1-GRE-SIEGE dans le Gestionnaire de serveur](images/02-windows-server-renommage.png)
+
+*Figure 2 — Nom Windows DC1-GRE-SIEGE confirmé après redémarrage, avant la promotion AD DS.*
+
+![Notification du Gestionnaire de serveur : rôle AD DS installé avec succès](images/05-role-ad-ds-installe.png)
+
+*Figure 5 — Installation du rôle AD DS réussie ; la promotion en contrôleur de domaine restait à effectuer à cet instant.*
+
+![Vérification des prérequis de promotion Active Directory validée](images/06-promotion-prerequis-reussis.png)
+
+*Figure 6 — Vérifications préalables satisfaites, avec avertissement non bloquant de délégation DNS pour la nouvelle forêt.*
+
 ## 4. Configuration IPv4 confirmée depuis `ipconfig /all`
 
 | Paramètre | Valeur observée |
@@ -83,7 +101,11 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 | DNS préféré | `10.10.10.10` |
 | DNS auxiliaire | Aucun indiqué |
 
-**Interprétation :** l'adresse DNS préférée pointe volontairement vers le futur serveur DNS local. Le **service DNS n'est pas encore installé**, et aucune résolution de nom depuis DC1 n'est revendiquée à cette étape.
+**Interprétation au moment de la configuration IPv4, avant la promotion :** l'adresse DNS préférée avait été positionnée sur le futur serveur DNS local, encore non installé à cet instant. **Après la promotion**, les recherches DNS SRV et A présentées ci-dessous ont répondu ; elles ne constituent toutefois pas un audit DNS complet.
+
+![Résultat ipconfig /all : adresse IPv4 statique 10.10.10.10, passerelle 10.10.10.1 et DNS 10.10.10.10](images/03-ipconfig-ipv4-statique.png)
+
+*Figure 3 — Configuration IPv4 de DC1 vérifiée par `ipconfig /all` avant l'installation d'AD DS.*
 
 ## 5. Tests réseau et résultats
 
@@ -95,6 +117,10 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 Les deux sorties de commande ont été transmises par l'auteur sous forme de captures d'écran.
 
 **Conclusion limitée au test :** les réponses ICMP prouvent l'accès à la passerelle et la connectivité IPv4 vers `8.8.8.8` depuis la VM Windows, à travers pfSense. Elles ne prouvent pas à elles seules le fonctionnement du DNS, d'Active Directory ou de tous les protocoles applicatifs.
+
+![Tests ping depuis Windows Server vers pfSense et Internet, quatre réponses pour chaque destination](images/04-ping-pfsense-internet.png)
+
+*Figure 4 — Connectivité IP vers la passerelle et vers `8.8.8.8` : 0 % de perte dans les deux tests.*
 
 ## 5 bis. Promotion en contrôleur de domaine : état observé
 
@@ -112,22 +138,36 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 | Résolution DNS directe de DC1 via `10.10.10.10` | **Réponse correcte :** `dc1-gre-siege.ironman.test` → `10.10.10.10` ; un délai initial de 2 secondes et `Server: UnKnown` restent à examiner |
 | Diagnostic DNS complet et autres services AD DS | **Non encore vérifiés** ; résolution DNS inverse (PTR) non vérifiée |
 
-## 6. Preuves visuelles à publier
+### Preuves de domaine et diagnostics Active Directory / DNS
 
-Des captures authentiques ont été prises pendant les manipulations :
-- récapitulatif de création de la VM ;
-- notification de réussite d'installation du rôle AD DS ;
-- options de promotion (nouvelle forêt `ironman.test`, DNS et catalogue global), vérification préalable satisfaisante et écran de connexion `IRONMAN\Administrateur` ;
-- écran « Serveur local » après promotion affichant `ironman.test` ;
-- premier démarrage et Gestionnaire de serveur ;
-- renommage confirmé après redémarrage ;
-- sortie `ipconfig /all` ;
-- commandes de ping et statistiques ;
-- sortie `dcdiag /test:Advertising` confirmant la réussite des tests Connectivity et Advertising ;
-- sortie `nslookup` du SRV LDAP avec l'hôte et le port annoncés ;
-- réponse `nslookup dc1-gre-siege.ironman.test 10.10.10.10` avec résolution directe correcte et avertissement de timeout initial.
+![Gestionnaire de serveur : DC1-GRE-SIEGE rejoint le domaine ironman.test après promotion](images/07-serveur-domaine-ironman.png)
 
-**À faire :** déposer les captures sélectionnées, après vérification de confidentialité, dans un futur dossier `images/`, puis les intégrer en Markdown à proximité des vérifications qu'elles étayent. **Aucune image non déposée n'est présentée comme publiée.**
+*Figure 7 — Après promotion et redémarrage, le Gestionnaire de serveur affiche le domaine `ironman.test` et l'adresse `10.10.10.10`.*
+
+![Diagnostic dcdiag : tests Connectivity et Advertising réussis](images/08-dcdiag-advertising.png)
+
+*Figure 8 — `dcdiag /test:Advertising` : les tests ciblés Connectivity et Advertising réussissent.*
+
+![Requête DNS SRV LDAP : dc1-gre-siege.ironman.test, port 389, IP 10.10.10.10](images/09-dns-srv-ldap.png)
+
+*Figure 9 — Découverte du contrôleur de domaine : enregistrement SRV LDAP résolu vers DC1 (port 389).* 
+
+![Résolution nslookup de DC1 réussie malgré un délai DNS initial et Server UnKnown](images/10-dns-nslookup-avertissement.png)
+
+*Figure 10 — Recherche DNS directe réussie ; un délai initial et `Server: UnKnown` restent à investiguer, sans diagnostic définitif à ce stade.*
+
+## 6. Preuves visuelles publiées
+
+Les **10 captures authentiques** figurent directement dans les sections techniques précédentes, chacune accompagnée d'une légende et replacée dans la chronologie de la manipulation. Elles couvrent :
+
+- la VM VMware et le renommage de DC1 (figures 1 et 2) ;
+- l'adressage IPv4 et les tests de connectivité (figures 3 et 4) ;
+- l'installation du rôle AD DS et les prérequis de promotion (figures 5 et 6) ;
+- la présence du domaine `ironman.test`, le diagnostic `dcdiag` et les recherches DNS (figures 7 à 10).
+
+[Ouvrir le dossier des images sources](images/README.md).
+
+**Confidentialité :** les captures publiées ne contiennent pas les mots de passe administrateur ou DSRM. Les exports de configuration pfSense restent stockés hors GitHub. Les images documentent uniquement ce qui a été réellement observé.
 
 ## 7. Étapes restantes
 
@@ -146,7 +186,7 @@ Des captures authentiques ont été prises pendant les manipulations :
 - [ ] Inspecter les zones DNS et la recherche inversée (PTR), puis tester la résolution externe et les autres services d'annuaire.
 - [ ] Configurer ensuite DHCP, conformément à l'architecture de laboratoire.
 - [ ] Vérifier la jonction d'un poste Windows 11 au domaine, l'authentification et les politiques de groupe.
-- [ ] Ajouter des captures authentiques contrôlées dans la documentation.
+- [x] Ajouter et intégrer dans le README les 10 captures réelles de déploiement et de vérification.
 
 **Aucun test ou service non réalisé n'est présenté comme réussi.**
 

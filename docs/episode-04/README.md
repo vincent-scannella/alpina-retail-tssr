@@ -8,20 +8,9 @@
 
 Créer un premier serveur Windows pour préparer les services d'identité et d'infrastructure du siège d'ALPINA RETAIL.
 
-```text
-                   Internet
-                       |
-                VMware VMnet8 / NAT
-                       |
-               pfSense-GRE-SIEGE
-                  WAN : DHCP
-                  LAN : 10.10.10.1/24
-                       |
-               VMware VMnet1 / LAN
-                       |
-                  DC1-GRE-SIEGE
-                  10.10.10.10/24
-```
+![Schéma du laboratoire actuel : pfSense, Windows Server AD DS DNS DHCP et poste Windows 11 sur VMnet1](../topologie-laboratoire-siege.svg)
+
+*Topologie synthétique du laboratoire au 2 novembre 2026 : DC1 installé et étendue DHCP active, mais aucun bail client ni jonction au domaine encore validés. [Voir le schéma vectoriel en grand](../topologie-laboratoire-siege.svg).*
 
 La liaison entre la VM Windows et pfSense est assurée par **VMnet1 (Host-only)**. Le WAN pfSense est raccordé au NAT de VMware. Cette architecture représente une maquette, pas un environnement de production.
 

@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 04 : Déploiement de Windows Server 2025 au siège de Grenoble
 
 > **Date des opérations :** 2 novembre 2026  
-> **Statut :** Windows Server installé, renommé et adressé en IPv4 statique ; connectivité vers pfSense et vers `8.8.8.8` **testée avec succès**. **Rôle AD DS installé, promotion de `DC1-GRE-SIEGE` vers la nouvelle forêt `ironman.test` engagée et redémarrage suivi d'une connexion au domaine `IRONMAN` confirmés. L'identité de domaine apparaît dans « Serveur local ». Le diagnostic ciblé `dcdiag /test:Advertising` a réussi (tests Connectivity et Advertising) ; une requête DNS SRV de découverte LDAP a réussi et renvoie `dc1-gre-siege.ironman.test` / `10.10.10.10` (port 389). Une résolution directe explicite avait retourné `10.10.10.10` mais avec un délai initial et `Server: UnKnown`. Une zone de recherche inversée intégrée à AD et un PTR ont ensuite été créés ; `nslookup 10.10.10.10 10.10.10.10` retourne désormais `dc1-gre-siege.ironman.test` sans message de délai d'attente. La répétition exacte de la recherche directe `nslookup dc1-gre-siege.ironman.test 10.10.10.10` après la correction affiche désormais le nom du DNS et la bonne adresse, sans timeout visible. Le test `dcdiag /test:DNS` a ensuite affiché une réussite pour le contrôleur `DC1-GRE-SIEGE` et pour le domaine `ironman.test`, avec Connectivity réussi. La résolution de noms externes et la configuration DHCP restent à vérifier.**  
+> **Statut :** Windows Server installé, renommé et adressé en IPv4 statique ; connectivité vers pfSense et vers `8.8.8.8` **testée avec succès**. **Rôle AD DS installé, promotion de `DC1-GRE-SIEGE` vers la nouvelle forêt `ironman.test` engagée et redémarrage suivi d'une connexion au domaine `IRONMAN` confirmés. L'identité de domaine apparaît dans « Serveur local ». Le diagnostic ciblé `dcdiag /test:Advertising` a réussi (tests Connectivity et Advertising) ; une requête DNS SRV de découverte LDAP a réussi et renvoie `dc1-gre-siege.ironman.test` / `10.10.10.10` (port 389). Une résolution directe explicite avait retourné `10.10.10.10` mais avec un délai initial et `Server: UnKnown`. Une zone de recherche inversée intégrée à AD et un PTR ont ensuite été créés ; `nslookup 10.10.10.10 10.10.10.10` retourne désormais `dc1-gre-siege.ironman.test` sans message de délai d'attente. La répétition exacte de la recherche directe `nslookup dc1-gre-siege.ironman.test 10.10.10.10` après la correction affiche désormais le nom du DNS et la bonne adresse, sans timeout visible. Le test `dcdiag /test:DNS` a ensuite affiché une réussite pour le contrôleur `DC1-GRE-SIEGE` et pour le domaine `ironman.test`, avec Connectivity réussi. Une requête `nslookup www.microsoft.com 10.10.10.10` a depuis réussi et renvoyé des adresses IPv4/IPv6 externes ; le DHCP reste à installer/configurer. Les tests applicatifs et la santé globale des services restent à poursuivre.**  
 > **Contexte :** laboratoire personnel TSSR simulant une entreprise entièrement fictive.
 
 ## 1. Objectif et architecture
@@ -78,6 +78,7 @@ Le disque de **80 Go** correspond au récapitulatif final de VMware ; une taille
 28. Vérification par **`nslookup 10.10.10.10 10.10.10.10`** : le résultat affiche **`Server: dc1-gre-siege.ironman.test`**, **`Address: 10.10.10.10`**, puis **`Nom: dc1-gre-siege.ironman.test`** et **`Address: 10.10.10.10`**, **sans délai d'attente signalé**. La résolution inverse testée fonctionne après la correction. L'absence du timeout sur ce test ne garantit pas qu'il ne puisse jamais réapparaître.
 29. **Contre-test du symptôme initial**, avec exactement **`nslookup dc1-gre-siege.ironman.test 10.10.10.10`** : le résultat affiche **`Serveur : dc1-gre-siege.ironman.test`**, **`Address : 10.10.10.10`**, puis **`Nom : dc1-gre-siege.ironman.test`**, **`Address : 10.10.10.10`**. **Ni `Server: UnKnown` ni `DNS request timed out`** dans la sortie observée. Ce résultat confirme la disparition du symptôme initial dans ce nouveau test, après ajout de la zone inversée et du PTR.
 30. Exécution de **`dcdiag /test:DNS`** : le résultat communiqué indique **`Connectivity` réussi**, puis **`DNS` réussi pour `DC1-GRE-SIEGE`** et **`DNS` réussi pour le domaine `ironman.test`**. Le diagnostic DNS ciblé passe dans les résultats visibles ; ce test ne constitue pas à lui seul une preuve de résolution DNS des noms Internet, qui sera contrôlée séparément.
+31. Exécution de **`nslookup www.microsoft.com 10.10.10.10`** : le résolveur est identifié comme **`dc1-gre-siege.ironman.test`** à l'adresse **`10.10.10.10`**. La réponse **non autoritaire** renvoie l'alias `www.microsoft.com-c-3.edgekey.net`, le nom canonique `e13678.dscb.akamaiedge.net`, l'adresse IPv4 **`23.200.213.221`** et plusieurs adresses IPv6. **La résolution DNS externe demandée est réussie**. Le mécanisme exact de récursion (redirecteur ou indications de racine) n'a pas encore été déterminé ; aucun ajout de redirecteur n'est nécessaire pour résoudre cette requête précise.
 
 ### Preuves de l'installation et de la promotion AD DS
 
@@ -143,7 +144,8 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 | Résolution DNS directe de DC1 via `10.10.10.10` | **Avant :** réponse correcte, mais timeout initial et `Server: UnKnown`. **Après PTR :** même commande sans ces messages, avec nom DNS et adresse attendus |
 | Recherche DNS inverse après ajout du PTR | **Réussie :** `nslookup 10.10.10.10 10.10.10.10` retrouve `dc1-gre-siege.ironman.test`, sans `Server: UnKnown` ni timeout dans la sortie fournie |
 | `dcdiag /test:DNS` | **Réussi dans les résultats fournis :** Connectivity, DNS pour DC1 et DNS pour `ironman.test` |
-| Résolution DNS Internet / autres tests AD DS | **Non encore vérifiés** ; fonctionnement applicatif et services complémentaires à contrôler |
+| Résolution DNS Internet | **Réussie** : `nslookup www.microsoft.com 10.10.10.10` retourne IPv4 `23.200.213.221`, adresses IPv6 et alias associés |
+| Autres tests AD DS | **À poursuivre** : services d'annuaire, SYSVOL et NETLOGON, jonction d'un client et authentification |
 
 ### Preuves de domaine et diagnostics Active Directory / DNS
 
@@ -172,7 +174,7 @@ Les **10 captures authentiques** figurent directement dans les sections techniqu
 - l'installation du rôle AD DS et les prérequis de promotion ;
 - la présence du domaine `ironman.test`, le diagnostic `dcdiag` et les recherches DNS **avant création de la zone inverse**.
 
-**Captures supplémentaires à intégrer ultérieurement :** zone inversée initialement vide, zone créée, enregistrement PTR, sorties réussies de `nslookup` après correction et résultat de `dcdiag /test:DNS`. Ces images ont été transmises dans le suivi du laboratoire, mais **ne figurent pas encore dans ce dépôt** ; elles doivent être téléversées après contrôle de confidentialité.
+**Captures supplémentaires à intégrer ultérieurement :** zone inversée initialement vide, zone créée, enregistrement PTR, sorties réussies de `nslookup` après correction, résultat de `dcdiag /test:DNS` et résolution externe de `www.microsoft.com`. Ces images ont été transmises dans le suivi du laboratoire, mais **ne figurent pas encore dans ce dépôt** ; elles doivent être téléversées après contrôle de confidentialité.
 
 [Ouvrir le dossier des images sources](images/README.md).
 
@@ -190,12 +192,13 @@ Les **10 captures authentiques** figurent directement dans les sections techniqu
 - [x] Lancer et achever la promotion de DC1 en premier contrôleur de domaine de la nouvelle forêt `ironman.test` : redémarrage et identité de domaine confirmés visuellement.
 - [x] Réaliser un premier diagnostic AD DS ciblé : `dcdiag /test:Advertising`, tests Connectivity et Advertising réussis.
 - [x] Exécuter `dcdiag /test:DNS` : Connectivity, DNS serveur et DNS domaine réussis dans la sortie fournie.
-- [ ] Approfondir les autres diagnostics AD DS, vérifier les services et tester la résolution DNS externe.
+- [ ] Approfondir les diagnostics AD DS, vérifier les partages SYSVOL et NETLOGON et le fonctionnement des services.
 - [x] Vérifier un enregistrement SRV AD DNS : recherche `_ldap._tcp.dc._msdcs.ironman.test` réussie, cible et port LDAP confirmés.
 - [x] Vérifier la résolution directe du nom de DC1 via son serveur DNS à `10.10.10.10` (réponse correcte, avertissement initial à investiguer).
 - [x] Inspecter la zone inversée, créer `10.10.10.in-addr.arpa` et le PTR de `10.10.10.10` puis confirmer la résolution inverse réussie.
 - [x] Refaire la commande exacte d'origine `nslookup dc1-gre-siege.ironman.test 10.10.10.10` : nom DNS identifié, aucun timeout dans ce test.
-- [ ] Vérifier la résolution DNS externe et réaliser des diagnostics DNS/AD plus complets, notamment après la correction.
+- [x] Vérifier la résolution DNS externe via DC1 : `nslookup www.microsoft.com 10.10.10.10` a retourné une réponse valide.
+- [ ] Réaliser au besoin des contrôles DNS/AD plus complets après la correction.
 - [ ] Configurer ensuite DHCP, conformément à l'architecture de laboratoire.
 - [ ] Vérifier la jonction d'un poste Windows 11 au domaine, l'authentification et les politiques de groupe.
 - [x] Ajouter et intégrer dans le README les 10 captures réelles de déploiement et de vérification.

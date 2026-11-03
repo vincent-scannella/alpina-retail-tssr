@@ -336,6 +336,19 @@ Depuis le poste Windows 11, l'Explorateur a ouvert le chemin réseau `\\dc1-gre-
 - **Preuve :** capture fournie dans la conversation du 03/11/2026 (non encore téléversée sur GitHub).
 - **Portée du test :** l'énumération des dossiers de stratégies via SMB est vérifiée ; **la lecture des fichiers internes (`GPT.INI`, etc.) reste à tester**.
 
+### 3.11. Consultation du dossier d'une GPO — 3 novembre 2026
+
+Depuis `PC-TEST-GRE`, l'Explorateur Windows a ouvert le dossier identifié par le GUID **`{31B2F340-016D-11D2-945F-00C04FB984F9}`**, correspondant à la **Default Domain Policy**, sous `SYSVOL/ironman.test/Policies`.
+
+**Éléments visibles dans la capture fournie en conversation :**
+- dossier `MACHINE` ;
+- dossier `USER` ;
+- fichier affiché `GPT`, de taille indiquée **1 Ko** (l'extension est masquée par l'Explorateur, ce qui est cohérent avec `GPT.INI`).
+
+**Validation :** depuis le poste client, les entrées du répertoire de cette GPO sont accessibles et listées via SMB.
+
+**Limite :** le contenu du fichier `GPT.INI` **n'a pas encore été ouvert ni lu** ; l'accès en lecture à ce fichier reste à tester. Capture fournie le 03/11/2026 dans la conversation, **non encore téléversée sur GitHub**.
+
 ## 4. Configuration IPv4 confirmée depuis `ipconfig /all`
 
 | Paramètre | Valeur observée |
@@ -447,7 +460,8 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Vérifier la découverte du contrôleur de domaine depuis `PC-TEST-GRE` avec `nltest /dsgetdc:ironman.test` : DC1 `10.10.10.10` trouvé, commande réussie (capture fournie en conversation, non déposée sur GitHub).
 - [x] Vérifier le canal sécurisé poste-domaine depuis Windows 11 : `Test-ComputerSecureChannel -Verbose` renvoie `True` et confirme la relation de confiance avec `ironman.test` (capture transmise en conversation, pas encore déposée sur GitHub).
 - [x] Accéder depuis Windows 11 au répertoire `\\dc1-gre-siege\SYSVOL\ironman.test\Policies` : trois dossiers GUID visibles (capture transmise en conversation, non déposée sur GitHub).
-- [ ] Vérifier la lecture effective d'un fichier `GPT.INI` dans SYSVOL, puis approfondir les diagnostics AD DS.
+- [x] Ouvrir depuis Windows 11 le répertoire de la `Default Domain Policy` (`{31B2F340-016D-11D2-945F-00C04FB984F9}`) et voir `MACHINE`, `USER` et le fichier `GPT` (capture en conversation, non déposée sur GitHub).
+- [ ] Vérifier l'ouverture et la lecture du fichier `GPT.INI` depuis le client ; approfondir ensuite les diagnostics AD DS.
 - [x] Vérifier l'application d'une première GPO ordinateur par `gpupdate`, le Registre et `gpresult`.
 - [x] Observer le verrouillage automatique en situation réelle : fonctionnement déclaré observé par l'auteur le 03/11/2026, sans capture ni mesure précise de la durée (900 s configurées et confirmées séparément).
 - [x] Vérifier un enregistrement SRV AD DNS : recherche `_ldap._tcp.dc._msdcs.ironman.test` réussie, cible et port LDAP confirmés.

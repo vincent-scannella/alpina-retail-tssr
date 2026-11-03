@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 04 : Windows Server 2025, Active Directory, DNS et DHCP
 
 > **Dates des opérations :** 2 et 3 novembre 2026  
-> **Statut :** DC1, AD DS, DNS et DHCP opérationnels dans le laboratoire ; **bail DHCP obtenu sur Windows 11, jonction au domaine, ouverture de session AD et application d'une GPO ordinateur vérifiés le 3 novembre 2026**. Test chronométré du verrouillage après 15 minutes non réalisé.  
+> **Statut :** DC1, AD DS, DNS et DHCP opérationnels dans le laboratoire ; **bail DHCP obtenu sur Windows 11, jonction au domaine, ouverture de session AD et application d'une GPO ordinateur vérifiés le 3 novembre 2026**. Verrouillage automatique observé ultérieurement par l'auteur sur le poste client (déclaration du 03/11/2026) ; aucune capture et aucun chronométrage précis fournis.  
 > **Périmètre :** laboratoire TSSR personnel au siège fictif de Grenoble.
 
 ## En bref
@@ -12,7 +12,7 @@
 | **Active Directory** | Forêt `ironman.test`, contrôles `dcdiag` réussis, `PC-TEST-GRE` joint au domaine ; authentification `IRONMAN\administrateur` et `IRONMAN\test.gre` observée | Accès client à `SYSVOL`/`NETLOGON` non testé |
 | **DNS** | SRV LDAP, recherches directes/inverses, `dcdiag /test:DNS` et DNS externe réussis ; requêtes `nslookup` depuis le poste client vérifiées | Pas d'audit DNS exhaustif |
 | **DHCP** | Serveur `10.10.10.10` : bail **`10.10.10.100/24`** délivré au client, passerelle `10.10.10.1`, DNS `10.10.10.10`, suffixe `ironman.test` et bail de **8 jours** | Un seul poste client a été testé |
-| **GPO** | `GPO-GRE-POSTES-VERROUILLAGE-15MIN` liée à `POSTES`, mise à jour réussie ; `gpresult` la liste ; `InactivityTimeoutSecs = 0x384` | Verrouillage effectif à 15 min **non chronométré** |
+| **GPO** | `GPO-GRE-POSTES-VERROUILLAGE-15MIN` liée à `POSTES`, mise à jour réussie ; `gpresult` la liste ; `InactivityTimeoutSecs = 0x384` | Verrouillage automatique déclaré observé par l'auteur ; pas de capture ni de mesure chronométrée précise |
 
 **Sommaire :** [Architecture](#1-objectif-et-architecture) · [VM Windows Server](#2-machine-virtuelle) · [Journal des manipulations](#3-installation-et-configuration-réellement-effectuées) · [Configuration IPv4](#4-configuration-ipv4-confirmée-depuis-ipconfig-all) · [Tests réseau](#5-tests-réseau-et-résultats) · [Contrôles AD DS/DNS](#6-validations-ad-ds-et-dns) · [Captures](#7-preuves-visuelles-publiées) · [Suite](#8-étapes-restantes)
 
@@ -26,7 +26,7 @@ Créer un premier serveur Windows pour préparer les services d'identité et d'i
 
 ![Schéma du laboratoire actuel : pfSense, Windows Server AD DS DNS DHCP et poste Windows 11 sur VMnet1](../topologie-laboratoire-siege.svg)
 
-*Topologie du laboratoire actualisée au 3 novembre 2026 : client `PC-TEST-GRE` en DHCP (`10.10.10.100`), joint au domaine `ironman.test`. Première GPO ordinateur appliquée, verrouillage chronométré non testé. [Voir le schéma vectoriel en grand](../topologie-laboratoire-siege.svg).*
+*Topologie du laboratoire actualisée au 3 novembre 2026 : client `PC-TEST-GRE` en DHCP (`10.10.10.100`), joint au domaine `ironman.test`. Première GPO ordinateur appliquée ; verrouillage ensuite observé manuellement par l'auteur, sans capture ni chronométrage précis. [Voir le schéma vectoriel en grand](../topologie-laboratoire-siege.svg).*
 
 La liaison entre la VM Windows et pfSense est assurée par **VMnet1 (Host-only)**. Le WAN pfSense est raccordé au NAT de VMware. Cette architecture représente une maquette, pas un environnement de production.
 
@@ -269,7 +269,15 @@ gpresult /scope computer /r
 
 ![gpresult confirme la GPO de verrouillage dans les stratégies ordinateur appliquées](images/40-gpo-gpresult-ordinateur.png)
 
-**Bilan de validation :** le **DHCP client**, la **résolution DNS**, la **localisation du DC via SRV**, la **jonction au domaine**, les **sessions AD** et la **réception du paramètre GPO** sont vérifiés sur `PC-TEST-GRE`. Le **verrouillage automatique effectivement déclenché après 15 minutes** n'a pas été observé chronomètre en main : il est explicitement indiqué **non testé**.
+**Bilan de validation :** le **DHCP client**, la **résolution DNS**, la **localisation du DC via SRV**, la **jonction au domaine**, les **sessions AD** et la **réception du paramètre GPO** sont vérifiés sur `PC-TEST-GRE`. **Complément déclaré le 03/11/2026 :** l'auteur a ensuite observé le verrouillage automatique du poste après inactivité. Ce retour constitue un test fonctionnel rapporté, **sans capture d'écran et sans mesure chronométrée précise** ; les paramètres à 900 secondes restent prouvés par les captures 36 à 40.
+
+### 3.6. Contrôle complémentaire du verrouillage — retour de l'auteur (3 novembre 2026)
+
+Après la validation de l'application de la GPO sur `PC-TEST-GRE`, l'auteur indique avoir **constaté le verrouillage automatique du poste à l'issue d'une période d'inactivité**. Ce contrôle de comportement a été confirmé lors de l'échange du **03/11/2026**.
+
+- **État :** fonctionnement observé et déclaré par l'auteur.
+- **Preuves existantes :** les captures 36 à 40 attestent la configuration et l'application de la GPO à 900 secondes.
+- **Limites :** aucune capture de l'écran verrouillé et aucun relevé de chronométrage exact n'ont été fournis. L'observation n'est donc **pas présentée comme une preuve visuelle ni comme une mesure précise des 900 secondes**.
 
 ## 4. Configuration IPv4 confirmée depuis `ipconfig /all`
 
@@ -359,7 +367,7 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 
 [Parcourir le dossier d'images et son inventaire](images/README.md).
 
-**Limites des preuves :** le bail DHCP, le domaine et le paramètre de GPO sont désormais confirmés sur un client. **Restent non testés :** le verrouillage chronométré après 15 minutes, l'accès depuis le client aux partages `SYSVOL`/`NETLOGON`, et un audit de fonctionnement multi-postes.
+**Limites des preuves :** le bail DHCP, le domaine et le paramètre de GPO sont désormais confirmés sur un client. **Restent à documenter :** un éventuel relevé chronométré/capture du verrouillage (le fonctionnement a été déclaré observé), l'accès depuis le client aux partages `SYSVOL`/`NETLOGON`, et un audit de fonctionnement multi-postes.
 
 **Confidentialité :** aucun mot de passe administrateur ou DSRM ni export de configuration pfSense n'est publié.
 
@@ -379,7 +387,7 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Vérifier avec `dcdiag /test:Services` : tests Connectivity et Services réussis.
 - [ ] Approfondir les diagnostics AD DS et vérifier l'accès aux partages `SYSVOL` / `NETLOGON` depuis un client.
 - [x] Vérifier l'application d'une première GPO ordinateur par `gpupdate`, le Registre et `gpresult`.
-- [ ] Observer le verrouillage automatique réel après 15 minutes (non testé lors de cette séance).
+- [x] Observer le verrouillage automatique en situation réelle : fonctionnement déclaré observé par l'auteur le 03/11/2026, sans capture ni mesure précise de la durée (900 s configurées et confirmées séparément).
 - [x] Vérifier un enregistrement SRV AD DNS : recherche `_ldap._tcp.dc._msdcs.ironman.test` réussie, cible et port LDAP confirmés.
 - [x] Vérifier la résolution directe du nom de DC1 via son serveur DNS à `10.10.10.10` (réponse correcte, avertissement initial à investiguer).
 - [x] Inspecter la zone inversée, créer `10.10.10.in-addr.arpa` et le PTR de `10.10.10.10` puis confirmer la résolution inverse réussie.
@@ -394,7 +402,7 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Joindre Windows 11 Pro au domaine `ironman.test` ; authentifier un administrateur et l'utilisateur standard `test.gre` ; ranger les objets dans les OU ; vérifier la première GPO côté ordinateur.
 - [x] Publier et documenter **40 captures réelles** (23 initiales et 17 de la séance du 3 novembre 2026), avec résultats observés et limites explicites.
 
-**Aucun test ou service non réalisé n'est présenté comme réussi.** En particulier, le verrouillage automatique à 15 minutes reste **non testé**.
+**Traçabilité :** les tests instrumentés et les captures authentiques sont distingués des observations rapportées. Le verrouillage automatique a été **observé selon l'auteur**, sans capture ni relevé chronométré ; les accès `SYSVOL`/`NETLOGON` depuis le client restent à tester.
 
 ---
 

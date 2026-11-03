@@ -50,7 +50,7 @@ L'objectif est de concevoir une infrastructure multisite cohérente, puis d'en *
 | Identités | Domaine Active Directory commun aux quatre sites ; deux contrôleurs `DC1` et `DC2` au siège avec DNS et réplication |
 | DHCP | Windows Server au siège ; service DHCP local sur pfSense dans chaque boutique |
 | Réseau et sécurité | Pare-feu pfSense, VPN IPsec en étoile autour du siège, Wi-Fi interne et invité séparés sur les quatre sites |
-| Fichiers | Serveur Windows `FS1`, partages SMB, groupes AD et permissions NTFS |
+| Fichiers | **Conception initiale :** serveur Windows `FS1`, partages SMB, groupes AD et permissions NTFS. **Évolution du laboratoire au 03/11/2026 :** `FS1` Debian 12 + Samba envisagé, avec adaptation des ACL Linux/Samba ; Samba et jonction AD pas encore déployés (voir [épisode 05](../episode-05/README.md)) |
 | Administration | Comptes standards et comptes administratifs séparés ; délégation N1/N2 au technicien ; Windows LAPS |
 | Accès distants | Accès administratifs nominatifs avec MFA, droits limités et journalisation |
 | Mises à jour | WSUS prévu pour les serveurs Windows ; Windows Update piloté par GPO pour les postes |
@@ -68,6 +68,9 @@ L'objectif est de concevoir une infrastructure multisite cohérente, puis d'en *
 | Serveurs métier locaux | 15 min | 4 h | Panne du serveur local d'une boutique |
 
 Ces valeurs sont des **objectifs de conception**, non des résultats de tests ni des garanties. La réussite d'une tâche de sauvegarde ne suffit pas à prouver une restauration.
+
+
+> **Addendum de suivi — 03/11/2026 :** le laboratoire `FS1-GRE-SIEGE` est désormais prévu sous **Debian 12 + Samba** plutôt que sous Windows Server afin de démontrer l'interopérabilité Linux/AD. L'installation Debian et la connexion console sont vérifiées dans l'[épisode 05](../episode-05/README.md) ; les partages et les permissions ne sont pas encore opérationnels.
 
 ## 4. Politique d'accès aux fichiers
 

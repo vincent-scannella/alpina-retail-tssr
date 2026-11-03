@@ -334,7 +334,7 @@ Depuis le poste Windows 11, l'Explorateur a ouvert le chemin réseau `\\dc1-gre-
 
 - **Résultat observé :** accès réussi au répertoire `Policies` ; **trois dossiers nommés par des GUID** sont visibles, sans message d'erreur.
 - **Preuve :** capture fournie dans la conversation du 03/11/2026 (non encore téléversée sur GitHub).
-- **Portée du test :** l'énumération des dossiers de stratégies via SMB est vérifiée ; **la lecture des fichiers internes (`GPT.INI`, etc.) reste à tester**.
+- **Portée du test :** l'énumération des dossiers de stratégies via SMB est vérifiée ; la lecture du fichier `GPT.INI` de la Default Domain Policy est confirmée dans la section 3.11.
 
 ### 3.11. Consultation du dossier d'une GPO — 3 novembre 2026
 
@@ -347,7 +347,14 @@ Depuis `PC-TEST-GRE`, l'Explorateur Windows a ouvert le dossier identifié par l
 
 **Validation :** depuis le poste client, les entrées du répertoire de cette GPO sont accessibles et listées via SMB.
 
-**Limite :** le contenu du fichier `GPT.INI` **n'a pas encore été ouvert ni lu** ; l'accès en lecture à ce fichier reste à tester. Capture fournie le 03/11/2026 dans la conversation, **non encore téléversée sur GitHub**.
+**Contrôle complémentaire — lecture réussie le 03/11/2026 :** le fichier `GPT.INI` a été ouvert avec le Bloc-notes depuis le poste client. La capture montre exactement :
+
+```ini
+[General]
+Version=3
+```
+
+La lecture du contenu du fichier de la **Default Domain Policy** via SYSVOL est donc vérifiée. Cela confirme un accès en lecture à ce fichier, **sans prouver à lui seul l'application de la GPO** (vérifiée séparément par `gpresult`). Capture reçue dans la conversation, **non encore déposée en image sur GitHub**.
 
 ## 4. Configuration IPv4 confirmée depuis `ipconfig /all`
 
@@ -437,7 +444,7 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 
 [Parcourir le dossier d'images et son inventaire](images/README.md).
 
-**Limites des preuves :** le bail DHCP, le domaine et le paramètre de GPO sont désormais confirmés sur un client. **Restent à documenter :** un éventuel relevé chronométré/capture du verrouillage (le fonctionnement a été déclaré observé), la lecture détaillée des fichiers de stratégies, l'état de réplication et un audit de fonctionnement multi-postes (les deux partages sont accessibles depuis le client).
+**Limites des preuves :** le bail DHCP, le domaine et le paramètre de GPO sont désormais confirmés sur un client. **Restent à documenter :** un éventuel relevé chronométré/capture du verrouillage (le fonctionnement a été déclaré observé), la lecture détaillée des autres fichiers de stratégies, l'état de réplication et un audit de fonctionnement multi-postes (`GPT.INI` de la Default Domain Policy est lisible depuis le client).
 
 **Confidentialité :** aucun mot de passe administrateur ou DSRM ni export de configuration pfSense n'est publié.
 
@@ -461,7 +468,8 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Vérifier le canal sécurisé poste-domaine depuis Windows 11 : `Test-ComputerSecureChannel -Verbose` renvoie `True` et confirme la relation de confiance avec `ironman.test` (capture transmise en conversation, pas encore déposée sur GitHub).
 - [x] Accéder depuis Windows 11 au répertoire `\\dc1-gre-siege\SYSVOL\ironman.test\Policies` : trois dossiers GUID visibles (capture transmise en conversation, non déposée sur GitHub).
 - [x] Ouvrir depuis Windows 11 le répertoire de la `Default Domain Policy` (`{31B2F340-016D-11D2-945F-00C04FB984F9}`) et voir `MACHINE`, `USER` et le fichier `GPT` (capture en conversation, non déposée sur GitHub).
-- [ ] Vérifier l'ouverture et la lecture du fichier `GPT.INI` depuis le client ; approfondir ensuite les diagnostics AD DS.
+- [x] Vérifier la lecture du fichier `GPT.INI` de la Default Domain Policy depuis Windows 11 : `[General]` et `Version=3` visibles dans le Bloc-notes (capture transmise en conversation, non encore déposée sur GitHub).
+- [ ] Approfondir les diagnostics AD DS ; cette lecture ne vaut pas audit des autres fichiers de GPO ni vérification de réplication.
 - [x] Vérifier l'application d'une première GPO ordinateur par `gpupdate`, le Registre et `gpresult`.
 - [x] Observer le verrouillage automatique en situation réelle : fonctionnement déclaré observé par l'auteur le 03/11/2026, sans capture ni mesure précise de la durée (900 s configurées et confirmées séparément).
 - [x] Vérifier un enregistrement SRV AD DNS : recherche `_ldap._tcp.dc._msdcs.ironman.test` réussie, cible et port LDAP confirmés.

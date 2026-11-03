@@ -281,7 +281,7 @@ Après la validation de l'application de la GPO sur `PC-TEST-GRE`, l'auteur indi
 
 ### 3.7. Vérification de SYSVOL et NETLOGON depuis le poste client — 3 novembre 2026
 
-Le poste Windows 11 du laboratoire a accédé au chemin UNC `\\\\dc1-gre-siege\\SYSVOL` dans l'Explorateur de fichiers. La capture transmise dans la conversation de travail montre le fil d'Ariane **Réseau > dc1-gre-siege > SYSVOL** et le dossier **`ironman.test`** visible, sans message d'erreur.
+Le poste Windows 11 du laboratoire a accédé au chemin UNC `\\dc1-gre-siege\SYSVOL` dans l'Explorateur de fichiers. La capture transmise dans la conversation de travail montre le fil d'Ariane **Réseau > dc1-gre-siege > SYSVOL** et le dossier **`ironman.test`** visible, sans message d'erreur.
 
 - **Résultat validé :** partage `SYSVOL` accessible depuis le poste client via SMB ; le dossier du domaine est listé.
 - **Preuve :** capture reçue dans la conversation le 03/11/2026 ; **non encore téléversée dans le dépôt GitHub**, le présent journal constitue la trace textuelle publique.
@@ -344,7 +344,7 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 | Recherche DNS inverse après ajout du PTR | **Réussie :** `nslookup 10.10.10.10 10.10.10.10` retrouve `dc1-gre-siege.ironman.test`, sans `Server: UnKnown` ni timeout dans la sortie fournie |
 | `dcdiag /test:DNS` | **Réussi dans les résultats fournis :** Connectivity, DNS pour DC1 et DNS pour `ironman.test` |
 | Résolution DNS Internet | **Réussie** : `nslookup www.microsoft.com 10.10.10.10` retourne IPv4 `23.200.213.221`, adresses IPv6 et alias associés |
-| Partages `SYSVOL` / `NETLOGON` | Publiés localement sur DC1 ; dossier `ironman.test` visible via `\\\\dc1-gre-siege\\SYSVOL` depuis Windows 11 le 03/11/2026 ; accès client à `NETLOGON` confirmé (dossier vide) |
+| Partages `SYSVOL` / `NETLOGON` | Publiés localement sur DC1 ; dossier `ironman.test` visible via `\\dc1-gre-siege\SYSVOL` depuis Windows 11 le 03/11/2026 ; accès client à `NETLOGON` confirmé (dossier vide) |
 | Diagnostic `dcdiag /test:Services` | **Réussi** pour DC1 ; le test `Connectivity` a également réussi |
 | Autres tests AD DS | **Authentification et GPO vérifiées depuis le client le 03/11/2026** ; accès client à `SYSVOL` validé, `NETLOGON` accessible également |
 
@@ -399,7 +399,7 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Exécuter `dcdiag /test:DNS` : Connectivity, DNS serveur et DNS domaine réussis dans la sortie fournie.
 - [x] Vérifier avec `net share` la publication des partages `SYSVOL` et `NETLOGON` sur DC1.
 - [x] Vérifier avec `dcdiag /test:Services` : tests Connectivity et Services réussis.
-- [x] Vérifier l'accès au partage `SYSVOL` depuis Windows 11 : ouverture du chemin `\\\\dc1-gre-siege\\SYSVOL` et affichage du dossier `ironman.test` (capture fournie dans la conversation ; non téléversée sur GitHub).
+- [x] Vérifier l'accès au partage `SYSVOL` depuis Windows 11 : ouverture du chemin `\\dc1-gre-siege\SYSVOL` et affichage du dossier `ironman.test` (capture fournie dans la conversation ; non téléversée sur GitHub).
 - [x] Vérifier l'accès client au partage `NETLOGON` : ouverture du partage et affichage du dossier vide, sans erreur (capture fournie en conversation, non déposée sur GitHub).
 - [ ] Approfondir les diagnostics AD DS et, si nécessaire, la lecture des fichiers de stratégies depuis le client.
 - [x] Vérifier l'application d'une première GPO ordinateur par `gpupdate`, le Registre et `gpresult`.

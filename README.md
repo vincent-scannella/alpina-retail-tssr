@@ -12,7 +12,7 @@ Je conçois, déploie et dépanne progressivement une infrastructure informatiqu
 
 | Entreprise simulée | Laboratoire personnel | Progression |
 |---|---|---|
-| **4 sites** · 75 collaborateurs fictifs | **Windows 11** · VMware Workstation · **16 Go de RAM sur l'hôte** | **Épisodes 00 à 04 documentés**, déploiement en cours |
+| **4 sites** · 75 collaborateurs fictifs | **Windows 11** · VMware Workstation · **16 Go de RAM sur l'hôte** | **Épisodes 00 à 05 documentés**, déploiement en cours |
 
 **Ce qui est déjà vérifié :**
 
@@ -53,6 +53,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **02** | [Cahier des charges informatique](docs/episode-02/README.md) | Besoins métier, architecture cible, droits d'accès et limites du laboratoire |
 | **03** | [Pare-feu pfSense et poste Windows 11](docs/episode-03/README.md) | Installation, adressage, NAT/PAT, filtrage ICMP, tests réseau et sauvegarde chiffrée |
 | **04** | [Windows Server, AD DS, DNS et DHCP](docs/episode-04/README.md) | DC1, dépannage DNS, DHCP réel sur Windows 11, jonction à `ironman.test`, utilisateur AD et première GPO (application vérifiée ; verrouillage ensuite observé par l'auteur sans capture) |
+| **05** | [FS1 — Serveur de fichiers Debian Linux](docs/episode-05/README.md) | Installation Debian 12, connexion console et `hostnamectl` validés ; réseau, SSH, Samba et intégration AD restent à vérifier |
 
 **Preuves visuelles :** [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures authentiques Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md).
 
@@ -90,6 +91,8 @@ Les compétences travaillées comprennent l'administration Windows Server, AD DS
 - [x] Vérifier le canal sécurisé de `PC-TEST-GRE` avec `Test-ComputerSecureChannel -Verbose` : `True` le 03/11/2026 (capture en conversation, non encore déposée sur GitHub).
 - [x] Lire depuis Windows 11 le fichier `GPT.INI` de la Default Domain Policy via SYSVOL (`[General]`, `Version=3` ; capture fournie dans la conversation, non encore déposée sur GitHub).
 - [ ] Approfondir les diagnostics AD DS et les contrôles des autres fichiers de stratégies.
+- [x] Installer Debian 12 sur `FS1-GRE-SIEGE`, réussir la connexion console et vérifier l'identité via `hostnamectl` (capture en conversation, non encore sur GitHub).
+- [ ] Configurer le réseau de FS1, SSH, Samba et l'intégration AD puis tester les accès depuis Windows 11.
 - [ ] Poursuivre la conception et le déploiement progressif des autres serveurs, des sauvegardes, de la supervision et des futurs VPN intersites.
 
 ## À propos

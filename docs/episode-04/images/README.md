@@ -37,6 +37,32 @@ Ces **13 captures complémentaires sont désormais téléversées et intégrées
 | `22-dhcp-options-passerelle-dns-domaine.png` | Options 003, 006, 015 |
 | `23-dhcp-plage-100-199.png` | Plage IPv4 contrôlée |
 
-**Statut vérifié :** les 23 images PNG ci-dessus sont présentes dans ce dossier GitHub et sont toutes intégrées au README principal. Leurs légendes précisent les résultats observés et leurs limites. Le bail DHCP depuis un poste client et la jonction au domaine restent à vérifier.
+## Captures 24 à 40 — Validation côté client et première GPO (3 novembre 2026)
+
+Ces **17 captures authentiques** prolongent la séance du 2 novembre : bail réel, résolutions DNS sur le client, jonction au domaine, comptes, OU et réception de la stratégie ordinateur. Elles sont commentées dans [l'épisode 04](../README.md).
+
+| Fichier | Preuve observée |
+|---|---|
+| [`24-dhcp-bail-client-ipconfig.png`](24-dhcp-bail-client-ipconfig.png) | Bail 10.10.10.100, DNS, passerelle et durée de huit jours |
+| [`25-dns-client-nslookup-domaine.png`](25-dns-client-nslookup-domaine.png) | Résolution du nom ironman.test depuis Windows 11 |
+| [`26-dns-client-srv-ldap.png`](26-dns-client-srv-ldap.png) | DNS SRV LDAP de découverte du DC, port 389 |
+| [`27-ad-jonction-domaine-reussie.png`](27-ad-jonction-domaine-reussie.png) | Message de bienvenue au domaine ironman.test |
+| [`28-ad-ecran-connexion-domaine.png`](28-ad-ecran-connexion-domaine.png) | Écran Windows proposant la connexion à IRONMAN |
+| [`29-ad-authentification-administrateur.png`](29-ad-authentification-administrateur.png) | whoami : session de l'administrateur du domaine |
+| [`30-ad-objet-ordinateur-computers.png`](30-ad-objet-ordinateur-computers.png) | Objet PC-TEST-GRE visible dans Computers |
+| [`31-ad-ordinateur-deplace-ou-postes.png`](31-ad-ordinateur-deplace-ou-postes.png) | Objet PC-TEST-GRE déplacé dans l'OU POSTES |
+| [`32-ad-ou-postes-utilisateurs.png`](32-ad-ou-postes-utilisateurs.png) | OU POSTES et UTILISATEURS sous GRE-SIEGE |
+| [`33-ad-compte-test-grenoble.png`](33-ad-compte-test-grenoble.png) | Compte fictif Test Grenoble créé dans son OU |
+| [`34-ad-authentification-utilisateur.png`](34-ad-authentification-utilisateur.png) | whoami : session IRONMAN test.gre |
+| [`35-ad-groupes-utilisateur-standard.png`](35-ad-groupes-utilisateur-standard.png) | whoami /groups : Utilisateurs et intégrité moyenne |
+| [`36-gpo-lien-ou-postes.png`](36-gpo-lien-ou-postes.png) | Stratégie de verrouillage liée à POSTES |
+| [`37-gpo-inactivite-900-secondes.png`](37-gpo-inactivite-900-secondes.png) | Paramètre d'inactivité défini à 900 secondes |
+| [`38-gpo-gpupdate-reussi.png`](38-gpo-gpupdate-reussi.png) | gpupdate /force : traitements sans erreur |
+| [`39-gpo-registre-inactivitytimeoutsecs.png`](39-gpo-registre-inactivitytimeoutsecs.png) | Registre InactivityTimeoutSecs = 0x384 (900 s) |
+| [`40-gpo-gpresult-ordinateur.png`](40-gpo-gpresult-ordinateur.png) | gpresult ordinateur : GPO ciblée appliquée |
+
+**Bilan : 40 captures publiées**. La distribution DHCP, les connexions AD et la réception du paramètre GPO sont démontrées sur `PC-TEST-GRE`. **Le verrouillage automatique réellement déclenché après 15 minutes n'a pas été testé**.
+
+
 
 Ne pas publier de mots de passe, secrets, configuration pfSense complète ni données personnelles.

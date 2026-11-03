@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 04 : Windows Server 2025, Active Directory, DNS et DHCP
 
-> **Date des opérations :** 2 novembre 2026  
-> **Statut :** DC1 installé, domaine `ironman.test` créé, services AD DS et DNS contrôlés, dépannage DNS documenté et étendue DHCP active. **Attribution d'un bail client et jonction au domaine non encore validées.**  
+> **Dates des opérations :** 2 et 3 novembre 2026  
+> **Statut :** DC1, AD DS, DNS et DHCP opérationnels dans le laboratoire ; **bail DHCP obtenu sur Windows 11, jonction au domaine, ouverture de session AD et application d'une GPO ordinateur vérifiés le 3 novembre 2026**. Test chronométré du verrouillage après 15 minutes non réalisé.  
 > **Périmètre :** laboratoire TSSR personnel au siège fictif de Grenoble.
 
 ## En bref
@@ -9,13 +9,14 @@
 | Domaine technique | Résultat observé | Limite de la validation |
 |---|---|---|
 | **Windows Server 2025** | VM `DC1-GRE-SIEGE` créée, IPv4 `10.10.10.10/24`, accès à pfSense et ping Internet vérifiés | Performances et résilience non évaluées |
-| **Active Directory** | Forêt `ironman.test` créée ; promotion confirmée ; `dcdiag /test:Advertising` et `/test:Services` réussis ; partages `SYSVOL` et `NETLOGON` présents | Authentification et application des GPO depuis un poste client encore à tester |
-| **DNS** | SRV LDAP résolu, zone inversée et PTR ajoutés ; `nslookup` vérifié après correction ; `dcdiag /test:DNS` et résolution de nom Internet réussis | Pas d'audit DNS exhaustif |
-| **DHCP** | Service autorisé dans AD, étendue `DHCP-GRE-SIEGE` active, options 003/006/015 et plage `10.10.10.100–199` vérifiées | Bail et paramètres effectivement reçus sur `PC-TEST-GRE` à tester |
+| **Active Directory** | Forêt `ironman.test`, contrôles `dcdiag` réussis, `PC-TEST-GRE` joint au domaine ; authentification `IRONMAN\administrateur` et `IRONMAN\test.gre` observée | Accès client à `SYSVOL`/`NETLOGON` non testé |
+| **DNS** | SRV LDAP, recherches directes/inverses, `dcdiag /test:DNS` et DNS externe réussis ; requêtes `nslookup` depuis le poste client vérifiées | Pas d'audit DNS exhaustif |
+| **DHCP** | Serveur `10.10.10.10` : bail **`10.10.10.100/24`** délivré au client, passerelle `10.10.10.1`, DNS `10.10.10.10`, suffixe `ironman.test` et bail de **8 jours** | Un seul poste client a été testé |
+| **GPO** | `GPO-GRE-POSTES-VERROUILLAGE-15MIN` liée à `POSTES`, mise à jour réussie ; `gpresult` la liste ; `InactivityTimeoutSecs = 0x384` | Verrouillage effectif à 15 min **non chronométré** |
 
 **Sommaire :** [Architecture](#1-objectif-et-architecture) · [VM Windows Server](#2-machine-virtuelle) · [Journal des manipulations](#3-installation-et-configuration-réellement-effectuées) · [Configuration IPv4](#4-configuration-ipv4-confirmée-depuis-ipconfig-all) · [Tests réseau](#5-tests-réseau-et-résultats) · [Contrôles AD DS/DNS](#6-validations-ad-ds-et-dns) · [Captures](#7-preuves-visuelles-publiées) · [Suite](#8-étapes-restantes)
 
-**Navigation :** [Accueil / épisode 00](../../README.md) · [Épisode précédent : 03 — pfSense](../episode-03/README.md) · [Inventaire des 23 captures](images/README.md)
+**Navigation :** [Accueil / épisode 00](../../README.md) · [Épisode précédent : 03 — pfSense](../episode-03/README.md) · [Inventaire des 40 captures](images/README.md)
 
 **Dépannage marquant :** un test `nslookup` obtenait l'adresse de DC1, mais affichait initialement `Server: UnKnown` et un délai d'attente. Une zone inversée et un enregistrement PTR ont été créés ; les contre-tests ont ensuite retrouvé le nom du serveur sans les messages initiaux. Les captures **avant / correction / après** sont intégrées dans le journal technique.
 
@@ -25,7 +26,7 @@ Créer un premier serveur Windows pour préparer les services d'identité et d'i
 
 ![Schéma du laboratoire actuel : pfSense, Windows Server AD DS DNS DHCP et poste Windows 11 sur VMnet1](../topologie-laboratoire-siege.svg)
 
-*Topologie synthétique du laboratoire au 2 novembre 2026 : DC1 installé et étendue DHCP active, mais aucun bail client ni jonction au domaine encore validés. [Voir le schéma vectoriel en grand](../topologie-laboratoire-siege.svg).*
+*Topologie du laboratoire actualisée au 3 novembre 2026 : client `PC-TEST-GRE` en DHCP (`10.10.10.100`), joint au domaine `ironman.test`. Première GPO ordinateur appliquée, verrouillage chronométré non testé. [Voir le schéma vectoriel en grand](../topologie-laboratoire-siege.svg).*
 
 La liaison entre la VM Windows et pfSense est assurée par **VMnet1 (Host-only)**. Le WAN pfSense est raccordé au NAT de VMware. Cette architecture représente une maquette, pas un environnement de production.
 
@@ -178,6 +179,98 @@ Ce journal conserve les **manipulations réellement effectuées et leurs observa
 
 *Pool — `10.10.10.100` à `10.10.10.199` (100 adresses IPv4). Aucun bail effectivement attribué n'est encore prouvé.*
 
+### 3.5. Tests de bout en bout depuis Windows 11 — 3 novembre 2026
+
+Cette seconde séance permet de passer de la **configuration côté serveur** à la **preuve du fonctionnement côté poste client**. Les trois VM (`pfSense-GRE-SIEGE`, `DC1-GRE-SIEGE` et `PC-TEST-GRE`) ont été démarrées pour les essais.
+
+**40. Attribution DHCP réelle.** Le poste `PC-TEST-GRE` était configuré initialement en `10.10.10.20/24` statique (DNS statique `10.10.10.1`). Ses paramètres IPv4 et DNS ont été basculés en automatique. La commande `ipconfig /all` a affiché :
+
+| Paramètre observé sur `PC-TEST-GRE` | Résultat du 03/11/2026 |
+|---|---|
+| DHCP activé | Oui |
+| Adresse IPv4 et masque | **`10.10.10.100/24`** ; `255.255.255.0` |
+| Passerelle par défaut | `10.10.10.1` |
+| Serveur DHCP | **`10.10.10.10`** |
+| Serveur DNS | **`10.10.10.10`** |
+| Suffixe DNS de connexion | `ironman.test` |
+| Début du bail | 3 novembre 2026, 05:12:29 |
+| Expiration du bail | 11 novembre 2026, 05:12:29 |
+| Durée calculée du bail | **8 jours** |
+
+![Attribution DHCP réelle : PC-TEST-GRE reçoit 10.10.10.100, les options et un bail de huit jours](images/24-dhcp-bail-client-ipconfig.png)
+
+*Preuve client : un bail reçu du serveur Windows `10.10.10.10`. Ce résultat valide la distribution sur **un poste**, pas une montée en charge ou tous les VLAN.*
+
+**41. Résolution DNS côté client.** `nslookup ironman.test` interroge `DC1-GRE-SIEGE.ironman.test` (`10.10.10.10`) et renvoie `10.10.10.10`. Le test prouve que le DNS fourni par DHCP résout le nom interrogé.
+
+![Résolution du domaine ironman.test par le poste client](images/25-dns-client-nslookup-domaine.png)
+
+**42. Découverte du contrôleur de domaine.** La commande `nslookup -type=SRV _ldap._tcp.dc._msdcs.ironman.test` exécutée sur Windows 11 retourne la cible `dc1-gre-siege.ironman.test`, le port LDAP **389** et l'adresse `10.10.10.10`.
+
+![Enregistrement DNS SRV LDAP résolu depuis le poste client](images/26-dns-client-srv-ldap.png)
+
+**43. Jonction de Windows 11 Pro au domaine.** Après avoir saisi `ironman.test` dans les propriétés système, Windows affiche **« Bienvenue dans le domaine ironman.test »**. Le poste a ensuite redémarré ; l'écran d'authentification propose **« Connectez-vous à IRONMAN »**. Ce message et les vérifications suivantes attestent la jonction effective.
+
+![Confirmation Windows : bienvenue dans le domaine ironman.test](images/27-ad-jonction-domaine-reussie.png)
+
+[Voir la preuve de l'écran de connexion au domaine](images/28-ad-ecran-connexion-domaine.png).
+
+**44. Authentification et objets Active Directory.** Une session avec le compte administrateur de domaine a été ouverte, et `whoami` a retourné **`ironman\administrateur`**. Dans ADUC, `PC-TEST-GRE` apparaît d'abord dans `Computers`.
+
+![Session Windows ouverte avec le compte de domaine Administrateur](images/29-ad-authentification-administrateur.png)
+
+[Voir l'objet `PC-TEST-GRE` dans `Computers`](images/30-ad-objet-ordinateur-computers.png).
+
+**45. Organisation des unités d'organisation (OU).** Les OU `ALPINA-RETAIL` → `GRE-SIEGE` → `POSTES` et `UTILISATEURS` ont été créées. L'objet ordinateur `PC-TEST-GRE` a été déplacé dans `POSTES`.
+
+```text
+ironman.test
+└── ALPINA-RETAIL
+    └── GRE-SIEGE
+        ├── POSTES
+        │   └── PC-TEST-GRE
+        └── UTILISATEURS
+            └── Test Grenoble (test.gre)
+```
+
+![Objet ordinateur PC-TEST-GRE rangé dans l'OU POSTES](images/31-ad-ordinateur-deplace-ou-postes.png)
+
+[Voir les OU POSTES et UTILISATEURS](images/32-ad-ou-postes-utilisateurs.png).
+
+**46. Authentification d'un utilisateur métier de test.** Le compte fictif **Test Grenoble** (`IRONMAN\test.gre`) a été créé sous `UTILISATEURS`. L'ouverture de session sur `PC-TEST-GRE` fonctionne ; `whoami` retourne **`ironman\test.gre`**.
+
+![Compte utilisateur Test Grenoble créé dans l'OU UTILISATEURS](images/33-ad-compte-test-grenoble.png)
+
+![Confirmation de la session IRONMAN test.gre avec whoami](images/34-ad-authentification-utilisateur.png)
+
+**47. Contrôle des privilèges.** `whoami /groups` affiche `BUILTIN\Utilisateurs` et un **niveau d'intégrité moyen** (`S-1-16-8192`), sans `BUILTIN\Administrateurs` dans le jeton présenté. Ces observations sont **cohérentes avec une session standard**. L'appartenance à `Utilisateurs du domaine` est également visible dans la sortie `gpresult /r` utilisateur.
+
+[Voir la sortie `whoami /groups`](images/35-ad-groupes-utilisateur-standard.png).
+
+**48. Première GPO ordinateur.** La stratégie `GPO-GRE-POSTES-VERROUILLAGE-15MIN` a été créée et liée à l'OU `POSTES`. Le paramètre **Configuration ordinateur → Stratégies → Paramètres Windows → Paramètres de sécurité → Stratégies locales → Options de sécurité → Ouverture de session interactive : limite d'inactivité de l'ordinateur** a été défini à **900 secondes**.
+
+![GPO liée à l'OU POSTES du siège de Grenoble](images/36-gpo-lien-ou-postes.png)
+
+![Paramètre de verrouillage après 900 secondes d'inactivité](images/37-gpo-inactivite-900-secondes.png)
+
+**49. Vérification sur le poste client.** `gpupdate /force` termine les traitements ordinateur et utilisateur **sans erreur**. La lecture du Registre et le rapport des stratégies ordinateur confirment la configuration :
+
+```cmd
+reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v InactivityTimeoutSecs
+gpresult /scope computer /r
+```
+
+- `InactivityTimeoutSecs` = **`REG_DWORD 0x384`** = **900 secondes** ;
+- `gpresult /scope computer /r`, lancé dans un terminal administrateur, affiche **`GPO-GRE-POSTES-VERROUILLAGE-15MIN`** parmi les stratégies ordinateur appliquées, ainsi que `Default Domain Policy`.
+
+![Mise à jour des stratégies ordinateur et utilisateur sans erreur](images/38-gpo-gpupdate-reussi.png)
+
+![Registre Windows : InactivityTimeoutSecs vaut 0x384](images/39-gpo-registre-inactivitytimeoutsecs.png)
+
+![gpresult confirme la GPO de verrouillage dans les stratégies ordinateur appliquées](images/40-gpo-gpresult-ordinateur.png)
+
+**Bilan de validation :** le **DHCP client**, la **résolution DNS**, la **localisation du DC via SRV**, la **jonction au domaine**, les **sessions AD** et la **réception du paramètre GPO** sont vérifiés sur `PC-TEST-GRE`. Le **verrouillage automatique effectivement déclenché après 15 minutes** n'a pas été observé chronomètre en main : il est explicitement indiqué **non testé**.
+
 ## 4. Configuration IPv4 confirmée depuis `ipconfig /all`
 
 | Paramètre | Valeur observée |
@@ -231,7 +324,7 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 | Résolution DNS Internet | **Réussie** : `nslookup www.microsoft.com 10.10.10.10` retourne IPv4 `23.200.213.221`, adresses IPv6 et alias associés |
 | Partages `SYSVOL` / `NETLOGON` | **Présents et publiés** dans `net share` sur DC1 ; accès à partir d'un client non encore testé |
 | Diagnostic `dcdiag /test:Services` | **Réussi** pour DC1 ; le test `Connectivity` a également réussi |
-| Autres tests AD DS | **À poursuivre** : accès depuis un client, authentification, SYSVOL et application des GPO |
+| Autres tests AD DS | **Authentification depuis le client et GPO vérifiées le 03/11/2026** ; accès client à `SYSVOL`/`NETLOGON` encore à tester |
 
 ### Preuves de domaine et diagnostics Active Directory / DNS
 
@@ -253,17 +346,20 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 
 ## 7. Preuves visuelles publiées
 
-Les **23 captures authentiques** sont maintenant vérifiées dans `docs/episode-04/images/` et **intégrées dans ce README avec leurs légendes** :
+Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-04/images/` et **intégrées dans ce README avec leurs légendes** :
 
 - **01 à 10 — installation et promotion :** paramètres VMware, renommage, réseau, rôle AD DS, domaine, premières requêtes DNS ;
 - **11 et 12 — services Active Directory :** partages `SYSVOL` et `NETLOGON`, diagnostic `dcdiag /test:Services` ;
 - **13 à 17 — dépannage DNS avant/après :** zone inversée absente, zone créée, ajout du PTR, résolutions inverse et directe après correction ;
 - **18 et 19 — validation DNS :** diagnostic `dcdiag /test:DNS`, résolution d'un domaine externe ;
-- **20 à 23 — configuration DHCP :** autorisation dans AD, étendue active, options 003/006/015 et plage enregistrée.
+- **20 à 23 — configuration DHCP :** autorisation dans AD, étendue active, options 003/006/015 et plage enregistrée ;
+- **24 à 26 — tests client DHCP/DNS :** bail de huit jours, résolution du domaine et enregistrement SRV LDAP ;
+- **27 à 35 — intégration Active Directory :** jonction et authentification, objet ordinateur, OU, compte utilisateur standard et groupes ;
+- **36 à 40 — première GPO :** liaison à l'OU, paramètre 900 secondes, `gpupdate`, Registre et `gpresult`.
 
 [Parcourir le dossier d'images et son inventaire](images/README.md).
 
-**Limites des preuves :** la création de l'étendue et la présence des paramètres ne prouvent pas qu'un client a reçu un bail DHCP. La durée du bail, l'obtention d'une adresse par `PC-TEST-GRE`, son accès aux partages et la jonction au domaine restent à vérifier.
+**Limites des preuves :** le bail DHCP, le domaine et le paramètre de GPO sont désormais confirmés sur un client. **Restent non testés :** le verrouillage chronométré après 15 minutes, l'accès depuis le client aux partages `SYSVOL`/`NETLOGON`, et un audit de fonctionnement multi-postes.
 
 **Confidentialité :** aucun mot de passe administrateur ou DSRM ni export de configuration pfSense n'est publié.
 
@@ -281,7 +377,9 @@ Les **23 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Exécuter `dcdiag /test:DNS` : Connectivity, DNS serveur et DNS domaine réussis dans la sortie fournie.
 - [x] Vérifier avec `net share` la publication des partages `SYSVOL` et `NETLOGON` sur DC1.
 - [x] Vérifier avec `dcdiag /test:Services` : tests Connectivity et Services réussis.
-- [ ] Approfondir les diagnostics AD DS, vérifier l'accès aux partages depuis un client et l'application des GPO.
+- [ ] Approfondir les diagnostics AD DS et vérifier l'accès aux partages `SYSVOL` / `NETLOGON` depuis un client.
+- [x] Vérifier l'application d'une première GPO ordinateur par `gpupdate`, le Registre et `gpresult`.
+- [ ] Observer le verrouillage automatique réel après 15 minutes (non testé lors de cette séance).
 - [x] Vérifier un enregistrement SRV AD DNS : recherche `_ldap._tcp.dc._msdcs.ironman.test` réussie, cible et port LDAP confirmés.
 - [x] Vérifier la résolution directe du nom de DC1 via son serveur DNS à `10.10.10.10` (réponse correcte, avertissement initial à investiguer).
 - [x] Inspecter la zone inversée, créer `10.10.10.in-addr.arpa` et le PTR de `10.10.10.10` puis confirmer la résolution inverse réussie.
@@ -292,11 +390,11 @@ Les **23 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Créer et activer l'étendue `DHCP-GRE-SIEGE` pour `10.10.10.0/24` (statut « Actif » visible dans la console).
 - [x] Vérifier dans la console les options d'étendue DHCP 003 (`10.10.10.1`), 006 (`10.10.10.10`) et 015 (`ironman.test`).
 - [x] Vérifier dans la console la plage DHCP enregistrée : `10.10.10.100` à `10.10.10.199` (100 adresses).
-- [ ] Contrôler la durée du bail puis tester l'attribution réelle d'une adresse DHCP à `PC-TEST-GRE`.
-- [ ] Vérifier la jonction d'un poste Windows 11 au domaine, l'authentification et les politiques de groupe.
-- [x] Publier et intégrer les **23 captures réelles** dans ce README, avec des légendes et leurs limites.
+- [x] Vérifier le bail de **8 jours** et les paramètres effectivement attribués par DHCP à `PC-TEST-GRE` : `10.10.10.100/24`, routeur et DNS conformes.
+- [x] Joindre Windows 11 Pro au domaine `ironman.test` ; authentifier un administrateur et l'utilisateur standard `test.gre` ; ranger les objets dans les OU ; vérifier la première GPO côté ordinateur.
+- [x] Publier et documenter **40 captures réelles** (23 initiales et 17 de la séance du 3 novembre 2026), avec résultats observés et limites explicites.
 
-**Aucun test ou service non réalisé n'est présenté comme réussi.**
+**Aucun test ou service non réalisé n'est présenté comme réussi.** En particulier, le verrouillage automatique à 15 minutes reste **non testé**.
 
 ---
 

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1010" viewBox="0 0 1440 1010" role="img" aria-labelledby="title desc">
 <title id="title">Topologie actuelle du laboratoire ALPINA RETAIL au siège de Grenoble</title>
-<desc id="desc">Internet, NAT VMware VMnet8, pare-feu pfSense avec LAN 10.10.10.1, VMnet1 Host-only, serveur DC1-GRE-SIEGE 10.10.10.10 avec Active Directory, DNS et DHCP, et client Windows 11 PC-TEST-GRE 10.10.10.20 configuré initialement en statique. Le client a reçu un bail DHCP 10.10.10.100, rejoint le domaine et reçu une GPO de verrouillage à 900 secondes, dont l'effet chronométré reste non testé.</desc>
+<desc id="desc">Internet, NAT VMware VMnet8, pare-feu pfSense avec LAN 10.10.10.1, VMnet1 Host-only, serveur DC1-GRE-SIEGE 10.10.10.10 avec Active Directory, DNS et DHCP, et client Windows 11 PC-TEST-GRE 10.10.10.20 configuré initialement en statique. Le client a reçu un bail DHCP 10.10.10.100, rejoint le domaine et reçu une GPO de verrouillage à 900 secondes, dont le verrouillage effectif a ensuite été observé selon l'auteur sans capture ni chronométrage précis.</desc>
 <defs>
   <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#07121f"/><stop offset=".55" stop-color="#0f2235"/><stop offset="1" stop-color="#0a1928"/></linearGradient>
   <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2cc7de"/><stop offset="1" stop-color="#70afff"/></linearGradient>
@@ -54,7 +54,7 @@
 <text x="893" y="751" fill="#fbffff" font-size="28" font-weight="735" text-anchor="start">PC-TEST-GRE</text>
 <text x="893" y="782" fill="#cce5f3" font-size="17" font-weight="500" text-anchor="start">Windows 11 Pro  ·  DHCP 10.10.10.100</text>
 <text x="893" y="814" fill="#cfeeea" font-size="17" font-weight="540" text-anchor="start">Domaine ironman.test  ·  Jonction validée</text>
-<text x="893" y="844" fill="#ffd7a0" font-size="17" font-weight="500" text-anchor="start">GPO 900 s reçue  ·  Verrouillage non testé</text>
+<text x="893" y="844" fill="#ffd7a0" font-size="17" font-weight="500" text-anchor="start">GPO 900 s appliquée  ·  Verrouillage déclaré observé</text>
 <rect x="56" y="921" width="1328" height="45" rx="12" fill="#152b3e" stroke="#2b5367" stroke-width="1.5"/>
 <text x="78" y="950" fill="#d0e3f1" font-size="18" font-weight="530" text-anchor="start">PÉRIMÈTRE : seules les VM du siège sont déployées. Les trois boutiques et les VPN intersites restent prévisionnels.</text>
 <text x="58" y="991" fill="#96b6c9" font-size="14" font-weight="430" text-anchor="start">Document d'architecture pédagogique · Résultats détaillés et captures authentiques disponibles dans les épisodes 03 et 04.</text>

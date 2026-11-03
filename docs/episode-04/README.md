@@ -328,6 +328,14 @@ Test-ComputerSecureChannel -Verbose
 
 **Preuve :** capture de la console fournie le 03/11/2026 dans la conversation de travail ; **image non téléversée dans le dépôt GitHub**.
 
+### 3.10. Accès au répertoire des GPO dans SYSVOL — 3 novembre 2026
+
+Depuis le poste Windows 11, l'Explorateur a ouvert le chemin réseau `\\dc1-gre-siege\SYSVOL\ironman.test\Policies`.
+
+- **Résultat observé :** accès réussi au répertoire `Policies` ; **trois dossiers nommés par des GUID** sont visibles, sans message d'erreur.
+- **Preuve :** capture fournie dans la conversation du 03/11/2026 (non encore téléversée sur GitHub).
+- **Portée du test :** l'énumération des dossiers de stratégies via SMB est vérifiée ; **la lecture des fichiers internes (`GPT.INI`, etc.) reste à tester**.
+
 ## 4. Configuration IPv4 confirmée depuis `ipconfig /all`
 
 | Paramètre | Valeur observée |
@@ -438,7 +446,8 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Vérifier l'accès client au partage `NETLOGON` : ouverture du partage et affichage du dossier vide, sans erreur (capture fournie en conversation, non déposée sur GitHub).
 - [x] Vérifier la découverte du contrôleur de domaine depuis `PC-TEST-GRE` avec `nltest /dsgetdc:ironman.test` : DC1 `10.10.10.10` trouvé, commande réussie (capture fournie en conversation, non déposée sur GitHub).
 - [x] Vérifier le canal sécurisé poste-domaine depuis Windows 11 : `Test-ComputerSecureChannel -Verbose` renvoie `True` et confirme la relation de confiance avec `ironman.test` (capture transmise en conversation, pas encore déposée sur GitHub).
-- [ ] Approfondir les diagnostics AD DS et vérifier si nécessaire la lecture des fichiers de stratégies depuis le client.
+- [x] Accéder depuis Windows 11 au répertoire `\\dc1-gre-siege\SYSVOL\ironman.test\Policies` : trois dossiers GUID visibles (capture transmise en conversation, non déposée sur GitHub).
+- [ ] Vérifier la lecture effective d'un fichier `GPT.INI` dans SYSVOL, puis approfondir les diagnostics AD DS.
 - [x] Vérifier l'application d'une première GPO ordinateur par `gpupdate`, le Registre et `gpresult`.
 - [x] Observer le verrouillage automatique en situation réelle : fonctionnement déclaré observé par l'auteur le 03/11/2026, sans capture ni mesure précise de la durée (900 s configurées et confirmées séparément).
 - [x] Vérifier un enregistrement SRV AD DNS : recherche `_ldap._tcp.dc._msdcs.ironman.test` réussie, cible et port LDAP confirmés.

@@ -9,7 +9,7 @@
 | Domaine technique | Résultat observé | Limite de la validation |
 |---|---|---|
 | **Windows Server 2025** | VM `DC1-GRE-SIEGE` créée, IPv4 `10.10.10.10/24`, accès à pfSense et ping Internet vérifiés | Performances et résilience non évaluées |
-| **Active Directory** | Forêt `ironman.test`, contrôles `dcdiag` réussis, `PC-TEST-GRE` joint au domaine ; authentification `IRONMAN\administrateur` et `IRONMAN\test.gre` observée | Accès client à `SYSVOL`/`NETLOGON` non testé |
+| **Active Directory** | Forêt `ironman.test`, contrôles `dcdiag` réussis, `PC-TEST-GRE` joint au domaine ; authentification `IRONMAN\administrateur` et `IRONMAN\test.gre` observée | Accès client à `SYSVOL` confirmé le 03/11/2026 ; `NETLOGON` reste à tester |
 | **DNS** | SRV LDAP, recherches directes/inverses, `dcdiag /test:DNS` et DNS externe réussis ; requêtes `nslookup` depuis le poste client vérifiées | Pas d'audit DNS exhaustif |
 | **DHCP** | Serveur `10.10.10.10` : bail **`10.10.10.100/24`** délivré au client, passerelle `10.10.10.1`, DNS `10.10.10.10`, suffixe `ironman.test` et bail de **8 jours** | Un seul poste client a été testé |
 | **GPO** | `GPO-GRE-POSTES-VERROUILLAGE-15MIN` liée à `POSTES`, mise à jour réussie ; `gpresult` la liste ; `InactivityTimeoutSecs = 0x384` | Verrouillage automatique déclaré observé par l'auteur ; pas de capture ni de mesure chronométrée précise |
@@ -279,6 +279,14 @@ Après la validation de l'application de la GPO sur `PC-TEST-GRE`, l'auteur indi
 - **Preuves existantes :** les captures 36 à 40 attestent la configuration et l'application de la GPO à 900 secondes.
 - **Limites :** aucune capture de l'écran verrouillé et aucun relevé de chronométrage exact n'ont été fournis. L'observation n'est donc **pas présentée comme une preuve visuelle ni comme une mesure précise des 900 secondes**.
 
+### 3.7. Vérification de SYSVOL depuis le poste client — 3 novembre 2026
+
+Le poste Windows 11 du laboratoire a accédé au chemin UNC `\\\\dc1-gre-siege\\SYSVOL` dans l'Explorateur de fichiers. La capture transmise dans la conversation de travail montre le fil d'Ariane **Réseau > dc1-gre-siege > SYSVOL** et le dossier **`ironman.test`** visible, sans message d'erreur.
+
+- **Résultat validé :** partage `SYSVOL` accessible depuis le poste client via SMB ; le dossier du domaine est listé.
+- **Preuve :** capture reçue dans la conversation le 03/11/2026 ; **non encore téléversée dans le dépôt GitHub**, le présent journal constitue la trace textuelle publique.
+- **Limite :** ce contrôle ne démontre pas, à lui seul, la lecture des fichiers internes de stratégie ni l'accès à `NETLOGON`, prévu lors du test suivant.
+
 ## 4. Configuration IPv4 confirmée depuis `ipconfig /all`
 
 | Paramètre | Valeur observée |
@@ -330,9 +338,9 @@ Les deux sorties de commande ont été transmises par l'auteur sous forme de cap
 | Recherche DNS inverse après ajout du PTR | **Réussie :** `nslookup 10.10.10.10 10.10.10.10` retrouve `dc1-gre-siege.ironman.test`, sans `Server: UnKnown` ni timeout dans la sortie fournie |
 | `dcdiag /test:DNS` | **Réussi dans les résultats fournis :** Connectivity, DNS pour DC1 et DNS pour `ironman.test` |
 | Résolution DNS Internet | **Réussie** : `nslookup www.microsoft.com 10.10.10.10` retourne IPv4 `23.200.213.221`, adresses IPv6 et alias associés |
-| Partages `SYSVOL` / `NETLOGON` | **Présents et publiés** dans `net share` sur DC1 ; accès à partir d'un client non encore testé |
+| Partages `SYSVOL` / `NETLOGON` | Publiés localement sur DC1 ; dossier `ironman.test` visible via `\\\\dc1-gre-siege\\SYSVOL` depuis Windows 11 le 03/11/2026 ; accès client à `NETLOGON` non encore testé |
 | Diagnostic `dcdiag /test:Services` | **Réussi** pour DC1 ; le test `Connectivity` a également réussi |
-| Autres tests AD DS | **Authentification depuis le client et GPO vérifiées le 03/11/2026** ; accès client à `SYSVOL`/`NETLOGON` encore à tester |
+| Autres tests AD DS | **Authentification et GPO vérifiées depuis le client le 03/11/2026** ; accès client à `SYSVOL` validé, `NETLOGON` encore à tester |
 
 ### Preuves de domaine et diagnostics Active Directory / DNS
 
@@ -367,7 +375,7 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 
 [Parcourir le dossier d'images et son inventaire](images/README.md).
 
-**Limites des preuves :** le bail DHCP, le domaine et le paramètre de GPO sont désormais confirmés sur un client. **Restent à documenter :** un éventuel relevé chronométré/capture du verrouillage (le fonctionnement a été déclaré observé), l'accès depuis le client aux partages `SYSVOL`/`NETLOGON`, et un audit de fonctionnement multi-postes.
+**Limites des preuves :** le bail DHCP, le domaine et le paramètre de GPO sont désormais confirmés sur un client. **Restent à documenter :** un éventuel relevé chronométré/capture du verrouillage (le fonctionnement a été déclaré observé), l'accès depuis le client à `NETLOGON` (le partage `SYSVOL` est accessible), et un audit de fonctionnement multi-postes.
 
 **Confidentialité :** aucun mot de passe administrateur ou DSRM ni export de configuration pfSense n'est publié.
 
@@ -385,7 +393,8 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Exécuter `dcdiag /test:DNS` : Connectivity, DNS serveur et DNS domaine réussis dans la sortie fournie.
 - [x] Vérifier avec `net share` la publication des partages `SYSVOL` et `NETLOGON` sur DC1.
 - [x] Vérifier avec `dcdiag /test:Services` : tests Connectivity et Services réussis.
-- [ ] Approfondir les diagnostics AD DS et vérifier l'accès aux partages `SYSVOL` / `NETLOGON` depuis un client.
+- [x] Vérifier l'accès au partage `SYSVOL` depuis Windows 11 : ouverture du chemin `\\\\dc1-gre-siege\\SYSVOL` et affichage du dossier `ironman.test` (capture fournie dans la conversation ; non téléversée sur GitHub).
+- [ ] Vérifier l'accès client au partage `NETLOGON` ; approfondir ensuite les diagnostics AD DS.
 - [x] Vérifier l'application d'une première GPO ordinateur par `gpupdate`, le Registre et `gpresult`.
 - [x] Observer le verrouillage automatique en situation réelle : fonctionnement déclaré observé par l'auteur le 03/11/2026, sans capture ni mesure précise de la durée (900 s configurées et confirmées séparément).
 - [x] Vérifier un enregistrement SRV AD DNS : recherche `_ldap._tcp.dc._msdcs.ironman.test` réussie, cible et port LDAP confirmés.
@@ -402,7 +411,7 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Joindre Windows 11 Pro au domaine `ironman.test` ; authentifier un administrateur et l'utilisateur standard `test.gre` ; ranger les objets dans les OU ; vérifier la première GPO côté ordinateur.
 - [x] Publier et documenter **40 captures réelles** (23 initiales et 17 de la séance du 3 novembre 2026), avec résultats observés et limites explicites.
 
-**Traçabilité :** les tests instrumentés et les captures authentiques sont distingués des observations rapportées. Le verrouillage automatique a été **observé selon l'auteur**, sans capture ni relevé chronométré ; les accès `SYSVOL`/`NETLOGON` depuis le client restent à tester.
+**Traçabilité :** les tests instrumentés et les captures authentiques sont distingués des observations rapportées. Le verrouillage automatique a été **observé selon l'auteur**, sans capture ni relevé chronométré ; l'accès client à `SYSVOL` est démontré par une capture fournie dans la conversation (non déposée sur GitHub) ; `NETLOGON` reste à tester.
 
 ---
 

@@ -29,7 +29,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 
 ![Topologie réelle du laboratoire du siège de Grenoble : Internet, VMware NAT VMnet8, pfSense, VMnet1, DC1 Windows Server et PC-TEST-GRE](docs/topologie-laboratoire-siege.svg)
 
-*Schéma de synthèse au 3 novembre 2026 — équipement du laboratoire réellement créé. **DHCP client, jonction AD et application de la GPO vérifiés** ; verrouillage automatique après 15 minutes non chronométré. [Ouvrir le schéma vectoriel en grand](docs/topologie-laboratoire-siege.svg).*
+*Schéma de synthèse au 3 novembre 2026 — équipement du laboratoire réellement créé. **DHCP client, jonction AD et application de la GPO vérifiés** ; verrouillage automatique observé par l'auteur sans capture ni mesure chronométrée précise. [Ouvrir le schéma vectoriel en grand](docs/topologie-laboratoire-siege.svg).*
 
 *Le poste `PC-TEST-GRE`, initialement configuré en statique sur `10.10.10.20`, utilise maintenant un **bail DHCP `10.10.10.100` délivré par DC1**. Les trois VM ont été allumées simultanément pour les essais du 3 novembre, malgré les 16 Go de RAM de l'hôte.*
 
@@ -52,7 +52,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **01** | [Organisation et organigramme](docs/episode-01/README.md) | Répartition des 75 collaborateurs simulés, organigramme et [dossier PDF](docs/episode-01/Alpina_Retail_Organisation_Episode_01.pdf) |
 | **02** | [Cahier des charges informatique](docs/episode-02/README.md) | Besoins métier, architecture cible, droits d'accès et limites du laboratoire |
 | **03** | [Pare-feu pfSense et poste Windows 11](docs/episode-03/README.md) | Installation, adressage, NAT/PAT, filtrage ICMP, tests réseau et sauvegarde chiffrée |
-| **04** | [Windows Server, AD DS, DNS et DHCP](docs/episode-04/README.md) | DC1, dépannage DNS, DHCP réel sur Windows 11, jonction à `ironman.test`, utilisateur AD et première GPO (verrouillage chronométré non testé) |
+| **04** | [Windows Server, AD DS, DNS et DHCP](docs/episode-04/README.md) | DC1, dépannage DNS, DHCP réel sur Windows 11, jonction à `ironman.test`, utilisateur AD et première GPO (application vérifiée ; verrouillage ensuite observé par l'auteur sans capture) |
 
 **Preuves visuelles :** [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures authentiques Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md).
 
@@ -84,7 +84,8 @@ Les compétences travaillées comprennent l'administration Windows Server, AD DS
 - [x] Créer et activer l'étendue DHCP du siège ; contrôler sa plage et ses options.
 - [x] Confirmer la durée du bail de **8 jours** et l'attribution DHCP à `PC-TEST-GRE` (`ipconfig /all`).
 - [x] Joindre Windows 11 au domaine, authentifier des comptes AD et vérifier l'application d'une GPO ordinateur à 900 secondes.
-- [ ] Tester par observation le verrouillage automatique réel après 15 minutes ; approfondir les accès clients à `SYSVOL`/`NETLOGON`.
+- [x] Observer le verrouillage automatique sur `PC-TEST-GRE` (retour de l'auteur du 03/11/2026 ; pas de capture ni de chronométrage précis).
+- [ ] Vérifier depuis le client les accès aux partages `SYSVOL`/`NETLOGON` ; approfondir les diagnostics AD DS.
 - [ ] Poursuivre la conception et le déploiement progressif des autres serveurs, des sauvegardes, de la supervision et des futurs VPN intersites.
 
 ## À propos

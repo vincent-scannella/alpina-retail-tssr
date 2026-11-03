@@ -85,7 +85,8 @@ Les compétences travaillées comprennent l'administration Windows Server, AD DS
 - [x] Confirmer la durée du bail de **8 jours** et l'attribution DHCP à `PC-TEST-GRE` (`ipconfig /all`).
 - [x] Joindre Windows 11 au domaine, authentifier des comptes AD et vérifier l'application d'une GPO ordinateur à 900 secondes.
 - [x] Observer le verrouillage automatique sur `PC-TEST-GRE` (retour de l'auteur du 03/11/2026 ; pas de capture ni de chronométrage précis).
-- [ ] Vérifier depuis le client les accès aux partages `SYSVOL`/`NETLOGON` ; approfondir les diagnostics AD DS.
+- [x] Vérifier depuis Windows 11 les partages `SYSVOL` et `NETLOGON` (captures transmises en conversation, non encore déposées sur GitHub).
+- [ ] Approfondir les diagnostics AD DS et la lecture des fichiers internes de stratégies.
 - [ ] Poursuivre la conception et le déploiement progressif des autres serveurs, des sauvegardes, de la supervision et des futurs VPN intersites.
 
 ## À propos

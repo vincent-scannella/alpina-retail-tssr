@@ -61,7 +61,7 @@ Ces **17 captures authentiques** prolongent la séance du 2 novembre : bail rée
 | [`39-gpo-registre-inactivitytimeoutsecs.png`](39-gpo-registre-inactivitytimeoutsecs.png) | Registre InactivityTimeoutSecs = 0x384 (900 s) |
 | [`40-gpo-gpresult-ordinateur.png`](40-gpo-gpresult-ordinateur.png) | gpresult ordinateur : GPO ciblée appliquée |
 
-**Bilan : 40 captures publiées**. La distribution DHCP, les connexions AD et la réception du paramètre GPO sont démontrées sur `PC-TEST-GRE`. **Le verrouillage automatique réellement déclenché après 15 minutes n'a pas été testé**.
+**Bilan : 40 captures publiées**. La distribution DHCP, les connexions AD et la réception du paramètre GPO sont démontrées sur `PC-TEST-GRE`. **Le verrouillage automatique a ensuite été observé selon l'auteur (03/11/2026)**, mais aucune capture de ce comportement ni mesure chronométrée précise n'ont été fournies. Les captures 36 à 40 prouvent la configuration et l'application du paramètre à 900 s.
 
 
 

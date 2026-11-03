@@ -9,7 +9,7 @@
 | Domaine technique | Résultat observé | Limite de la validation |
 |---|---|---|
 | **Windows Server 2025** | VM `DC1-GRE-SIEGE` créée, IPv4 `10.10.10.10/24`, accès à pfSense et ping Internet vérifiés | Performances et résilience non évaluées |
-| **Active Directory** | Forêt `ironman.test`, contrôles `dcdiag` réussis, `PC-TEST-GRE` joint au domaine ; authentification `IRONMAN\administrateur` et `IRONMAN\test.gre` observée | Accès à `SYSVOL` et `NETLOGON` depuis le client confirmé ; découverte du contrôleur par `nltest` validée le 03/11/2026 |
+| **Active Directory** | Forêt `ironman.test`, contrôles `dcdiag` réussis, `PC-TEST-GRE` joint au domaine ; authentification `IRONMAN\administrateur` et `IRONMAN\test.gre` observée | Accès client à `SYSVOL`/`NETLOGON`, découverte du DC (`nltest`) et canal sécurisé (`True`) confirmés le 03/11/2026 |
 | **DNS** | SRV LDAP, recherches directes/inverses, `dcdiag /test:DNS` et DNS externe réussis ; requêtes `nslookup` depuis le poste client vérifiées | Pas d'audit DNS exhaustif |
 | **DHCP** | Serveur `10.10.10.10` : bail **`10.10.10.100/24`** délivré au client, passerelle `10.10.10.1`, DNS `10.10.10.10`, suffixe `ironman.test` et bail de **8 jours** | Un seul poste client a été testé |
 | **GPO** | `GPO-GRE-POSTES-VERROUILLAGE-15MIN` liée à `POSTES`, mise à jour réussie ; `gpresult` la liste ; `InactivityTimeoutSecs = 0x384` | Verrouillage automatique déclaré observé par l'auteur ; pas de capture ni de mesure chronométrée précise |
@@ -310,9 +310,23 @@ nltest /dsgetdc:ironman.test
 - Indicateurs renvoyés, entre autres : `PDC`, `GC`, `DS`, `LDAP`, `KDC`, `TIMESERV`, `WRITABLE`, `DNS_DC`, `DNS_DOMAIN` et `DNS_FOREST`.
 - Message de fin : **« La commande a été correctement exécutée »**.
 
-**Interprétation :** la découverte de DC1 par le poste client fonctionne et retourne les informations de localisation attendues. Les indicateurs décrivent les rôles annoncés par le DC et ne constituent pas un diagnostic approfondi de chaque service. Le canal sécurisé entre la machine et le domaine reste à vérifier séparément.
+**Interprétation :** la découverte de DC1 par le poste client fonctionne et retourne les informations de localisation attendues. Les indicateurs décrivent les rôles annoncés par le DC et ne constituent pas un diagnostic approfondi de chaque service. Le canal sécurisé entre la machine et le domaine est contrôlé séparément dans le test suivant.
 
 **Preuve :** capture reçue dans la conversation de travail du 03/11/2026 ; **non encore déposée en fichier image sur GitHub**.
+
+### 3.9. Vérification du canal sécurisé Active Directory — 3 novembre 2026
+
+Sur le client `PC-TEST-GRE`, une console Windows PowerShell élevée a exécuté :
+
+```powershell
+Test-ComputerSecureChannel -Verbose
+```
+
+**Résultat observé :** `True`, accompagné du commentaire PowerShell : « Le canal sécurisé entre l’ordinateur local et le domaine ironman.test fonctionne correctement. »
+
+**Conclusion :** la relation de confiance du compte ordinateur avec le domaine `ironman.test` fonctionne pour ce test, depuis le client. Ce contrôle ne constitue pas à lui seul un audit complet des protocoles AD, de DNS ou de la réplication.
+
+**Preuve :** capture de la console fournie le 03/11/2026 dans la conversation de travail ; **image non téléversée dans le dépôt GitHub**.
 
 ## 4. Configuration IPv4 confirmée depuis `ipconfig /all`
 
@@ -423,7 +437,8 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Vérifier l'accès au partage `SYSVOL` depuis Windows 11 : ouverture du chemin `\\dc1-gre-siege\SYSVOL` et affichage du dossier `ironman.test` (capture fournie dans la conversation ; non téléversée sur GitHub).
 - [x] Vérifier l'accès client au partage `NETLOGON` : ouverture du partage et affichage du dossier vide, sans erreur (capture fournie en conversation, non déposée sur GitHub).
 - [x] Vérifier la découverte du contrôleur de domaine depuis `PC-TEST-GRE` avec `nltest /dsgetdc:ironman.test` : DC1 `10.10.10.10` trouvé, commande réussie (capture fournie en conversation, non déposée sur GitHub).
-- [ ] Vérifier le canal sécurisé poste-domaine ; approfondir ensuite les diagnostics AD DS et, si nécessaire, la lecture des fichiers de stratégies depuis le client.
+- [x] Vérifier le canal sécurisé poste-domaine depuis Windows 11 : `Test-ComputerSecureChannel -Verbose` renvoie `True` et confirme la relation de confiance avec `ironman.test` (capture transmise en conversation, pas encore déposée sur GitHub).
+- [ ] Approfondir les diagnostics AD DS et vérifier si nécessaire la lecture des fichiers de stratégies depuis le client.
 - [x] Vérifier l'application d'une première GPO ordinateur par `gpupdate`, le Registre et `gpresult`.
 - [x] Observer le verrouillage automatique en situation réelle : fonctionnement déclaré observé par l'auteur le 03/11/2026, sans capture ni mesure précise de la durée (900 s configurées et confirmées séparément).
 - [x] Vérifier un enregistrement SRV AD DNS : recherche `_ldap._tcp.dc._msdcs.ironman.test` réussie, cible et port LDAP confirmés.

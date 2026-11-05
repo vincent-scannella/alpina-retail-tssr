@@ -43,7 +43,7 @@ Les mots de passe et les identifiants de machine ne sont pas publiés.
    - `Architecture: x86-64`
    - `Virtualization: vmware`
 
-**Preuves disponibles :** captures de `hostnamectl` le 03/11 et des tests réseau, DNS, SSH et fichiers Linux le 05/11/2026, transmises dans la conversation ; **ces images ne sont pas encore déposées dans ce dépôt GitHub**. Le présent journal décrit les observations sans se substituer aux fichiers de preuve.
+**Preuves disponibles :** **10 captures d'écran authentiques du 05/11/2026 sont désormais déposées dans [`images/`](images/README.md)** pour documenter la configuration Linux, le LAN, les pings et le diagnostic DNS. La capture `hostnamectl` du 03/11/2026 a été fournie en conversation, mais n'est pas déposée sur GitHub. Les preuves visuelles sélectionnées sont des captures d'origine, sans reconstruction ni modification du texte.
 
 ## 3. Réseau et administration Linux — manipulations du 05/11/2026
 
@@ -107,7 +107,29 @@ nameserver 10.10.10.10
 - [ ] Vérifier et durcir le service SSH.
 - [ ] Installer et configurer Samba ; concevoir les partages et les ACL.
 - [ ] Intégrer le serveur Linux au domaine `ironman.test`, puis valider l'authentification et les accès depuis Windows 11.
-- [ ] Déposer les preuves visuelles choisies dans GitHub après contrôle du contenu sensible.
+- [x] Déposer **10 captures d'écran authentiques** sélectionnées du 05/11/2026 dans [images/README.md](images/README.md), sans secret d'authentification.
+
+## 5. Preuves visuelles authentiques
+
+**[Consulter les 10 captures Linux, réseau et DNS](images/README.md)** — toutes fournies par l'auteur lors des manipulations du **05/11/2026**.
+
+### Réseau de FS1 et communication avec le siège
+
+![Interface ens33, adresse 10.10.10.30/24 appliquée](images/01-fs1-ip-statique.png)
+
+![Ping pfSense 10.10.10.1, quatre réponses et 0% de perte](images/02-connectivite-pfsense.png)
+
+![Ping DC1 10.10.10.10, quatre réponses et 0% de perte](images/03-connectivite-dc1.png)
+
+### Diagnostic DNS — avant, correction et après redémarrage
+
+![Ancien DNS 10.50.10.2 et domaine localdomain restés dans resolv.conf](images/04-dns-ancien-resolv-conf.png)
+
+![Fichier resolv.conf corrigé : recherche ironman.test et DNS 10.10.10.10](images/05-dns-resolv-conf-corrige.png)
+
+![DNS ironman.test et 10.10.10.10 toujours présents après redémarrage](images/07-dns-persistant-apres-redemarrage.png)
+
+**Limite des preuves :** les tests ne constituent pas encore une validation de Samba ou de la jonction au domaine AD. Les copies d'écran ne montrent aucune authentification au domaine depuis Linux.
 
 ## Méthode
 

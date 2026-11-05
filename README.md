@@ -55,9 +55,9 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **02** | [Cahier des charges informatique](docs/episode-02/README.md) | Besoins métier, architecture cible, droits d'accès et limites du laboratoire |
 | **03** | [Pare-feu pfSense et poste Windows 11](docs/episode-03/README.md) | Installation, adressage, NAT/PAT, filtrage ICMP, tests réseau et sauvegarde chiffrée |
 | **04** | [Windows Server, AD DS, DNS et DHCP](docs/episode-04/README.md) | DC1, dépannage DNS, DHCP réel sur Windows 11, jonction à `ironman.test`, utilisateur AD et première GPO (application vérifiée ; verrouillage ensuite observé par l'auteur sans capture) |
-| **05** | [FS1 — Serveur de fichiers Debian Linux](docs/episode-05/README.md) | Debian 12, sudo, VMnet1/IP statique, ping pfSense / DC1, correction DNS et connexion SSH validés ; Samba et intégration AD à venir |
+| **05** | [FS1 — Serveur de fichiers Debian Linux](docs/episode-05/README.md) | Debian 12, sudo, IP statique VMnet1, ping pfSense / DC1, correction DNS et SSH validés ; [10 preuves visuelles](docs/episode-05/images/README.md) ; Samba et jonction AD à venir |
 
-**Preuves visuelles :** [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures authentiques Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md).
+**Preuves visuelles :** [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md) · [épisode 05 — 10 captures authentiques Debian / réseau / DNS](docs/episode-05/images/README.md).
 
 ## Vue d'ensemble de l'entreprise fictive
 

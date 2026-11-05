@@ -1,6 +1,6 @@
 # Épisode 05 — Captures authentiques Debian / Réseau / DNS
 
-**Date des manipulations : 05 novembre 2026.** Les dix fichiers PNG de ce dossier sont des **captures d'écran d'origine fournies au fil des manipulations**, sans génération ni simulation graphique. Elles servent de preuves associées au [journal technique de l'épisode 05](../README.md).
+**Date des manipulations : 05 novembre 2026.** Les onze fichiers PNG de ce dossier sont des **captures d'écran d'origine fournies au fil des manipulations**, sans génération ni simulation graphique. Elles servent de preuves associées au [journal technique de l'épisode 05](../README.md).
 
 Le projet est fictif. Les noms des hôtes et les IP visibles appartiennent au laboratoire ; aucune capture de mot de passe ni de jeton d'accès n'est publiée.
 
@@ -16,6 +16,8 @@ Le projet est fictif. Les noms des hôtes et les IP visibles appartiennent au la
 | [08-interfaces-ip-statique.png](08-interfaces-ip-statique.png) | `/etc/network/interfaces` : adresse, masque, passerelle et DNS cible |
 | [09-sudo-groupe-admin.png](09-sudo-groupe-admin.png) | `id administrateur` : appartenance au groupe sudo |
 | [10-reseau-nat-provisoire.png](10-reseau-nat-provisoire.png) | `ens33` UP avec IPv4 DHCP 10.50.10.131/24 sur VMnet8 |
+
+| [11-jonction-domaine-ads.png](11-jonction-domaine-ads.png) | Commande `net ads join` : jonction de FS1 au domaine `ironman.test` confirmée |
 
 ## Captures essentielles
 
@@ -47,6 +49,10 @@ Le projet est fictif. Les noms des hôtes et les IP visibles appartiennent au la
 
 ![DNS après reboot, noms et IP attendus](07-dns-persistant-apres-redemarrage.png)
 
-**Précautions d'interprétation :** ces contrôles attestent une configuration réseau et une résolution de nom au moment des tests, pas la disponibilité des services AD/Kerberos, un contrôle exhaustif des conflits d'adresses, ni un partage Samba en fonctionnement. La connexion SSH a été observée en session, mais aucun audit de sécurisation SSH n'a encore été effectué.
+### Première jonction au domaine Active Directory
+
+![Résultat net ads join vers ironman.test](11-jonction-domaine-ads.png)
+
+**Précautions d'interprétation :** ces contrôles attestent une configuration réseau et une résolution de nom au moment des tests, pas la disponibilité des services AD/Kerberos, un contrôle exhaustif des conflits d'adresses, ni une relation de confiance Winbind validée ni un partage Samba en fonctionnement. La connexion SSH a été observée en session, mais aucun audit de sécurisation SSH n'a encore été effectué.
 
 [Retour à l'épisode 05](../README.md)

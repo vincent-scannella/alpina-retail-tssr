@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 05 : FS1, serveur de fichiers Debian Linux
 
 > **Date du premier jalon :** 3 novembre 2026  
-> **Statut au 05/11/2026 :** Debian 12 installé et mis à jour ; interface IPv4 statique raccordée à VMnet1 ; communication avec pfSense et DC1, résolution DNS interne et accès SSH après redémarrage vérifiés. **Samba, jonction AD et partages non encore déployés/validés.**  
+> **Statut au 05/11/2026 :** Debian 12 installé et mis à jour ; interface IPv4 statique raccordée à VMnet1 ; communication avec pfSense et DC1, résolution DNS interne et accès SSH après redémarrage vérifiés. **Samba/Winbind installés et jonction au domaine confirmée ; services Winbind, canal de confiance et partages non encore validés.**  
 > **Périmètre :** laboratoire TSSR personnel, siège fictif de Grenoble. La société et ses utilisateurs sont simulés.
 
 ## Objectif métier
@@ -26,7 +26,7 @@ Mettre en place un serveur de fichiers Linux pour le siège d'ALPINA RETAIL, acc
 | Réseau d'installation | VMnet8 (NAT), adresse DHCP provisoire `10.50.10.131/24`, abandonné après mises à jour et bascule sur VMnet1 |
 | Routage / DNS configuré | Passerelle `10.10.10.1` (pfSense) ; DNS `10.10.10.10` (DC1) ; recherche `ironman.test`. La route par défaut n'a pas encore été relevée séparément. |
 | SSH | Connexion distante `ssh administrateur@10.10.10.30` depuis Windows Server fonctionnelle et reprise après redémarrage, le 05/11 ; durcissement restant |
-| Samba / intégration AD | Non installés ou non testés à ce stade |
+| Samba / intégration AD | Samba, Winbind et Kerberos installés ; configuration `smb.conf` contrôlée par `testparm -s` ; **`net ads join` au domaine `ironman.test` réussi** le 05/11/2026 ; canal de confiance, Winbind et partages encore à tester |
 
 Les mots de passe et les identifiants de machine ne sont pas publiés.
 
@@ -92,9 +92,41 @@ nameserver 10.10.10.10
 - Redémarrage via `sudo reboot`, puis nouvelle connexion SSH depuis Windows Server : réussi.
 - Après redémarrage, `cat /etc/resolv.conf` montre toujours `search ironman.test` et `nameserver 10.10.10.10` : **persistance confirmée pour ce redémarrage**.
 
-**Limites :** la conservation du fichier après un redémarrage ne garantit pas qu'un futur service de gestion DNS ne le remplacera jamais. Les enregistrements SRV Active Directory, la route par défaut, le fonctionnement de Samba, la jonction AD et les règles d'accès n'ont pas encore été testés.
+**Limites :** la conservation du fichier après un redémarrage ne garantit pas qu'un futur service de gestion DNS ne le remplacera jamais. La route par défaut et les enregistrements SRV LDAP/Kerberos ont été vérifiés ultérieurement. La jonction Samba a également réussi (voir la section suivante), mais les accès aux partages et l'authentification AD restent à tester.
 
-## 4. Prochains tests
+## 4. Préparation du domaine et première jonction Samba — 05/11/2026
+
+- Route par défaut relevée : `default via 10.10.10.1 dev ens33 onlink`.
+- Depuis le LAN, `ping -c 4 1.1.1.1` : 4 réponses, 0 % de perte ; `getent ahostsv4 debian.org` : résolution externe OK.
+- DNS SRV depuis FS1 vers DC1 : LDAP `_ldap._tcp.dc._msdcs.ironman.test` → `0 100 389 dc1-gre-siege.ironman.test.` ; Kerberos `_kerberos._tcp.ironman.test` → `0 100 88 dc1-gre-siege.ironman.test.`
+- Horloge Debian synchronisée, NTP actif selon `timedatectl status`. Sur DC1, `w32tm /query /status` affiche `Local CMOS Clock` : référence NTP à améliorer. Comparaison quasi simultanée des deux horloges par SSH : aucun écart important visible.
+- FQDN Debian `hostname -f` : `fs1-gre-siege.ironman.test`. Une première requête DNS A vers DC1 n'a retourné aucune réponse ; un enregistrement A `fs1-gre-siege` → `10.10.10.30` a été ajouté dans la console DNS Windows, avec demande de PTR. Contrôle DNS après ajout encore à réaliser.
+- Installation réussie des composants `samba winbind libnss-winbind libpam-winbind krb5-user smbclient`.
+- Royaume Kerberos déclaré `IRONMAN.TEST` (`default_realm`) selon retour de l'auteur.
+- Sauvegarde préalable de `/etc/samba/smb.conf` dans `/etc/samba/smb.conf.bak`.
+- Configuration Samba : `workgroup = IRONMAN`, `server role = member server`, `security = ADS`, `realm = IRONMAN.TEST`, backend idmap par défaut `tdb` / plage 3000–7999, idmap `IRONMAN` en `rid` / plage 10000–999999. `testparm -s` a affiché ces paramètres.
+- Accès invités ensuite désactivés par `map to guest = Never` et `usershare allow guests = no` (contrôle `testparm` final encore à réaliser).
+
+### Jonction au domaine : résultat constaté
+
+Commande exécutée en SSH, mot de passe du compte AD non publié :
+
+```bash
+sudo net ads join -U 'IRONMAN\Administrateur'
+```
+
+Résultat :
+
+```text
+Using short domain name -- IRONMAN
+Joined 'FS1-GRE-SIEGE' to dns domain 'ironman.test'
+```
+
+![Capture authentique de la commande net ads join réussie](images/11-jonction-domaine-ads.png)
+
+**Statut exact :** Samba confirme que la jonction au domaine a réussi. Les tests de confiance `net ads testjoin`, de résolution des identités Winbind et d'accès SMB depuis Windows 11 sont encore à réaliser.
+
+## 5. Prochains tests
 
 - [x] Relever `ens33` et l'adresse IP statique avec `ip -br address`.
 - [x] Actualiser les listes APT, effectuer la mise à jour des paquets et configurer `sudo` pour l'utilisateur local.
@@ -102,16 +134,18 @@ nameserver 10.10.10.10
 - [x] Tester la connectivité ICMP vers pfSense (`10.10.10.1`) et DC1 (`10.10.10.10`).
 - [x] Corriger la configuration DNS, résoudre le nom de DC1 et confirmer que `/etc/resolv.conf` conserve les réglages après un redémarrage.
 - [x] Se connecter en SSH depuis Windows Server et se reconnecter après redémarrage.
-- [ ] Contrôler l'absence de conflit d'adresse IP, la route par défaut et la disponibilité des enregistrements SRV AD.
+- [x] Vérifier la route par défaut et les enregistrements DNS SRV LDAP/Kerberos.
+- [ ] Contrôler l'absence de conflit d'adresse IP et revalider les enregistrements A/PTR de FS1.
 - [ ] Vérifier les ressources réelles de la VM après sa recréation.
 - [ ] Vérifier et durcir le service SSH.
-- [ ] Installer et configurer Samba ; concevoir les partages et les ACL.
-- [ ] Intégrer le serveur Linux au domaine `ironman.test`, puis valider l'authentification et les accès depuis Windows 11.
-- [x] Déposer **10 captures d'écran authentiques** sélectionnées du 05/11/2026 dans [images/README.md](images/README.md), sans secret d'authentification.
+- [x] Installer Samba/Winbind/Kerberos, préparer la configuration de serveur membre et réaliser la jonction ADS de FS1.
+- [ ] Vérifier `testparm` après les derniers réglages, contrôler le canal de confiance et les identités Winbind.
+- [ ] Concevoir les partages Samba et les ACL, puis tester l'authentification et les accès depuis Windows 11.
+- [x] Déposer **11 captures d'écran authentiques** sélectionnées du 05/11/2026 dans [images/README.md](images/README.md), sans secret d'authentification.
 
-## 5. Preuves visuelles authentiques
+## 6. Preuves visuelles authentiques
 
-**[Consulter les 10 captures Linux, réseau et DNS](images/README.md)** — toutes fournies par l'auteur lors des manipulations du **05/11/2026**.
+**[Consulter les 11 captures Linux, réseau, DNS et AD](images/README.md)** — toutes fournies par l'auteur lors des manipulations du **05/11/2026**.
 
 ### Réseau de FS1 et communication avec le siège
 
@@ -129,7 +163,11 @@ nameserver 10.10.10.10
 
 ![DNS ironman.test et 10.10.10.10 toujours présents après redémarrage](images/07-dns-persistant-apres-redemarrage.png)
 
-**Limite des preuves :** les tests ne constituent pas encore une validation de Samba ou de la jonction au domaine AD. Les copies d'écran ne montrent aucune authentification au domaine depuis Linux.
+### Intégration Samba à Active Directory
+
+![Jonction Samba réussie au domaine ironman.test](images/11-jonction-domaine-ads.png)
+
+**Limite des preuves :** la jonction ADS est confirmée mais la relation de confiance, les identités Winbind et les accès SMB n'ont pas encore été validés.
 
 ## Méthode
 

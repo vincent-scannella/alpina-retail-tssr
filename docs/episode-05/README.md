@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 05 : FS1, serveur de fichiers Debian Linux
 
 > **Date du premier jalon :** 3 novembre 2026  
-> **Statut au 05/11/2026 :** Debian 12 installé et mis à jour ; interface IPv4 statique raccordée à VMnet1 ; communication avec pfSense et DC1, résolution DNS interne et accès SSH après redémarrage vérifiés. **Samba/Winbind installés ; jonction au domaine et relation de confiance confirmées ; `wbinfo -u` retourne les utilisateurs IRONMAN après dépannage Winbind. Correspondance UID/GID et accès SMB non encore validés.**  
+> **Statut au 05/11/2026 :** Debian 12 installé et mis à jour ; interface IPv4 statique raccordée à VMnet1 ; communication avec pfSense et DC1, résolution DNS interne et accès SSH après redémarrage vérifiés. **Samba/Winbind installés ; jonction au domaine et relation de confiance confirmées ; `wbinfo -u` retourne les utilisateurs IRONMAN après dépannage Winbind. Les identités UID/GID AD sont reconnues par NSS, le dossier COMMUN dispose de permissions Linux et l'ouverture du partage SMB depuis Windows 11 est observée ; écriture et test d'accès non autorisé encore à réaliser.**  
 > **Périmètre :** laboratoire TSSR personnel, siège fictif de Grenoble. La société et ses utilisateurs sont simulés.
 
 ## Objectif métier
@@ -26,7 +26,7 @@ Mettre en place un serveur de fichiers Linux pour le siège d'ALPINA RETAIL, acc
 | Réseau d'installation | VMnet8 (NAT), adresse DHCP provisoire `10.50.10.131/24`, abandonné après mises à jour et bascule sur VMnet1 |
 | Routage / DNS configuré | Passerelle `10.10.10.1` (pfSense) ; DNS `10.10.10.10` (DC1) ; recherche `ironman.test`. La route par défaut n'a pas encore été relevée séparément. |
 | SSH | Connexion distante `ssh administrateur@10.10.10.30` depuis Windows Server fonctionnelle et reprise après redémarrage, le 05/11 ; durcissement restant |
-| Samba / intégration AD | Samba, Winbind et Kerberos installés ; `net ads join` réussi ; `net ads testjoin` → `Join is OK` (retour de l'auteur) ; **`wbinfo -u` liste les utilisateurs IRONMAN** après redémarrage Winbind ; UID/GID et partages à tester |
+| Samba / intégration AD | Jonction et canal de confiance AD validés ; Winbind/NSS reconnaît le compte `test.gre` (UID `11108`) et le groupe AD `GG_FS1_COMMUN_RW` (GID `11110`) ; permissions Linux `2770` et partage `[COMMUN]` configurés ; ouverture depuis Windows 11 confirmée ; écriture à tester |
 
 Les mots de passe et les identifiants de machine ne sont pas publiés.
 
@@ -138,7 +138,55 @@ Joined 'FS1-GRE-SIEGE' to dns domain 'ironman.test'
 
 **Résultat :** Winbind énumère désormais les comptes Active Directory. La présence de comptes dans la liste ne prouve pas encore la résolution UID/GID par NSS ni les droits d'accès aux fichiers Samba.
 
-## 5. Prochains tests
+## 5. Partage COMMUN : mise en service partielle (05/11/2026)
+
+### Utilisateurs et groupes Active Directory
+
+- `getent passwd 'IRONMAN\test.gre'` retourne le compte `test.gre` avec UID **11108**, GID **10513** et le shell `/bin/false`.
+- Groupe global de sécurité **GG_FS1_COMMUN_RW** créé dans l'OU `ALPINA-RETAIL/GRE-SIEGE` sur Windows Server 2025 ; compte fictif **Test Grenoble** ajouté comme membre.
+- `getent group 'IRONMAN\GG_FS1_COMMUN_RW'` retourne le groupe reconnu par Linux avec GID **11110**.
+
+### Permissions Linux
+
+- `sudo mkdir -p /srv/samba/commun` : création du répertoire.
+- `sudo chgrp 'IRONMAN\GG_FS1_COMMUN_RW' /srv/samba/commun` : groupe propriétaire du dossier.
+- `sudo chmod 2770 /srv/samba/commun` : propriétaires et membres du groupe en lecture/écriture/traversée ; autres sans droits ; **SGID** activé.
+- `ls -ld /srv/samba/commun` confirme `drwxrws---`, propriétaire `root`, groupe `IRONMAN\gg_fs1_commun_rw`.
+
+### Configuration du partage SMB
+
+```ini
+[COMMUN]
+    comment = Dossier commun ALPINA RETAIL
+    path = /srv/samba/commun
+    browseable = yes
+    read only = no
+    guest ok = no
+    valid users = @"IRONMAN\gg_fs1_commun_rw"
+    create mask = 0660
+    force create mode = 0660
+    directory mask = 2770
+    force directory mode = 2770
+```
+
+`testparm -s` affiche les paramètres de cette section ; `sudo systemctl restart smbd` effectué et le service est indiqué `active` par l'auteur.
+
+### Résultat côté Windows 11
+
+**La capture authentique montre que l'Explorateur de fichiers de PC-TEST-GRE ouvre `\\10.10.10.30\COMMUN` et que le dossier est vide.** Cela valide l'ouverture du partage Samba depuis Windows 11.
+
+![Premier accès au partage COMMUN depuis Windows 11](images/20-acces-partage-depuis-windows11.png)
+
+### Limites et reprise de séance
+
+- **Validé :** intégration du groupe AD à NSS, permissions Linux, interprétation de la configuration Samba et ouverture du partage depuis Windows 11.
+- **À valider :** création/modification de `test-commun.txt` depuis Windows, permissions du fichier créées sur Debian, refus d'accès pour un compte non membre du groupe AD, et accès par FQDN.
+- Le test de création du fichier a été proposé, mais **il n'a pas été réalisé ou confirmé** avant l'arrêt de la séance.
+
+Voir [les huit nouvelles captures de cette phase](images/README.md) — recadrages et compression de certaines captures d'origine pour la lisibilité, sans modifier les résultats.
+
+
+## 6. Prochains tests
 
 - [x] Relever `ens33` et l'adresse IP statique avec `ip -br address`.
 - [x] Actualiser les listes APT, effectuer la mise à jour des paquets et configurer `sudo` pour l'utilisateur local.
@@ -153,13 +201,15 @@ Joined 'FS1-GRE-SIEGE' to dns domain 'ironman.test'
 - [x] Installer Samba/Winbind/Kerberos, préparer la configuration de serveur membre et réaliser la jonction ADS de FS1.
 - [x] Vérifier le canal de confiance avec `net ads testjoin` (`Join is OK`, selon retour de l'auteur) et résoudre l'incident Winbind `WORKGROUP` → `IRONMAN`.
 - [x] Récupérer les utilisateurs AD avec `wbinfo -u`.
-- [ ] Vérifier `testparm` après les derniers réglages et les identités POSIX UID/GID via NSS.
-- [ ] Concevoir les partages Samba et les ACL, puis tester l'authentification et les accès depuis Windows 11.
-- [x] Déposer **12 captures d'écran authentiques** sélectionnées du 05/11/2026 dans [images/README.md](images/README.md), sans secret d'authentification.
+- [x] Vérifier NSS pour le compte de test AD et le groupe autorisé, configurer le partage `[COMMUN]`, contrôler `testparm` et le démarrage de `smbd`.
+- [x] Créer le groupe de sécurité AD, définir les permissions `2770` sur `/srv/samba/commun` et vérifier l'ouverture du partage depuis Windows 11.
+- [ ] Créer un fichier depuis Windows 11, contrôler son propriétaire et ses permissions côté Debian, puis tester le refus d'accès aux non-membres.
+- [ ] Finaliser les autorisations effectives du partage COMMUN et déterminer les prochains partages et ACL suivant les besoins.
+- [x] Déposer **20 captures d'écran authentiques** sélectionnées du 05/11/2026 dans [images/README.md](images/README.md), sans secret d'authentification.
 
-## 6. Preuves visuelles authentiques
+## 7. Preuves visuelles authentiques
 
-**[Consulter les 12 captures Linux, réseau, DNS et AD](images/README.md)** — toutes fournies par l'auteur lors des manipulations du **05/11/2026**.
+**[Consulter les 20 captures Linux, réseau, DNS, AD et SMB](images/README.md)** — toutes fournies par l'auteur lors des manipulations du **05/11/2026**.
 
 ### Réseau de FS1 et communication avec le siège
 
@@ -183,12 +233,12 @@ Joined 'FS1-GRE-SIEGE' to dns domain 'ironman.test'
 
 ![Comptes AD énumérés par Winbind après dépannage](images/12-winbind-utilisateurs-ad.png)
 
-**Limite des preuves :** la jonction ADS, le test de confiance et l'énumération des utilisateurs Winbind sont validés. La correspondance UID/GID via NSS et les accès SMB restent à tester.
+**Limite des preuves :** NSS, le groupe AD et le dossier Samba sont configurés, et le partage s'ouvre depuis Windows 11 ; écriture et restriction d'accès aux non-membres restent à tester.
 
 ## Méthode
 
 **Besoin → configuration → vérification → diagnostic → preuves → documentation.**
 
-Aucun partage SMB ni accès AD n'est annoncé comme opérationnel à ce stade.
+Le partage COMMUN s'ouvre depuis Windows 11, mais aucun fichier créé depuis le client ni contrôle d'accès négatif n'a encore été validé.
 
 [Retour au README principal](../../README.md) · [Cahier des charges initial](../episode-02/README.md) · [Épisode 04 — Windows Server et AD](../episode-04/README.md)

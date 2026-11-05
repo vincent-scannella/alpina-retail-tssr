@@ -20,6 +20,7 @@ Je conçois, déploie et dépanne progressivement une infrastructure informatiqu
 - **Windows Server et AD DS :** Windows Server 2025, forêt `ironman.test`, promotion de `DC1-GRE-SIEGE`, tests `dcdiag` ciblés réussis ; partages `SYSVOL` et `NETLOGON` accessibles depuis Windows 11 et découverte du DC par `nltest /dsgetdc:ironman.test` réussie et canal sécurisé vérifié par PowerShell (`True`) et lecture de `GPT.INI` depuis SYSVOL (`Version=3`) ; captures fournies en conversation, pas encore déposées sur GitHub.
 - **DNS et dépannage :** résolution des noms internes et externes ; diagnostic du message `Server: UnKnown`, création d'une zone inversée et d'un enregistrement PTR, contre-test réussi.
 - **DHCP :** serveur autorisé dans Active Directory, étendue `DHCP-GRE-SIEGE` active ; **bail `10.10.10.100/24` de huit jours reçu et options vérifiées sur le client Windows 11**.
+- **Debian FS1 (épisode 05) :** Linux 12 sur `VMnet1` à `10.10.10.30/24` ; ping pfSense et DC1 réussi ; DNS interne corrigé et conservé après redémarrage ; connexion SSH vérifiée. **Samba et jonction AD non encore réalisés.**
 
 [**Voir les preuves pfSense — épisode 03**](docs/episode-03/README.md) · [**Voir les 40 captures Windows Server / AD / DNS / DHCP / GPO — épisode 04**](docs/episode-04/README.md)
 
@@ -40,6 +41,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | pfSense LAN | `10.10.10.1/24` | Configuré et testé |
 | DC1 — AD DS / DNS | `10.10.10.10/24` | Configuré et testé |
 | PC-TEST-GRE | `10.10.10.100/24` (DHCP ; statique initiale `10.10.10.20`) | Bail, DNS, jonction AD, sessions et GPO vérifiés |
+| FS1 — Debian 12 | `10.10.10.30/24` (statique, VMnet1) | Connectivité pfSense / DC1, résolution DNS DC1, SSH et persistance DNS au redémarrage vérifiés le 05/11 ; Samba / jonction AD en attente |
 | Étendue Windows DHCP | `10.10.10.100` → `10.10.10.199` | Active ; bail client de 8 jours confirmé |
 
 **À distinguer :** la connexion entre les quatre sites, les VPN et les autres serveurs de l'architecture cible sont pour le moment des **éléments de conception**, pas un environnement multisite opérationnel.
@@ -53,7 +55,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **02** | [Cahier des charges informatique](docs/episode-02/README.md) | Besoins métier, architecture cible, droits d'accès et limites du laboratoire |
 | **03** | [Pare-feu pfSense et poste Windows 11](docs/episode-03/README.md) | Installation, adressage, NAT/PAT, filtrage ICMP, tests réseau et sauvegarde chiffrée |
 | **04** | [Windows Server, AD DS, DNS et DHCP](docs/episode-04/README.md) | DC1, dépannage DNS, DHCP réel sur Windows 11, jonction à `ironman.test`, utilisateur AD et première GPO (application vérifiée ; verrouillage ensuite observé par l'auteur sans capture) |
-| **05** | [FS1 — Serveur de fichiers Debian Linux](docs/episode-05/README.md) | Installation Debian 12, connexion console et `hostnamectl` validés ; réseau, SSH, Samba et intégration AD restent à vérifier |
+| **05** | [FS1 — Serveur de fichiers Debian Linux](docs/episode-05/README.md) | Debian 12, sudo, VMnet1/IP statique, ping pfSense / DC1, correction DNS et connexion SSH validés ; Samba et intégration AD à venir |
 
 **Preuves visuelles :** [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures authentiques Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md).
 
@@ -92,7 +94,8 @@ Les compétences travaillées comprennent l'administration Windows Server, AD DS
 - [x] Lire depuis Windows 11 le fichier `GPT.INI` de la Default Domain Policy via SYSVOL (`[General]`, `Version=3` ; capture fournie dans la conversation, non encore déposée sur GitHub).
 - [ ] Approfondir les diagnostics AD DS et les contrôles des autres fichiers de stratégies.
 - [x] Installer Debian 12 sur `FS1-GRE-SIEGE`, réussir la connexion console et vérifier l'identité via `hostnamectl` (capture en conversation, non encore sur GitHub).
-- [ ] Configurer le réseau de FS1, SSH, Samba et l'intégration AD puis tester les accès depuis Windows 11.
+- [x] Raccorder FS1 au réseau LAN, configurer IPv4/DNS et vérifier les pings et l'accès SSH après redémarrage.
+- [ ] Vérifier le DNS Active Directory en profondeur, durcir SSH, déployer Samba, intégrer FS1 au domaine et tester les accès Windows 11.
 - [ ] Poursuivre la conception et le déploiement progressif des autres serveurs, des sauvegardes, de la supervision et des futurs VPN intersites.
 
 ## À propos

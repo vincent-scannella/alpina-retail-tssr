@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 05 : FS1, serveur de fichiers Debian Linux
 
 > **Date du premier jalon :** 3 novembre 2026  
-> **Statut au 05/11/2026 :** Debian 12 installé et mis à jour ; interface IPv4 statique raccordée à VMnet1 ; communication avec pfSense et DC1, résolution DNS interne et accès SSH après redémarrage vérifiés. **Samba/Winbind installés et jonction au domaine confirmée ; services Winbind, canal de confiance et partages non encore validés.**  
+> **Statut au 05/11/2026 :** Debian 12 installé et mis à jour ; interface IPv4 statique raccordée à VMnet1 ; communication avec pfSense et DC1, résolution DNS interne et accès SSH après redémarrage vérifiés. **Samba/Winbind installés ; jonction au domaine et relation de confiance confirmées ; `wbinfo -u` retourne les utilisateurs IRONMAN après dépannage Winbind. Correspondance UID/GID et accès SMB non encore validés.**  
 > **Périmètre :** laboratoire TSSR personnel, siège fictif de Grenoble. La société et ses utilisateurs sont simulés.
 
 ## Objectif métier
@@ -26,7 +26,7 @@ Mettre en place un serveur de fichiers Linux pour le siège d'ALPINA RETAIL, acc
 | Réseau d'installation | VMnet8 (NAT), adresse DHCP provisoire `10.50.10.131/24`, abandonné après mises à jour et bascule sur VMnet1 |
 | Routage / DNS configuré | Passerelle `10.10.10.1` (pfSense) ; DNS `10.10.10.10` (DC1) ; recherche `ironman.test`. La route par défaut n'a pas encore été relevée séparément. |
 | SSH | Connexion distante `ssh administrateur@10.10.10.30` depuis Windows Server fonctionnelle et reprise après redémarrage, le 05/11 ; durcissement restant |
-| Samba / intégration AD | Samba, Winbind et Kerberos installés ; configuration `smb.conf` contrôlée par `testparm -s` ; **`net ads join` au domaine `ironman.test` réussi** le 05/11/2026 ; canal de confiance, Winbind et partages encore à tester |
+| Samba / intégration AD | Samba, Winbind et Kerberos installés ; `net ads join` réussi ; `net ads testjoin` → `Join is OK` (retour de l'auteur) ; **`wbinfo -u` liste les utilisateurs IRONMAN** après redémarrage Winbind ; UID/GID et partages à tester |
 
 Les mots de passe et les identifiants de machine ne sont pas publiés.
 
@@ -126,6 +126,18 @@ Joined 'FS1-GRE-SIEGE' to dns domain 'ironman.test'
 
 **Statut exact :** Samba confirme que la jonction au domaine a réussi. Les tests de confiance `net ads testjoin`, de résolution des identités Winbind et d'accès SMB depuis Windows 11 sont encore à réaliser.
 
+### Incident Winbind — diagnostic, correction et vérification (05/11/2026)
+
+1. `wbinfo -u` affiche `Error looking up domain users`.
+2. `wbinfo --ping-dc` échoue en recherchant le domaine `WORKGROUP` avec `WBC_ERR_DOMAIN_NOT_FOUND`. `wbinfo --own-domain` retourne également `WORKGROUP`, alors que `smb.conf` déclare `IRONMAN`.
+3. Hypothèse : configuration encore chargée dans le service Winbind.
+4. `sudo systemctl restart winbind` exécuté. `wbinfo --own-domain` retourne ensuite `IRONMAN` (confirmé par l'auteur).
+5. Nouveau `wbinfo -u` réussi : liste des comptes `IRONMAN\\administrateur`, `IRONMAN\\invité`, `IRONMAN\\krbtgt` et `IRONMAN\\test.gre`.
+
+![Capture authentique de la liste des comptes AD retrouvés depuis Debian](images/12-winbind-utilisateurs-ad.png)
+
+**Résultat :** Winbind énumère désormais les comptes Active Directory. La présence de comptes dans la liste ne prouve pas encore la résolution UID/GID par NSS ni les droits d'accès aux fichiers Samba.
+
 ## 5. Prochains tests
 
 - [x] Relever `ens33` et l'adresse IP statique avec `ip -br address`.
@@ -139,13 +151,15 @@ Joined 'FS1-GRE-SIEGE' to dns domain 'ironman.test'
 - [ ] Vérifier les ressources réelles de la VM après sa recréation.
 - [ ] Vérifier et durcir le service SSH.
 - [x] Installer Samba/Winbind/Kerberos, préparer la configuration de serveur membre et réaliser la jonction ADS de FS1.
-- [ ] Vérifier `testparm` après les derniers réglages, contrôler le canal de confiance et les identités Winbind.
+- [x] Vérifier le canal de confiance avec `net ads testjoin` (`Join is OK`, selon retour de l'auteur) et résoudre l'incident Winbind `WORKGROUP` → `IRONMAN`.
+- [x] Récupérer les utilisateurs AD avec `wbinfo -u`.
+- [ ] Vérifier `testparm` après les derniers réglages et les identités POSIX UID/GID via NSS.
 - [ ] Concevoir les partages Samba et les ACL, puis tester l'authentification et les accès depuis Windows 11.
-- [x] Déposer **11 captures d'écran authentiques** sélectionnées du 05/11/2026 dans [images/README.md](images/README.md), sans secret d'authentification.
+- [x] Déposer **12 captures d'écran authentiques** sélectionnées du 05/11/2026 dans [images/README.md](images/README.md), sans secret d'authentification.
 
 ## 6. Preuves visuelles authentiques
 
-**[Consulter les 11 captures Linux, réseau, DNS et AD](images/README.md)** — toutes fournies par l'auteur lors des manipulations du **05/11/2026**.
+**[Consulter les 12 captures Linux, réseau, DNS et AD](images/README.md)** — toutes fournies par l'auteur lors des manipulations du **05/11/2026**.
 
 ### Réseau de FS1 et communication avec le siège
 
@@ -167,7 +181,9 @@ Joined 'FS1-GRE-SIEGE' to dns domain 'ironman.test'
 
 ![Jonction Samba réussie au domaine ironman.test](images/11-jonction-domaine-ads.png)
 
-**Limite des preuves :** la jonction ADS est confirmée mais la relation de confiance, les identités Winbind et les accès SMB n'ont pas encore été validés.
+![Comptes AD énumérés par Winbind après dépannage](images/12-winbind-utilisateurs-ad.png)
+
+**Limite des preuves :** la jonction ADS, le test de confiance et l'énumération des utilisateurs Winbind sont validés. La correspondance UID/GID via NSS et les accès SMB restent à tester.
 
 ## Méthode
 

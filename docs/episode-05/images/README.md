@@ -1,6 +1,6 @@
-# Épisode 05 — Captures authentiques Debian / Réseau / DNS
+# Épisode 05 — Captures authentiques Debian / Réseau / DNS / Active Directory / Samba
 
-**Date des manipulations : 05 novembre 2026.** Les douze fichiers PNG de ce dossier sont des **captures d'écran d'origine fournies au fil des manipulations**, sans génération ni simulation graphique. Elles servent de preuves associées au [journal technique de l'épisode 05](../README.md).
+**Date des manipulations : 05 novembre 2026.** Les vingt fichiers PNG de ce dossier sont des **captures authentiques issues des manipulations**, sans génération ni simulation graphique. Certaines ont été recadrées et compressées sans changer le contenu technique. Elles servent de preuves associées au [journal technique de l'épisode 05](../README.md).
 
 Le projet est fictif. Les noms des hôtes et les IP visibles appartiennent au laboratoire ; aucune capture de mot de passe ni de jeton d'accès n'est publiée.
 
@@ -16,10 +16,17 @@ Le projet est fictif. Les noms des hôtes et les IP visibles appartiennent au la
 | [08-interfaces-ip-statique.png](08-interfaces-ip-statique.png) | `/etc/network/interfaces` : adresse, masque, passerelle et DNS cible |
 | [09-sudo-groupe-admin.png](09-sudo-groupe-admin.png) | `id administrateur` : appartenance au groupe sudo |
 | [10-reseau-nat-provisoire.png](10-reseau-nat-provisoire.png) | `ens33` UP avec IPv4 DHCP 10.50.10.131/24 sur VMnet8 |
-
 | [11-jonction-domaine-ads.png](11-jonction-domaine-ads.png) | Commande `net ads join` : jonction de FS1 au domaine `ironman.test` confirmée |
-
 | [12-winbind-utilisateurs-ad.png](12-winbind-utilisateurs-ad.png) | `wbinfo -u` : utilisateurs IRONMAN récupérés après dépannage Winbind |
+
+| [13-winbind-domaine-workgroup.png](13-winbind-domaine-workgroup.png) | Ancien domaine WORKGROUP reconnu par Winbind avant rechargement |
+| [14-nss-utilisateur-ad.png](14-nss-utilisateur-ad.png) | Compte AD test.gre résolu en UID 11108 / GID 10513 |
+| [15-creation-groupe-ad.png](15-creation-groupe-ad.png) | Groupe de sécurité global GG_FS1_COMMUN_RW dans Active Directory |
+| [16-utilisateur-membre-groupe-ad.png](16-utilisateur-membre-groupe-ad.png) | Utilisateur fictif Test Grenoble membre du groupe AD |
+| [17-nss-groupe-ad.png](17-nss-groupe-ad.png) | Groupe AD reconnu par Debian avec GID 11110 |
+| [18-permissions-sgid-commun.png](18-permissions-sgid-commun.png) | Droits drwxrws--- (2770) et groupe AD sur /srv/samba/commun |
+| [19-testparm-partage-commun.png](19-testparm-partage-commun.png) | Configuration interprétée de la section Samba [COMMUN] |
+| [20-acces-partage-depuis-windows11.png](20-acces-partage-depuis-windows11.png) | Explorateur Windows 11 ouvre le partage SMB de FS1 (dossier vide) |
 
 ## Captures essentielles
 
@@ -59,6 +66,36 @@ Le projet est fictif. Les noms des hôtes et les IP visibles appartiennent au la
 
 ![Résultat de wbinfo -u](12-winbind-utilisateurs-ad.png)
 
-**Précautions d'interprétation :** ces contrôles attestent une configuration réseau et une résolution de nom au moment des tests, pas la disponibilité des services AD/Kerberos, un contrôle exhaustif des conflits d'adresses, ni une correspondance UID/GID via NSS validée ni un partage Samba en fonctionnement. La jonction AD, le test de confiance et l'énumération Winbind ont été réalisés. La connexion SSH a été observée en session, mais aucun audit de sécurisation SSH n'a encore été effectué.
+### Groupe AD, permissions Linux et partage Windows 11
+
+**Compte AD test.gre résolu en UID 11108 / GID 10513**
+
+![Compte AD test.gre résolu en UID 11108 / GID 10513](14-nss-utilisateur-ad.png)
+
+**Groupe de sécurité global GG_FS1_COMMUN_RW dans Active Directory**
+
+![Groupe de sécurité global GG_FS1_COMMUN_RW dans Active Directory](15-creation-groupe-ad.png)
+
+**Utilisateur fictif Test Grenoble membre du groupe AD**
+
+![Utilisateur fictif Test Grenoble membre du groupe AD](16-utilisateur-membre-groupe-ad.png)
+
+**Groupe AD reconnu par Debian avec GID 11110**
+
+![Groupe AD reconnu par Debian avec GID 11110](17-nss-groupe-ad.png)
+
+**Droits drwxrws--- (2770) et groupe AD sur /srv/samba/commun**
+
+![Droits drwxrws--- (2770) et groupe AD sur /srv/samba/commun](18-permissions-sgid-commun.png)
+
+**Configuration interprétée de la section Samba [COMMUN]**
+
+![Configuration interprétée de la section Samba [COMMUN]](19-testparm-partage-commun.png)
+
+**Explorateur Windows 11 ouvre le partage SMB de FS1 (dossier vide)**
+
+![Explorateur Windows 11 ouvre le partage SMB de FS1 (dossier vide)](20-acces-partage-depuis-windows11.png)
+
+**Précautions d'interprétation :** ces contrôles attestent une configuration réseau et une résolution de nom au moment des tests, pas la disponibilité des services AD/Kerberos, un contrôle exhaustif des conflits d'adresses, ni une écriture sur le partage Samba ni une restriction d'accès testée depuis un compte non membre du groupe ; NSS et l'ouverture SMB Windows sont maintenant documentés. La jonction AD, le test de confiance et l'énumération Winbind ont été réalisés. La connexion SSH a été observée en session, mais aucun audit de sécurisation SSH n'a encore été effectué.
 
 [Retour à l'épisode 05](../README.md)

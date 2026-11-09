@@ -20,7 +20,7 @@ Je conçois, déploie et dépanne progressivement une infrastructure informatiqu
 - **Windows Server et AD DS :** Windows Server 2025, forêt `ironman.test`, promotion de `DC1-GRE-SIEGE`, tests `dcdiag` ciblés réussis ; partages `SYSVOL` et `NETLOGON` accessibles depuis Windows 11 et découverte du DC par `nltest /dsgetdc:ironman.test` réussie et canal sécurisé vérifié par PowerShell (`True`) et lecture de `GPT.INI` depuis SYSVOL (`Version=3`) ; captures fournies en conversation, pas encore déposées sur GitHub.
 - **DNS et dépannage :** résolution des noms internes et externes ; diagnostic du message `Server: UnKnown`, création d'une zone inversée et d'un enregistrement PTR, contre-test réussi.
 - **DHCP :** serveur autorisé dans Active Directory, étendue `DHCP-GRE-SIEGE` active ; **bail `10.10.10.100/24` de huit jours reçu et options vérifiées sur le client Windows 11**.
-- **Debian FS1 (épisode 05) :** Debian 12 sur `VMnet1` (`10.10.10.30/24`) ; AD `ironman.test` joint ; Winbind/NSS reconnaît utilisateurs et groupes AD ; groupe `GG_FS1_COMMUN_RW` et permissions Linux `2770` en place ; **partage `COMMUN` ouvert depuis Windows 11**. L'écriture et la restriction aux comptes non membres ne sont pas encore validées.
+- **Debian FS1 (épisode 05) :** Debian 12 sur `VMnet1` (`10.10.10.30/24`) ; AD `ironman.test` joint ; Winbind/NSS reconnaît utilisateurs et groupes AD ; groupe `GG_FS1_COMMUN_RW` et permissions Linux `2770` en place ; **partage `COMMUN` accessible en lecture/écriture depuis Windows 11**, contenu relu sur Debian, propriétaire/groupe et permissions `660` observés ; **refus SMB `NT_STATUS_ACCESS_DENIED`** obtenu avec un compte non autorisé le 09/11/2026. Le durcissement global reste à faire.
 
 [**Voir les preuves pfSense — épisode 03**](docs/episode-03/README.md) · [**Voir les 40 captures Windows Server / AD / DNS / DHCP / GPO — épisode 04**](docs/episode-04/README.md)
 
@@ -55,9 +55,9 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **02** | [Cahier des charges informatique](docs/episode-02/README.md) | Besoins métier, architecture cible, droits d'accès et limites du laboratoire |
 | **03** | [Pare-feu pfSense et poste Windows 11](docs/episode-03/README.md) | Installation, adressage, NAT/PAT, filtrage ICMP, tests réseau et sauvegarde chiffrée |
 | **04** | [Windows Server, AD DS, DNS et DHCP](docs/episode-04/README.md) | DC1, dépannage DNS, DHCP réel sur Windows 11, jonction à `ironman.test`, utilisateur AD et première GPO (application vérifiée ; verrouillage ensuite observé par l'auteur sans capture) |
-| **05** | [FS1 — Serveur de fichiers Debian Linux](docs/episode-05/README.md) | Debian / Samba / AD / Winbind, groupe de sécurité et partage `[COMMUN]` ; [20 captures authentiques](docs/episode-05/images/README.md) ; ouverture SMB Windows 11 réussie, écriture et contrôle d'accès encore à tester |
+| **05** | [FS1 — Serveur de fichiers Debian Linux](docs/episode-05/README.md) | Samba/AD/Winbind, groupe de sécurité, partage `[COMMUN]` ; écriture et lecture fonctionnelles, permissions `660`, accès non autorisé refusé ; [22 captures authentiques](docs/episode-05/images/README.md) ; chantier Samba du siège validé le 09/11/2026 |
 
-**Preuves visuelles :** [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md) · [épisode 05 — 20 captures authentiques Debian / réseau / DNS / AD / SMB](docs/episode-05/images/README.md).
+**Preuves visuelles :** [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md) · [épisode 05 — 22 captures authentiques Debian / réseau / DNS / AD / SMB](docs/episode-05/images/README.md).
 
 ## Vue d'ensemble de l'entreprise fictive
 
@@ -98,7 +98,9 @@ Les compétences travaillées comprennent l'administration Windows Server, AD DS
 - [x] Vérifier DNS SRV LDAP/Kerberos, installer Samba/Winbind et joindre FS1 à `ironman.test` (`net ads join`).
 - [x] Vérifier la relation de confiance `net ads testjoin` et l'énumération des utilisateurs IRONMAN via Winbind après diagnostic.
 - [x] Résoudre les identités AD par NSS sur Debian, attribuer le groupe de sécurité et les permissions au dossier COMMUN, et ouvrir le partage depuis Windows 11.
-- [ ] Vérifier l'écriture réelle, les droits du fichier côté Debian et le refus d'accès d'un utilisateur hors du groupe ; durcir SSH.
+- [x] Créer et enregistrer un fichier depuis Windows 11 ; vérifier sa lecture sur Debian, son propriétaire AD, son groupe et les permissions `660`.
+- [x] Confirmer le refus d'accès SMB (`NT_STATUS_ACCESS_DENIED`) pour `IRONMAN\Administrateur`, compte sans autorisation dans le scénario.
+- [ ] Durcir SSH, Samba, Windows Server et les règles réseau selon la feuille de route sécurité.
 - [ ] Poursuivre la conception et le déploiement progressif des autres serveurs, des sauvegardes, de la supervision et des futurs VPN intersites.
 
 ## À propos

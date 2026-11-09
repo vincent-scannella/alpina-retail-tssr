@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 06 : durcissement de l'infrastructure du siège
 
 > **Ouverture du chantier :** 09 novembre 2026  
-> **Statut :** durcissement SSH de `FS1-GRE-SIEGE` terminé et testé ; sécurisation de Samba, de Windows Server et du pare-feu à poursuivre.  
+> **Statut :** durcissement SSH et SMB/Samba de `FS1-GRE-SIEGE` terminé et testé le 09/11/2026 ; Windows Server, Active Directory et pfSense restent à traiter.  
 > **Périmètre :** laboratoire de l'entreprise fictive ALPINA RETAIL, siège de Grenoble.
 
 ## Besoin métier
@@ -82,20 +82,84 @@ La configuration a été appliquée avec `sudo systemctl reload ssh`.
 
 **Conclusion :** la configuration SSH est valide et la connexion distante par clé fonctionne ; cela ne constitue pas un audit exhaustif du système (ACL de clés, journalisation, mises à jour, règles de filtrage SSH, rotation des clés et PRA restent hors périmètre de ce jalon).
 
-## 5. Prochaines tâches
+## 5. Durcissement Samba et vérification SMB 3.1.1
+
+### Configuration avant modification
+
+Sur FS1, la configuration interprétée par `testparm -sv` indiquait :
+
+```text
+map to guest = Never
+server min protocol = SMB2_02
+server signing = default
+```
+
+**Interprétation :** pas de basculement automatique en invité, SMB1 déjà exclu, mais signature serveur pas systématiquement requise.
+
+### Paramètres appliqués sur FS1
+
+Dans la section `[global]` de `/etc/samba/smb.conf`, l'auteur a défini :
+
+```ini
+server signing = mandatory
+usershare allow guests = no
+```
+
+Dans la section `[COMMUN]` :
+
+```ini
+server smb encrypt = required
+```
+
+Une sauvegarde préalable du fichier a été conservée localement sous `/etc/samba/smb.conf.bak-securite`.
+
+`testparm -s` a interprété `server signing = required` et `server smb encrypt = required`. Le résultat de `testparm -s >/dev/null && systemctl restart smbd` confirme « Loaded services file OK » et « ROLE_DOMAIN_MEMBER ». Le diagnostic mentionne aussi `Weak crypto is allowed by GnuTLS` : c'est un avertissement de compatibilité qui ne prouve pas une exploitation de cryptographie faible dans la connexion SMB 3.1.1 testée ; il pourra être revu lors du durcissement complémentaire.
+
+**Attention aux captures :** la capture de la section `[global]` ci-dessous précède la correction de `usershare allow guests` à `no` : elle montre encore `Yes`. Le changement a été ensuite effectué et la configuration rechargée, mais une nouvelle capture de ce seul paramètre n'a pas été fournie.
+
+![Section globale Samba avec signature requise avant dernière correction guests](images/04-samba-signature-obligatoire.png)
+
+![Section COMMUN : chiffrement SMB requis](images/03-samba-partage-chiffrement-obligatoire.png)
+
+### Recette côté Windows 11
+
+Sur `PC-TEST-GRE`, le fichier `test-commun.txt` s'ouvre toujours dans `\\10.10.10.30\COMMUN` après le redémarrage du service Samba.
+
+Depuis PowerShell **exécuté en administrateur**, l'utilisateur a relevé la session avec `Get-SmbConnection | Select-Object ServerName, ShareName, Dialect, Signed, Encrypted` :
+
+```text
+ServerName : 10.10.10.30
+ShareName  : COMMUN
+Dialect    : 3.1.1
+Signed     : False
+Encrypted  : True
+```
+
+![Get-SmbConnection avec SMB 3.1.1 et chiffrement actif](images/05-client-smb3-chiffre.png)
+
+**Interprétation de `Signed=False` :** avec le chiffrement SMB3 requis et actif, le trafic n'utilise pas nécessairement la signature SMB distincte. Le chiffrement SMB fournit lui-même les garanties d'intégrité attendues ; ce résultat n'invalide pas le test. Cette particularité est documentée par Microsoft : https://github.com/MicrosoftDocs/SupportArticles-docs/blob/main/support/windows-server/networking/reduced-performance-after-smb-encryption-signing.md.
+
+### Conclusion du jalon
+
+**Validé :** connexion de Windows 11 au partage, négociation SMB 3.1.1 et chiffrement réellement observé par le client ; la signature obligatoire est configurée dans Samba. Aucune modification supplémentaire n'est nécessaire pour conclure ce test ciblé.
+
+**À poursuivre :** politiques de sécurité Windows Server et contrôles du pare-feu pfSense ; ces sujets constituent des chantiers distincts.
+
+
+## 6. Prochaines tâches
 
 - [x] Empêcher la connexion SSH directe de `root`.
 - [x] Mettre en place une paire ED25519 dédiée, protégée par une passphrase.
 - [x] Ajouter la clé publique au compte de gestion Debian et confirmer l'authentification par clé.
 - [x] Désactiver les connexions par mot de passe et par clavier interactif.
 - [x] Vérifier `sshd -t` et les valeurs effectives de `sshd -T`, recharger SSH puis **réussir une nouvelle connexion**.
-- [ ] Contrôler les principaux paramètres de sécurité Samba/SMB du serveur de fichiers.
+- [x] Vérifier et renforcer les paramètres Samba, puis valider une session chiffrée SMB 3.1.1 (`Encrypted=True`) depuis Windows 11.
 - [ ] Poursuivre la sécurisation de Windows Server, d'Active Directory et de pfSense.
 - [ ] Préparer le chantier de sauvegarde et de restauration.
 
 ## Preuves
 
-[Consulter les deux captures authentiques avant/après SSH](images/README.md).
+[Consulter les cinq captures authentiques SSH et Samba/SMB](images/README.md).
 
 **Méthode appliquée :** modification → contrôle indispensable → test fonctionnel → documentation. Pas de séries de commandes redondantes.
 

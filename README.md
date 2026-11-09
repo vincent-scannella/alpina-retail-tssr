@@ -20,7 +20,7 @@ Je conçois, déploie et dépanne progressivement une infrastructure informatiqu
 - **Windows Server et AD DS :** Windows Server 2025, forêt `ironman.test`, promotion de `DC1-GRE-SIEGE`, tests `dcdiag` ciblés réussis ; partages `SYSVOL` et `NETLOGON` accessibles depuis Windows 11 et découverte du DC par `nltest /dsgetdc:ironman.test` réussie et canal sécurisé vérifié par PowerShell (`True`) et lecture de `GPT.INI` depuis SYSVOL (`Version=3`) ; captures fournies en conversation, pas encore déposées sur GitHub.
 - **DNS et dépannage :** résolution des noms internes et externes ; diagnostic du message `Server: UnKnown`, création d'une zone inversée et d'un enregistrement PTR, contre-test réussi.
 - **DHCP :** serveur autorisé dans Active Directory, étendue `DHCP-GRE-SIEGE` active ; **bail `10.10.10.100/24` de huit jours reçu et options vérifiées sur le client Windows 11**.
-- **Debian FS1 (épisode 05) :** Debian 12 sur `VMnet1` (`10.10.10.30/24`) ; AD `ironman.test` joint ; Winbind/NSS reconnaît utilisateurs et groupes AD ; groupe `GG_FS1_COMMUN_RW` et permissions Linux `2770` en place ; **partage `COMMUN` accessible en lecture/écriture depuis Windows 11**, contenu relu sur Debian, propriétaire/groupe et permissions `660` observés ; **refus SMB `NT_STATUS_ACCESS_DENIED`** obtenu avec un compte non autorisé le 09/11/2026. L'accès SSH de FS1 a été renforcé le 09/11/2026 avec une clé ED25519 et la désactivation des connexions root et par mot de passe ; le durcissement global reste en cours.
+- **Debian FS1 (épisode 05) :** Debian 12 sur `VMnet1` (`10.10.10.30/24`) ; AD `ironman.test` joint ; Winbind/NSS reconnaît utilisateurs et groupes AD ; groupe `GG_FS1_COMMUN_RW` et permissions Linux `2770` en place ; **partage `COMMUN` accessible en lecture/écriture depuis Windows 11**, contenu relu sur Debian, propriétaire/groupe et permissions `660` observés ; **refus SMB `NT_STATUS_ACCESS_DENIED`** obtenu avec un compte non autorisé le 09/11/2026. L'accès SSH de FS1 est renforcé par clé ED25519 ; Samba impose désormais la signature serveur et le chiffrement SMB3 du partage COMMUN (SMB 3.1.1, `Encrypted=True` côté Windows 11) ; le durcissement global reste en cours.
 
 [**Voir les preuves pfSense — épisode 03**](docs/episode-03/README.md) · [**Voir les 40 captures Windows Server / AD / DNS / DHCP / GPO — épisode 04**](docs/episode-04/README.md)
 
@@ -41,7 +41,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | pfSense LAN | `10.10.10.1/24` | Configuré et testé |
 | DC1 — AD DS / DNS | `10.10.10.10/24` | Configuré et testé |
 | PC-TEST-GRE | `10.10.10.100/24` (DHCP ; statique initiale `10.10.10.20`) | Bail, DNS, jonction AD, sessions et GPO vérifiés |
-| FS1 — Debian 12 | `10.10.10.30/24` (statique, VMnet1) | AD/Winbind et partage Samba validés ; SSH avec clé ED25519 vérifié le 09/11 ; interdiction root et mots de passe appliquée |
+| FS1 — Debian 12 | `10.10.10.30/24` (statique, VMnet1) | AD/Winbind et partage Samba validés ; SSH par clé ED25519 ; COMMUN chiffré via SMB 3.1.1 confirmé par Windows 11 le 09/11 |
 | Étendue Windows DHCP | `10.10.10.100` → `10.10.10.199` | Active ; bail client de 8 jours confirmé |
 
 **À distinguer :** la connexion entre les quatre sites, les VPN et les autres serveurs de l'architecture cible sont pour le moment des **éléments de conception**, pas un environnement multisite opérationnel.
@@ -56,7 +56,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **03** | [Pare-feu pfSense et poste Windows 11](docs/episode-03/README.md) | Installation, adressage, NAT/PAT, filtrage ICMP, tests réseau et sauvegarde chiffrée |
 | **04** | [Windows Server, AD DS, DNS et DHCP](docs/episode-04/README.md) | DC1, dépannage DNS, DHCP réel sur Windows 11, jonction à `ironman.test`, utilisateur AD et première GPO (application vérifiée ; verrouillage ensuite observé par l'auteur sans capture) |
 | **05** | [FS1 — Serveur de fichiers Debian Linux](docs/episode-05/README.md) | Samba/AD/Winbind, groupe de sécurité, partage `[COMMUN]` ; écriture et lecture fonctionnelles, permissions `660`, accès non autorisé refusé ; [22 captures authentiques](docs/episode-05/images/README.md) ; chantier Samba du siège validé le 09/11/2026 |
-| **06** | [Durcissement de l'infrastructure — siège Grenoble](docs/episode-06/README.md) | **SSH sur FS1 renforcé :** `root` interdit, authentification par mot de passe désactivée, clé ED25519 protégée par passphrase, nouvelle connexion fonctionnelle après rechargement ; [2 captures avant/après](docs/episode-06/images/README.md) ; sécurité globale encore en cours |
+| **06** | [Durcissement de l'infrastructure — siège Grenoble](docs/episode-06/README.md) | **SSH et Samba sur FS1 renforcés :** SSH par clé ED25519, mots de passe/root interdits ; partage COMMUN chiffré en SMB 3.1.1 (`Encrypted=True`), signature serveur requise ; [5 captures](docs/episode-06/images/README.md) ; Windows Server / pfSense restent à traiter |
 
 **Preuves visuelles :** [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md) · [épisode 05 — 22 captures authentiques Debian / réseau / DNS / AD / SMB](docs/episode-05/images/README.md).
 
@@ -102,7 +102,8 @@ Les compétences travaillées comprennent l'administration Windows Server, AD DS
 - [x] Créer et enregistrer un fichier depuis Windows 11 ; vérifier sa lecture sur Debian, son propriétaire AD, son groupe et les permissions `660`.
 - [x] Confirmer le refus d'accès SMB (`NT_STATUS_ACCESS_DENIED`) pour `IRONMAN\Administrateur`, compte sans autorisation dans le scénario.
 - [x] Durcir SSH sur FS1 : désactiver `PermitRootLogin`, mots de passe et clavier interactif ; vérifier une nouvelle connexion ED25519 après rechargement.
-- [ ] Poursuivre le durcissement Samba, Windows Server et les règles réseau selon la feuille de route sécurité.
+- [x] Durcir Samba sur FS1 : signature serveur requise, chiffrement SMB3 obligatoire pour COMMUN, partages invités désactivés, ouverture du partage vérifiée sur Windows 11 (`Encrypted=True`, SMB 3.1.1).
+- [ ] Poursuivre le durcissement de Windows Server et les règles réseau pfSense selon la feuille de route sécurité.
 - [ ] Poursuivre la conception et le déploiement progressif des autres serveurs, des sauvegardes, de la supervision et des futurs VPN intersites.
 
 ## À propos

@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 06 : durcissement de l'infrastructure du siège
 
 > **Ouverture du chantier :** 09 novembre 2026  
-> **Statut :** durcissement SSH et SMB/Samba de `FS1-GRE-SIEGE` terminé et testé le 09/11/2026 ; Windows Server, Active Directory et pfSense restent à traiter.  
+> **Statut :** SSH et Samba renforcés sur FS1 ; profil de pare-feu de domaine de DC1 vérifié et politique de mots de passe AD renforcée (09/11/2026). Autres paramètres de Windows Server et pfSense à poursuivre.  
 > **Périmètre :** laboratoire de l'entreprise fictive ALPINA RETAIL, siège de Grenoble.
 
 ## Besoin métier
@@ -146,7 +146,84 @@ Encrypted  : True
 **À poursuivre :** politiques de sécurité Windows Server et contrôles du pare-feu pfSense ; ces sujets constituent des chantiers distincts.
 
 
-## 6. Prochaines tâches
+## 6. Sécurisation de DC1 : pare-feu et comptes Active Directory
+
+### Pare-feu Windows Defender — profil Domaine
+
+Sur `DC1-GRE-SIEGE` (Windows Server 2025), les trois profils du pare-feu sont indiqués **activés** via `Get-NetFirewallProfile`. Les champs `DefaultInboundAction` ressortent `NotConfigured` dans cette commande ; cette seule valeur ne signifie pas que toutes les connexions entrantes sont permises.
+
+La commande suivante a montré la politique active du **profil de domaine** :
+
+```powershell
+netsh advfirewall show currentprofile
+```
+
+Résumé des résultats :
+
+```text
+Profil de domaine
+État : Actif
+Stratégie de pare-feu : BlockInbound,AllowOutbound
+LogAllowedConnections : Désactiver
+LogDroppedConnections : Désactiver
+```
+
+La politique autorise les connexions sortantes par défaut et bloque les entrantes non couvertes par une règle d'autorisation. Aucune modification n'a été requise. La journalisation des connexions bloquées est désactivée : à reconsidérer au besoin pour le diagnostic.
+
+![Politique réelle du pare-feu de domaine sur DC1](images/08-dc1-firewall-domaine.png)
+
+### Politique de mot de passe avant durcissement
+
+Commande :
+
+```powershell
+Get-ADDefaultDomainPasswordPolicy | Select-Object MinPasswordLength, ComplexityEnabled, LockoutThreshold, LockoutDuration, MaxPasswordAge
+```
+
+Résultat observé :
+
+| Paramètre | Avant |
+|---|---|
+| Longueur minimale | 7 |
+| Complexité | `True` |
+| Seuil de verrouillage | 0 (désactivé) |
+| Durée de verrouillage | 10 min (sans effet puisque seuil à 0) |
+| Durée maximale du mot de passe | 42 jours |
+
+![Politique AD initiale](images/06-ad-policy-initial.png)
+
+### Renforcement et validation
+
+Modification effectuée depuis PowerShell administrateur sur DC1 :
+
+```powershell
+Set-ADDefaultDomainPasswordPolicy -Identity "ironman.test" -MinPasswordLength 14 -LockoutThreshold 10 -LockoutDuration "00:15:00" -LockoutObservationWindow "00:15:00"
+```
+
+Commande de vérification :
+
+```powershell
+Get-ADDefaultDomainPasswordPolicy | Select-Object MinPasswordLength, ComplexityEnabled, LockoutThreshold, LockoutDuration, LockoutObservationWindow
+```
+
+Paramètres **vérifiés sur capture le 09/11/2026** :
+
+| Paramètre | Après |
+|---|---|
+| `MinPasswordLength` | **14** |
+| `ComplexityEnabled` | **True** |
+| `LockoutThreshold` | **10** |
+| `LockoutDuration` | **00:15:00** |
+| `LockoutObservationWindow` | **00:15:00** |
+
+![Politique AD après renforcement](images/07-ad-policy-renforcee.png)
+
+**Interprétation :** les nouveaux mots de passe devront respecter les règles du domaine. Les comptes répondant à cette politique peuvent être verrouillés après dix échecs dans la fenêtre prévue. Les mots de passe existants n'ont pas été changés automatiquement par cette commande. La durée maximale de 42 jours n'a pas été modifiée à ce stade.
+
+**Limite :** la capture prouve la configuration de la politique AD par défaut, mais pas un test réel de verrouillage de compte ou l'absence de politiques de mot de passe fines (FGPP) pouvant prendre le pas pour certains utilisateurs. La connexion et l'utilisation des principaux services AD/DNS/DHCP ne sont pas de nouveau testées ici, conformément au principe d'éviter les contrôles répétitifs.
+
+
+## 7. Prochaines tâches
 
 - [x] Empêcher la connexion SSH directe de `root`.
 - [x] Mettre en place une paire ED25519 dédiée, protégée par une passphrase.
@@ -154,12 +231,14 @@ Encrypted  : True
 - [x] Désactiver les connexions par mot de passe et par clavier interactif.
 - [x] Vérifier `sshd -t` et les valeurs effectives de `sshd -T`, recharger SSH puis **réussir une nouvelle connexion**.
 - [x] Vérifier et renforcer les paramètres Samba, puis valider une session chiffrée SMB 3.1.1 (`Encrypted=True`) depuis Windows 11.
-- [ ] Poursuivre la sécurisation de Windows Server, d'Active Directory et de pfSense.
+- [x] Vérifier le profil Domaine du pare-feu de DC1 (`BlockInbound,AllowOutbound`) sans modifier les règles existantes.
+- [x] Renforcer et contrôler la politique de mots de passe par défaut d'Active Directory (14 caractères, 10 échecs, 15 minutes).
+- [ ] Poursuivre la sécurisation des services Windows Server et de pfSense.
 - [ ] Préparer le chantier de sauvegarde et de restauration.
 
 ## Preuves
 
-[Consulter les cinq captures authentiques SSH et Samba/SMB](images/README.md).
+[Consulter les huit captures authentiques SSH, SMB, pare-feu et comptes AD](images/README.md).
 
 **Méthode appliquée :** modification → contrôle indispensable → test fonctionnel → documentation. Pas de séries de commandes redondantes.
 

@@ -56,7 +56,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **03** | [Pare-feu pfSense et poste Windows 11](docs/episode-03/README.md) | Installation, adressage, NAT/PAT, filtrage ICMP, tests réseau et sauvegarde chiffrée |
 | **04** | [Windows Server, AD DS, DNS et DHCP](docs/episode-04/README.md) | DC1, dépannage DNS, DHCP réel sur Windows 11, jonction à `ironman.test`, utilisateur AD et première GPO (application vérifiée ; verrouillage ensuite observé par l'auteur sans capture) |
 | **05** | [FS1 — Serveur de fichiers Debian Linux](docs/episode-05/README.md) | Samba/AD/Winbind, groupe de sécurité, partage `[COMMUN]` ; écriture et lecture fonctionnelles, permissions `660`, accès non autorisé refusé ; [22 captures authentiques](docs/episode-05/images/README.md) ; chantier Samba du siège validé le 09/11/2026 |
-| **06** | [Durcissement de l'infrastructure — siège Grenoble](docs/episode-06/README.md) | **SSH et Samba sur FS1 renforcés :** SSH par clé ED25519, mots de passe/root interdits ; partage COMMUN chiffré en SMB 3.1.1 (`Encrypted=True`), signature serveur requise ; [5 captures](docs/episode-06/images/README.md) ; Windows Server / pfSense restent à traiter |
+| **06** | [Durcissement de l'infrastructure — siège Grenoble](docs/episode-06/README.md) | SSH (clé ED25519), Samba (SMB3 chiffré), pare-feu du DC actif en `BlockInbound,AllowOutbound`, politique AD renforcée (14 caractères, verrouillage après 10 échecs) ; [8 captures](docs/episode-06/images/README.md) ; autres contrôles Windows Server / pfSense à poursuivre |
 
 **Preuves visuelles :** [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md) · [épisode 05 — 22 captures authentiques Debian / réseau / DNS / AD / SMB](docs/episode-05/images/README.md).
 
@@ -103,7 +103,9 @@ Les compétences travaillées comprennent l'administration Windows Server, AD DS
 - [x] Confirmer le refus d'accès SMB (`NT_STATUS_ACCESS_DENIED`) pour `IRONMAN\Administrateur`, compte sans autorisation dans le scénario.
 - [x] Durcir SSH sur FS1 : désactiver `PermitRootLogin`, mots de passe et clavier interactif ; vérifier une nouvelle connexion ED25519 après rechargement.
 - [x] Durcir Samba sur FS1 : signature serveur requise, chiffrement SMB3 obligatoire pour COMMUN, partages invités désactivés, ouverture du partage vérifiée sur Windows 11 (`Encrypted=True`, SMB 3.1.1).
-- [ ] Poursuivre le durcissement de Windows Server et les règles réseau pfSense selon la feuille de route sécurité.
+- [x] Vérifier le pare-feu de domaine de DC1 : actif et politique `BlockInbound,AllowOutbound`.
+- [x] Renforcer la politique de mots de passe du domaine `ironman.test` : longueur minimale 14, complexité activée, verrouillage après 10 échecs pendant 15 minutes, compteur réinitialisé après 15 minutes.
+- [ ] Poursuivre la sécurisation de Windows Server et des règles pfSense selon la feuille de route sécurité.
 - [ ] Poursuivre la conception et le déploiement progressif des autres serveurs, des sauvegardes, de la supervision et des futurs VPN intersites.
 
 ## À propos

@@ -206,7 +206,73 @@ Sauvegarde terminee avec succes.
 
 **Limites :** ce test confirme la bonne exécution manuelle et l'écriture du journal, pas le déclenchement automatique de cron. La sauvegarde est effectuée sans dispositif de cohérence applicative et aucun mécanisme de rétention/nettoyage des archives n'est encore défini. Le volume étant dans la même VM, une copie indépendante reste nécessaire.
 
-## 7. Limites et prochaines tâches TSSR
+## 7. Copie des archives vers Windows Server via SCP et contrôle SHA-256
+
+**Objectif de l'exercice TSSR :** conserver une seconde copie des archives sur une autre VM et confirmer l'intégrité des fichiers transférés.
+
+**Destination de laboratoire :** `DC1-GRE-SIEGE` (Windows Server 2025), `C:\ALPINA_BACKUPS\FS1`. L'usage d'un contrôleur de domaine comme dépôt de sauvegardes est réservé à cet exercice : ce n'est **pas** la solution à retenir en production.
+
+### Préparer et transférer les archives
+
+Dossier créé sur DC1 avec PowerShell administrateur :
+
+```powershell
+New-Item -ItemType Directory -Path "C:\ALPINA_BACKUPS\FS1" -Force
+```
+
+Récupération des archives depuis DC1 en SSH, avec la clé privée déjà configurée pour accéder à FS1 :
+
+```powershell
+scp -i "C:\Users\Administrateur\.ssh\id_ed25519_alpina_fs1" "administrateur@10.10.10.30:/mnt/backup/commun-*.tar.gz" "C:\ALPINA_BACKUPS\FS1"
+```
+
+La clé protégée par une passphrase a été utilisée ; **ni clé privée ni passphrase ne sont publiées**.
+
+Trois transferts indiqués à **100 %**. Vérification de la présence des archives sur DC1 :
+
+```powershell
+Get-ChildItem "C:\ALPINA_BACKUPS\FS1" | Select-Object Name, Length, LastWriteTime
+```
+
+Trois fichiers reçus, de 237 octets chacun :
+
+- `commun-2026-11-10_1130.tar.gz`
+- `commun-2026-11-10_114555.tar.gz`
+- `commun-2026-11-10_115455.tar.gz`
+
+![Copies SCP des archives vers DC1](images/08-scp-archives-100pc.png)
+
+### Comparer les empreintes SHA-256
+
+Sur **DC1** :
+
+```powershell
+Get-FileHash "C:\ALPINA_BACKUPS\FS1\commun-2026-11-10_115455.tar.gz" -Algorithm SHA256
+```
+
+![Empreinte SHA-256 calculée sur Windows Server](images/09-sha256-dc1.png)
+
+Sur **FS1**, commande exécutée à distance depuis PowerShell de DC1 :
+
+```powershell
+ssh -i "C:\Users\Administrateur\.ssh\id_ed25519_alpina_fs1" administrateur@10.10.10.30 "sha256sum /mnt/backup/commun-2026-11-10_115455.tar.gz"
+```
+
+![Empreinte SHA-256 calculée sur Debian](images/10-sha256-fs1.png)
+
+**Empreintes comparées :**
+
+```text
+DC1 : 7570DE6F5B83AC0093CFC45F858C64612379877B82A688E04D0BFCB2C75DE683
+FS1 : 7570de6f5b83ac0093cfc45f858c64612379877b82a688e04d0bfcb2c75de683
+```
+
+**Résultat :** les empreintes correspondent (la casse des caractères hexadécimaux ne change pas leur valeur). Le fichier reçu sur DC1 correspond donc, avec une très forte assurance, au fichier source de FS1.
+
+**Limites :** seules les empreintes d'une des trois archives copiées ont été comparées. Cette opération ne démontre ni une restauration à partir de DC1 ni une protection contre une perte de l'hôte VMware : les deux VM restent sur le même ordinateur physique. Aucune copie hors de cet hôte n'a encore été mise en place.
+
+
+## 8. Limites et prochaines tâches TSSR
 
 - [x] Ajouter et identifier un disque dédié de 15 Gio.
 - [x] Partitionner `/dev/sdb` sans toucher au disque système.
@@ -220,13 +286,15 @@ Sauvegarde terminee avec succes.
 - [x] Créer le script Bash, vérifier sa syntaxe et exécuter une sauvegarde réussie.
 - [x] Ajouter la tâche quotidienne à 02 h à la crontab de `root`, vérifier son enregistrement et la journalisation en exécution manuelle.
 - [ ] Observer le déclenchement automatique effectif par cron à 02 h lorsque la VM est allumée.
-- [ ] Prévoir une **copie indépendante de la VM et de son hôte** ; un autre disque virtuel dans la même VM ne remplace pas une sauvegarde externe.
+- [x] Copier les trois archives par SCP de FS1 vers DC1 et confirmer la présence des trois fichiers côté Windows Server.
+- [x] Comparer les empreintes SHA-256 de l'archive `commun-2026-11-10_115455.tar.gz` sur DC1 et FS1 : **identiques**.
+- [ ] Prévoir une **copie indépendante de l'hôte physique VMware** (support ou destination externe) ; le transfert vers DC1 reste une démonstration TSSR, pas une sauvegarde hors site.
 - [ ] Préparer, à terme, une procédure de restauration plus complète et une politique de conservation.
 
 > **Prudence :** le répertoire `/mnt/backup/restauration-test` contient les données d'un test de restauration, à ne pas confondre avec des sauvegardes historiques. Les archives et sauvegardes opérationnelles ne doivent pas être publiées sur GitHub.
 
 ## Preuves
 
-[Voir les sept captures authentiques de la manipulation](images/README.md).
+[Voir les dix captures authentiques de la manipulation](images/README.md).
 
 [Retour au README principal](../../README.md) · [Épisode 06 — Sécurisation de l'infrastructure](../episode-06/README.md)

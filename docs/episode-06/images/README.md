@@ -1,6 +1,6 @@
 # ALPINA RETAIL — Épisode 06 — Preuves visuelles SSH, Samba, pare-feu et Active Directory
 
-**09–10 novembre 2026.** Quinze captures authentiques transmises par l'auteur, liées au [compte rendu de l'épisode 06](../README.md).
+**09–10 novembre 2026.** Seize captures authentiques transmises par l'auteur, liées au [compte rendu de l'épisode 06](../README.md).
 
 | Capture | Ce qu'elle montre |
 |---|---|
@@ -19,6 +19,7 @@
 | [13 — DC1 interroge pfSense](13-dc1-resout-via-pfsense.png) | `nslookup www.microsoft.com 10.10.10.1` réussit |
 | [14 — DC1 résout via le redirecteur](14-dc1-resout-via-redirecteur.png) | Résolution externe sur DC1 après `Add-DnsServerForwarder` |
 | [15 — PC-TEST résout via DC1](15-client-resout-via-dc1.png) | `nslookup www.microsoft.com` : serveur `10.10.10.10`, réponse IPv4 et IPv6 |
+| [16 — PC-TEST : accès DNS direct à pfSense refusé](16-client-dns-direct-pfsense-refuse.png) | `nslookup www.microsoft.com 10.10.10.1` aboutit à des timeouts, conformément au comportement attendu |
 
 ## Avant
 
@@ -60,4 +61,6 @@
 
 ![Résolution réussie sur PC-TEST via DC1](15-client-resout-via-dc1.png)
 
-**Limites :** la connexion SSH par clé a été confirmée par l'auteur après rechargement, mais n'a pas fait l'objet d'une capture dédiée. Aucune clé privée ni passphrase n'est incluse. La deuxième capture est compressée pour le dépôt sans changement des valeurs affichées. La capture 04 précède la dernière modification de la configuration des partages invités. Les treize captures ajoutées après la mise en place de SSH proviennent des séances authentiques et ont été compressées pour le dépôt. La capture 09 a une palette réduite pour respecter une taille raisonnable.
+![PC-TEST : pas de réponse du DNS pfSense en accès direct](16-client-dns-direct-pfsense-refuse.png)
+
+**Limites :** la connexion SSH par clé a été confirmée par l'auteur après rechargement, mais n'a pas fait l'objet d'une capture dédiée. Aucune clé privée ni passphrase n'est incluse. La deuxième capture est compressée pour le dépôt sans changement des valeurs affichées. La capture 04 précède la dernière modification de la configuration des partages invités. Les quatorze captures ajoutées après la mise en place de SSH proviennent des séances authentiques et ont été compressées pour le dépôt. La capture 09 a une palette réduite pour respecter une taille raisonnable.

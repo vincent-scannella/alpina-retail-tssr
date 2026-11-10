@@ -290,6 +290,10 @@ Cette modification fait de pfSense un **redirecteur DNS externe** pour DC1, tout
 
 ![Validation de bout en bout sur PC-TEST via DC1](images/15-client-resout-via-dc1.png)
 
+**Contrôle négatif complémentaire :** depuis PC-TEST, `nslookup www.microsoft.com 10.10.10.1` aboutit à plusieurs `DNS request timed out`. Ce résultat est conforme au blocage DNS `TCP/UDP 53` situé sur pfSense **sous l'autorisation DNS spécifique à DC1**. Comme ce test n'est pas une capture des compteurs/journaux de règle, il ne prouve pas à lui seul la cause exacte de chaque timeout ; il montre bien le comportement attendu pour ce scénario.
+
+![PC-TEST : interrogation DNS directe de pfSense sans réponse](images/16-client-dns-direct-pfsense-refuse.png)
+
 **Conclusion :** incident de résolution externe **résolu dans le laboratoire** grâce au chemin `PC-TEST → DC1 → pfSense → DNS en amont`. Le mécanisme précis empêchant les requêtes directes aux serveurs externes avant le correctif **n'a pas été démontré** : ne pas attribuer sans preuve la panne à une règle pfSense, à VMware NAT ou aux serveurs racines. La configuration actuelle fonctionne, mais ne constitue pas encore une politique réseau entièrement restrictive.
 
 
@@ -308,13 +312,14 @@ Cette modification fait de pfSense un **redirecteur DNS externe** pour DC1, tout
 - [x] Préparer les règles LAN DNS, NTP et Web ; désactiver l'autorisation IPv6 générale ; positionner l'autorisation DNS DC1 avant le blocage DNS des autres clients.
 - [x] Configurer une source NTP externe sur le PDC Emulator et constater sa sélection par Windows Time.
 - [x] Diagnostiquer et corriger la résolution DNS externe via le redirecteur pfSense, puis valider sur DC1 et PC-TEST.
-- [ ] Tester le refus du DNS direct depuis PC-TEST vers `1.1.1.1` sur le port 53.
+- [x] Vérifier le refus de réponse pour `nslookup www.microsoft.com 10.10.10.1` depuis PC-TEST (contrôle négatif conforme à la règle de blocage DNS).
+- [ ] Vérifier si nécessaire le refus du DNS direct depuis PC-TEST vers un résolveur externe (`1.1.1.1`) sur le port 53 ; non encore testé depuis le client.
 - [ ] Poursuivre le filtrage LAN avec les flux autorisés nécessaires avant de supprimer la règle générale IPv4 ; éviter de couper les services.
 - [ ] Préparer le chantier de sauvegarde et de restauration.
 
 ## Preuves
 
-[Consulter les quinze captures authentiques SSH, SMB, Windows Server, pfSense et résolution DNS](images/README.md).
+[Consulter les seize captures authentiques SSH, SMB, Windows Server, pfSense et résolution DNS](images/README.md).
 
 **Méthode appliquée :** modification → contrôle indispensable → test fonctionnel → documentation. Pas de séries de commandes redondantes.
 

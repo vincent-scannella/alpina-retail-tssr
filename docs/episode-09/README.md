@@ -26,6 +26,8 @@ Ces constats sont **ponctuels**. Un ping positif ne prouve pas la disponibilité
 
 Script créé dans `/usr/local/sbin/surveillance-alpina.sh`. Une version **reconstituée à partir des commandes effectivement mises en œuvre et testées** est publiée dans ce dépôt : [surveillance-alpina.sh](surveillance-alpina.sh).
 
+> **Correctif logiciel ajouté au dépôt après audit :** la version publiée vérifie aussi les erreurs de lecture `df` ainsi que la validité numérique du pourcentage, pour éviter un faux état `OK`. **Ce correctif n'a pas encore été copié, exécuté ni validé sur la VM FS1** ; les captures et tests ci-dessous concernent la version effectivement installée le 10 novembre 2026.
+
 Le script s'exécute en `root` et consigne ses observations dans `/var/log/surveillance-alpina.log` :
 
 - **ICMP :** pfSense `10.10.10.1` et DC1 `10.10.10.10`, 2 paquets avec attente maximale de 2 secondes par requête.
@@ -119,6 +121,6 @@ Le téléchargement de l'appliance Centreon prévue pour VMware a été confirm�
 | `PC-TEST-GRE` et `FS1-GRE-SIEGE` | Arrêtés pour libérer de la RAM |
 | pfSense et DC1 | Conservés pour la suite de l'infrastructure |
 
-**À la reprise :** contrôler les ressources de la VM Centreon, régler son interface réseau sur VMnet1, vérifier l'adresse `10.10.10.40` disponible, démarrer et identifier l'OS/la version, finaliser l'accès Web Centreon, puis ajouter pfSense, DC1 et FS1 avec des contrôles adaptés. Remettre FS1 en marche au moment de tester sa supervision, sous réserve de la RAM disponible.
+**À la reprise :** recopier le correctif de supervision dans FS1 et vérifier la syntaxe, le cas normal et une erreur de mesure simulée ; ensuite, contrôler les ressources de la VM Centreon, régler son interface réseau sur VMnet1, vérifier l'adresse `10.10.10.40` disponible, démarrer et identifier l'OS/la version, finaliser l'accès Web Centreon, puis ajouter pfSense, DC1 et FS1 avec des contrôles adaptés. Remettre FS1 en marche au moment de tester sa supervision, sous réserve de la RAM disponible.
 
 **Précaution :** aucune configuration Centreon, aucun agent, aucune connexion à l'interface Web et aucun hôte Centreon supervisé ne sont encore validés.

@@ -95,7 +95,7 @@ L'adresse WAN est une adresse privée, attribuée dynamiquement. Elle peut chang
 - DHCP pfSense : désactivé
 - DHCP VMware sur VMnet1 : désactivé et vérifié
 
-**Contexte chronologique :** lors de cette étape, le DHCP Windows Server n'était pas encore déployé. Il a depuis été configuré et son étendue activée dans l'[épisode 04](../episode-04/README.md), mais **aucune attribution de bail à un client n'a encore été validée**.
+**Contexte chronologique :** lors de cet épisode, le DHCP Windows Server n'était pas encore déployé et aucun bail client n'avait donc été vérifié. **Mise à jour ultérieure :** l'[épisode 04](../episode-04/README.md) confirme l'étendue active et la réception par `PC-TEST-GRE` d'un bail `10.10.10.100/24` de huit jours, avec ses options DHCP.
 
 ## 4. Installation et configuration réalisées
 
@@ -258,12 +258,12 @@ Les cinq captures suivantes proviennent du **laboratoire réel**. Elles illustre
 
 ## 6. Limites de la validation
 
-Les éléments suivants ne sont pas encore validés :
+Les éléments ci-dessous constituent les limites de l'épisode à sa date de réalisation ; certains ont été validés dans les épisodes suivants :
 
 - Vérification et traitement de l'avertissement de confiance du certificat HTTPS de l'interface Web pfSense (le certificat utilisé n'a pas encore été validé par une autorité de confiance sur Windows).
 - Navigation HTTP vers un site externe (seul HTTPS a été testé explicitement) ; contrôles complémentaires des comportements TLS/certificats selon les besoins.
 - **Journalisation du blocage ICMP :** non réalisée, la journalisation de la règle de test n'ayant pas été activée. Si une nouvelle campagne de tests de filtrage est organisée, activer et contrôler les logs avant le test.
-- **Attribution d'un bail DHCP au client :** le serveur Windows et son étendue sont désormais configurés dans l'épisode 04, mais le passage de `PC-TEST-GRE` en DHCP, la réception d'une adresse et la durée du bail ne sont pas encore validés.
+- **DHCP côté client (mise à jour du suivi) :** non validé au moment de l'épisode 03 ; **validé ensuite dans l'[épisode 04](../episode-04/README.md)** : `PC-TEST-GRE` en DHCP, adresse `10.10.10.100/24`, options et bail de huit jours vérifiés.
 - VPN IPsec entre le siège et les boutiques.
 - Persistance d'autres paramètres de configuration après redémarrage (la persistance des adresses WAN/LAN a été observée).
 - Intégrité cryptographique de la copie de sauvegarde et **test de restauration pfSense** : non réalisés. Le fichier est visible sur le PC hôte avec une taille cohérente, sans que cela garantisse sa restaurabilité.

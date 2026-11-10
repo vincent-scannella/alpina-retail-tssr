@@ -315,7 +315,7 @@ Cette modification fait de pfSense un **redirecteur DNS externe** pour DC1, tout
 - [x] Vérifier le refus de réponse pour `nslookup www.microsoft.com 10.10.10.1` depuis PC-TEST (contrôle négatif conforme à la règle de blocage DNS).
 - [ ] Vérifier si nécessaire le refus du DNS direct depuis PC-TEST vers un résolveur externe (`1.1.1.1`) sur le port 53 ; non encore testé depuis le client.
 - [ ] Poursuivre le filtrage LAN avec les flux autorisés nécessaires avant de supprimer la règle générale IPv4 ; éviter de couper les services.
-- [ ] Préparer le chantier de sauvegarde et de restauration.
+- [x] Préparer, réaliser et documenter ensuite le chantier de sauvegarde et de restauration dans l'[épisode 07](../episode-07/README.md) : disque ext4 monté par UUID, archive `tar.gz`, extraction isolée et comparaison `cmp` réussies. **Limites conservées :** sauvegarde cron réelle à 02 h non observée et absence de copie hors hôte.
 
 ## Preuves
 

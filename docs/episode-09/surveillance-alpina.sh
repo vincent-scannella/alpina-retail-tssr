@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # ALPINA RETAIL - Surveillance legere FS1 (reconstitution documentee du laboratoire)
+# Correctif de robustesse sur la mesure du disque ajoute au depot apres l'audit.
+# Ce correctif n'a pas encore ete applique ni teste sur la VM FS1.
 LOG="/var/log/surveillance-alpina.log"
 
 # Disponibilite ICMP des equipements
@@ -37,14 +39,25 @@ if ! mountpoint -q /mnt/backup
 then
     echo "$(date '+%F %T') | FS1 | BACKUP | ALERTE : disque non monte" | tee -a "$LOG"
 else
-    utilisation=$(df -P /mnt/backup | awk 'NR==2 {gsub(/%/, "", $5); print $5}')
-
-    if [ "$utilisation" -ge 80 ]
+    # Ne jamais qualifier le disque OK si df echoue ou renvoie une valeur vide/invalide.
+    if ! df_sortie=$(LC_ALL=C df -P /mnt/backup 2>/dev/null)
     then
-        etat="ALERTE"
+        echo "$(date '+%F %T') | FS1 | BACKUP | ALERTE : lecture du disque impossible" | tee -a "$LOG"
     else
-        etat="OK"
-    fi
+        utilisation=$(printf '%s\n' "$df_sortie" | awk 'NR==2 {gsub(/%/, "", $5); print $5}')
 
-    echo "$(date '+%F %T') | FS1 | BACKUP | ${utilisation}% | $etat" | tee -a "$LOG"
+        if [[ ! "$utilisation" =~ ^[0-9]+$ ]] || (( utilisation > 100 ))
+        then
+            echo "$(date '+%F %T') | FS1 | BACKUP | ALERTE : valeur d'utilisation invalide" | tee -a "$LOG"
+        else
+            if (( utilisation >= 80 ))
+            then
+                etat="ALERTE"
+            else
+                etat="OK"
+            fi
+
+            echo "$(date '+%F %T') | FS1 | BACKUP | ${utilisation}% | $etat" | tee -a "$LOG"
+        fi
+    fi
 fi

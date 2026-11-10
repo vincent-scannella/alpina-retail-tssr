@@ -32,13 +32,15 @@ Résultats observés :
 
 ## 3. Partitionnement, formatage et montage
 
-Après vérification du nom et de la taille du **nouveau** disque, les opérations suivantes ont été réalisées :
+Après vérification du nom et de la taille du **nouveau** disque, les opérations historiques suivantes ont été réalisées **à cette étape précise du laboratoire** :
+
+> **Avertissement de sécurité :** les noms `/dev/sda` et `/dev/sdb` peuvent changer d'un démarrage à l'autre. Lors du redémarrage du 10 novembre, le disque de sauvegarde est devenu `/dev/sda1` alors qu'il était `/dev/sdb1` initialement. **Ne jamais réexécuter les commandes `fdisk` ou `mkfs.ext4` ci-dessous sans identifier explicitement le disque cible avec `lsblk -o NAME,SIZE,FSTYPE,LABEL,UUID,MOUNTPOINTS`, `blkid` et `findmnt`.** Un mauvais choix effacerait des données. Le montage permanent s'appuie sur l'UUID, pas sur ces noms variables.
 
 ```bash
 sudo fdisk /dev/sdb
 ```
 
-Dans `fdisk` : `n` (nouvelle partition), `p` (primaire), numéro `1`, premier et dernier secteurs par défaut, `p` (contrôle), puis `w` (écriture). Cette étape a créé `/dev/sdb1` sur 15 Gio. **Ne jamais exécuter ces actions sur `/dev/sda` dans cette maquette.**
+Dans `fdisk` : `n` (nouvelle partition), `p` (primaire), numéro `1`, premier et dernier secteurs par défaut, `p` (contrôle), puis `w` (écriture). Cette étape a créé `/dev/sdb1` sur 15 Gio **au moment de la manipulation**. La lettre du disque n'est pas une garantie d'identité : voir l'avertissement ci-dessus avant toute réutilisation.
 
 Formatage en ext4 et création du point de montage :
 

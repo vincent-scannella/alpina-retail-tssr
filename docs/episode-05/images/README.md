@@ -18,7 +18,6 @@ Le projet est fictif. Les noms des hôtes et les IP visibles appartiennent au la
 | [10-reseau-nat-provisoire.png](10-reseau-nat-provisoire.png) | `ens33` UP avec IPv4 DHCP 10.50.10.131/24 sur VMnet8 |
 | [11-jonction-domaine-ads.png](11-jonction-domaine-ads.png) | Commande `net ads join` : jonction de FS1 au domaine `ironman.test` confirmée |
 | [12-winbind-utilisateurs-ad.png](12-winbind-utilisateurs-ad.png) | `wbinfo -u` : utilisateurs IRONMAN récupérés après dépannage Winbind |
-
 | [13-winbind-domaine-workgroup.png](13-winbind-domaine-workgroup.png) | Ancien domaine WORKGROUP reconnu par Winbind avant rechargement |
 | [14-nss-utilisateur-ad.png](14-nss-utilisateur-ad.png) | Compte AD test.gre résolu en UID 11108 / GID 10513 |
 | [15-creation-groupe-ad.png](15-creation-groupe-ad.png) | Groupe de sécurité global GG_FS1_COMMUN_RW dans Active Directory |

@@ -1,6 +1,6 @@
 # ALPINA RETAIL — Épisode 06 — Preuves visuelles SSH, Samba, pare-feu et Active Directory
 
-**09 novembre 2026.** Huit captures authentiques transmises par l'auteur, liées au [compte rendu de l'épisode 06](../README.md).
+**09–10 novembre 2026.** Quinze captures authentiques transmises par l'auteur, liées au [compte rendu de l'épisode 06](../README.md).
 
 | Capture | Ce qu'elle montre |
 |---|---|
@@ -12,6 +12,13 @@
 | [06 — Politique AD initiale](06-ad-policy-initial.png) | Longueur minimale 7 et seuil de verrouillage 0 avant durcissement |
 | [07 — Politique AD renforcée](07-ad-policy-renforcee.png) | Longueur minimale 14, complexité activée, verrouillage 10 tentatives / 15 minutes |
 | [08 — Pare-feu DC1 profil Domaine](08-dc1-firewall-domaine.png) | État actif ; politique `BlockInbound,AllowOutbound` |
+| [09 — Ordre des règles LAN pfSense](09-lan-regles-dns-ntp.png) | DNS/NTP autorisés pour DC1 ; blocage DNS clients ; Web ; IPv4 générale encore active |
+| [10 — Échec DNS externe sur DC1](10-dc1-dns-externe-echec.png) | `nslookup www.microsoft.com 10.10.10.10` en timeout |
+| [11 — Aucun redirecteur DNS configuré](11-dc1-sans-redirecteur.png) | `Get-DnsServerForwarder` : IPAddress vide et root hints actifs |
+| [12 — Résolution DNS sur pfSense](12-pfsense-dns-lookup-ok.png) | Réponse A/AAAA/CNAME avec délais du résolveur et du DNS VMware |
+| [13 — DC1 interroge pfSense](13-dc1-resout-via-pfsense.png) | `nslookup www.microsoft.com 10.10.10.1` réussit |
+| [14 — DC1 résout via le redirecteur](14-dc1-resout-via-redirecteur.png) | Résolution externe sur DC1 après `Add-DnsServerForwarder` |
+| [15 — PC-TEST résout via DC1](15-client-resout-via-dc1.png) | `nslookup www.microsoft.com` : serveur `10.10.10.10`, réponse IPv4 et IPv6 |
 
 ## Avant
 
@@ -37,4 +44,20 @@
 
 ![Pare-feu du contrôleur de domaine actif](08-dc1-firewall-domaine.png)
 
-**Limites :** la connexion SSH par clé a été confirmée par l'auteur après rechargement, mais n'a pas fait l'objet d'une capture dédiée. Aucune clé privée ni passphrase n'est incluse. La deuxième capture est compressée pour le dépôt sans changement des valeurs affichées. La capture 04 précède la dernière modification de la configuration des partages invités. Les six captures SMB/AD/pare-feu ajoutées proviennent des séances authentiques et ont été compressées pour le dépôt.
+## Règles pfSense et résolution de la panne DNS
+
+![Règles LAN pfSense](09-lan-regles-dns-ntp.png)
+
+![Échec initial de la résolution externe sur DC1](10-dc1-dns-externe-echec.png)
+
+![Absence de redirecteur configuré](11-dc1-sans-redirecteur.png)
+
+![Résolution DNS réussie depuis pfSense](12-pfsense-dns-lookup-ok.png)
+
+![Résolution réussie de DC1 vers pfSense](13-dc1-resout-via-pfsense.png)
+
+![Résolution réussie sur DC1 après configuration du redirecteur](14-dc1-resout-via-redirecteur.png)
+
+![Résolution réussie sur PC-TEST via DC1](15-client-resout-via-dc1.png)
+
+**Limites :** la connexion SSH par clé a été confirmée par l'auteur après rechargement, mais n'a pas fait l'objet d'une capture dédiée. Aucune clé privée ni passphrase n'est incluse. La deuxième capture est compressée pour le dépôt sans changement des valeurs affichées. La capture 04 précède la dernière modification de la configuration des partages invités. Les treize captures ajoutées après la mise en place de SSH proviennent des séances authentiques et ont été compressées pour le dépôt. La capture 09 a une palette réduite pour respecter une taille raisonnable.

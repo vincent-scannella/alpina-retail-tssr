@@ -223,7 +223,77 @@ Paramètres **vérifiés sur capture le 09/11/2026** :
 **Limite :** la capture prouve la configuration de la politique AD par défaut, mais pas un test réel de verrouillage de compte ou l'absence de politiques de mot de passe fines (FGPP) pouvant prendre le pas pour certains utilisateurs. La connexion et l'utilisation des principaux services AD/DNS/DHCP ne sont pas de nouveau testées ici, conformément au principe d'éviter les contrôles répétitifs.
 
 
-## 7. Prochaines tâches
+## 7. Sécurisation réseau pfSense, NTP et diagnostic DNS
+
+### 7.1 Architecture et règles pfSense — 10 novembre 2026
+
+- Pare-feu `pfSense-GRE-SIEGE` : LAN `10.10.10.1`, WAN `10.50.10.128` sur VMware NAT (VMnet8).
+- WAN privé : option `Block private networks and loopback addresses` désactivée pour le WAN sur adresse RFC 1918, `Block bogon networks` conservée. Pas de règle d'autorisation WAN explicite visible lors du contrôle.
+- SSH pfSense désactivé après rétablissement de l'accès Web ; accès HTTPS conservé.
+- Sauvegarde XML complète chiffrée téléchargée par l'auteur, **non publiée** dans ce dépôt (document sensible).
+- Alias `ALPINA_DC1` → `10.10.10.10` ; alias `ALPINA_WEB_PORTS` → `80`, `443`.
+- Sur LAN, de haut en bas : autorisation NTP `UDP/123` depuis DC1 ; autorisation DNS `TCP/UDP 53` depuis DC1 ; blocage DNS classique `TCP/UDP 53` depuis `LAN subnets` ; autorisation Web `TCP 80/443` depuis `LAN subnets` ; règle générale IPv4 `Default allow LAN to any` encore **active** ; règle IPv6 par défaut **désactivée**.
+- L'ordre est essentiel : l'autorisation DNS DC1 doit être **au-dessus** du blocage DNS visant le LAN.
+
+![Ordre des règles LAN pfSense après correction](images/09-lan-regles-dns-ntp.png)
+
+**Portée et limites :** les règles filtrent les paquets traversant pfSense. Les communications entre postes du même sous-réseau, comme PC-TEST et DC1, ne passent normalement pas par lui. Le blocage DNS classique ne couvre pas le DNS over HTTPS ou des méthodes de contournement. **La règle générale IPv4 reste permissive** ; la politique « deny by default » du LAN n'est pas encore atteinte. La règle de blocage DNS externe pour les clients devra encore faire l'objet d'un test négatif dédié.
+
+### 7.2 Référence horaire du domaine
+
+- `Get-ADDomain | Select-Object PDCEmulator` a identifié `DC1-GRE-SIEGE.ironman.test` comme titulaire du rôle PDC Emulator.
+- `w32tm /query /source` retournait `Local CMOS Clock`.
+- Le service Windows Time a été configuré sur DC1 avec trois pairs `0.fr.pool.ntp.org`, `1.fr.pool.ntp.org`, `2.fr.pool.ntp.org` en mode client (`0x8`) et `/reliable:yes`.
+- `w32tm /resync /rediscover` a réussi ; `w32tm /query /source` a ensuite retourné `0.fr.pool.ntp.org,0x8`.
+- Une règle pfSense autorise explicitement la sortie de `ALPINA_DC1` en `UDP/123`.
+
+**Contrôle effectué :** la nouvelle source est identifiée ; cette observation ne suffit pas à elle seule à auditer la précision horaire ni la synchronisation de tous les postes du domaine.
+
+### 7.3 Incident : résolution DNS externe impossible depuis DC1
+
+**Symptôme :** `nslookup www.microsoft.com` lancé sur PC-TEST vers `10.10.10.10` échouait par dépassement du délai d'attente. Le même échec était observé directement sur DC1.
+
+![Échec DNS externe sur le contrôleur de domaine](images/10-dc1-dns-externe-echec.png)
+
+**Diagnostic successif :**
+
+1. `nslookup dc1-gre-siege.ironman.test 10.10.10.10` fonctionnait : le service DNS interne et l'enregistrement de DC1 répondaient.
+2. `Get-DnsServerForwarder | Format-List IPAddress,UseRootHint,Timeout` montrait **aucun redirecteur**, `UseRootHint=True`, `Timeout=3`.
+3. `nslookup www.microsoft.com 1.1.1.1` échouait ; `Test-NetConnection 1.1.1.1 -Port 53` indiquait l'échec TCP/53.
+4. `Test-NetConnection 1.1.1.1 -Port 443` indiquait `TcpTestSucceeded : True` : la connectivité sortante n'était pas intégralement coupée.
+5. `nslookup www.microsoft.com 10.50.10.2` échouait également depuis DC1.
+6. **pfSense**, depuis `Diagnostics > DNS Lookup`, résolvait `www.microsoft.com` : une adresse IPv4 était reçue, et le serveur amont `10.50.10.2` répondait en 7 ms.
+7. `nslookup www.microsoft.com 10.10.10.1` depuis DC1 **réussissait**, établissant un chemin de résolution fonctionnel via le résolveur pfSense.
+
+![Absence initiale de redirecteurs sur DC1](images/11-dc1-sans-redirecteur.png)
+
+![DNS Lookup fonctionnel sur pfSense](images/12-pfsense-dns-lookup-ok.png)
+
+![Interrogation directe du résolveur pfSense depuis DC1](images/13-dc1-resout-via-pfsense.png)
+
+### 7.4 Correctif appliqué et validation de bout en bout
+
+Sur DC1, dans PowerShell administrateur :
+
+```powershell
+Add-DnsServerForwarder -IPAddress 10.10.10.1
+```
+
+Cette modification fait de pfSense un **redirecteur DNS externe** pour DC1, tout en conservant le service DNS du contrôleur de domaine pour `ironman.test`. Elle a été acceptée sans erreur.
+
+**Vérifications positives :**
+
+- Depuis **DC1** : `nslookup www.microsoft.com 10.10.10.10` a renvoyé des adresses, dont `23.200.213.221`.
+- Depuis **PC-TEST-GRE** : `nslookup www.microsoft.com` a utilisé `DC1-GRE-SIEGE.ironman.test` (`10.10.10.10`) et renvoyé des adresses IPv4/IPv6 sans délai d'attente.
+
+![Résolution externe rétablie sur DC1 après ajout du redirecteur](images/14-dc1-resout-via-redirecteur.png)
+
+![Validation de bout en bout sur PC-TEST via DC1](images/15-client-resout-via-dc1.png)
+
+**Conclusion :** incident de résolution externe **résolu dans le laboratoire** grâce au chemin `PC-TEST → DC1 → pfSense → DNS en amont`. Le mécanisme précis empêchant les requêtes directes aux serveurs externes avant le correctif **n'a pas été démontré** : ne pas attribuer sans preuve la panne à une règle pfSense, à VMware NAT ou aux serveurs racines. La configuration actuelle fonctionne, mais ne constitue pas encore une politique réseau entièrement restrictive.
+
+
+## 8. Prochaines tâches
 
 - [x] Empêcher la connexion SSH directe de `root`.
 - [x] Mettre en place une paire ED25519 dédiée, protégée par une passphrase.
@@ -233,12 +303,18 @@ Paramètres **vérifiés sur capture le 09/11/2026** :
 - [x] Vérifier et renforcer les paramètres Samba, puis valider une session chiffrée SMB 3.1.1 (`Encrypted=True`) depuis Windows 11.
 - [x] Vérifier le profil Domaine du pare-feu de DC1 (`BlockInbound,AllowOutbound`) sans modifier les règles existantes.
 - [x] Renforcer et contrôler la politique de mots de passe par défaut d'Active Directory (14 caractères, 10 échecs, 15 minutes).
-- [ ] Poursuivre la sécurisation des services Windows Server et de pfSense.
+- [x] Vérifier Microsoft Defender en temps réel sur DC1 (`True` pour le service, l'antivirus et la protection temps réel).
+- [x] Adapter le WAN privé de pfSense à VMware NAT, conserver la protection WAN, désactiver SSH et sauvegarder la configuration hors GitHub.
+- [x] Préparer les règles LAN DNS, NTP et Web ; désactiver l'autorisation IPv6 générale ; positionner l'autorisation DNS DC1 avant le blocage DNS des autres clients.
+- [x] Configurer une source NTP externe sur le PDC Emulator et constater sa sélection par Windows Time.
+- [x] Diagnostiquer et corriger la résolution DNS externe via le redirecteur pfSense, puis valider sur DC1 et PC-TEST.
+- [ ] Tester le refus du DNS direct depuis PC-TEST vers `1.1.1.1` sur le port 53.
+- [ ] Poursuivre le filtrage LAN avec les flux autorisés nécessaires avant de supprimer la règle générale IPv4 ; éviter de couper les services.
 - [ ] Préparer le chantier de sauvegarde et de restauration.
 
 ## Preuves
 
-[Consulter les huit captures authentiques SSH, SMB, pare-feu et comptes AD](images/README.md).
+[Consulter les quinze captures authentiques SSH, SMB, Windows Server, pfSense et résolution DNS](images/README.md).
 
 **Méthode appliquée :** modification → contrôle indispensable → test fonctionnel → documentation. Pas de séries de commandes redondantes.
 

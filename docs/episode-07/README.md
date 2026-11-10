@@ -149,7 +149,62 @@ Fichiers identiques
 
 **Validation acquise :** une archive a été créée sur le disque dédié, son contenu a été listé, elle a été extraite ailleurs et les deux versions du fichier `test-commun.txt` étaient identiques au moment du test.
 
-## 6. Limites et prochaines tâches TSSR
+## 6. Sauvegarde automatique avec cron — 10 novembre 2026
+
+Pour automatiser la procédure manuelle validée, un script Bash simple a été créé dans `/usr/local/sbin/sauvegarde-commun.sh` :
+
+```bash
+#!/bin/bash
+
+# Arreter le script si une commande echoue
+set -e
+
+# Verifier que le disque de sauvegarde est monte
+if ! mountpoint -q /mnt/backup; then
+    echo "ERREUR : disque de sauvegarde non monte."
+    exit 1
+fi
+
+# Sauvegarder le partage Samba COMMUN
+tar -czf "/mnt/backup/commun-$(date +%F_%H%M%S).tar.gz" -C /srv/samba commun
+
+echo "Sauvegarde terminee avec succes."
+```
+
+**Précision :** le contrôle `mountpoint` évite d'écrire sur la partition système si le montage est absent ; il ne garantit pas à lui seul que le volume monté est le bon disque en cas d'erreur d'administration. Une vérification plus stricte par UUID pourrait être ajoutée dans une version ultérieure.
+
+**Vérifications réalisées :**
+
+- `sudo bash -n /usr/local/sbin/sauvegarde-commun.sh` : aucune erreur de syntaxe détectée.
+- `sudo bash /usr/local/sbin/sauvegarde-commun.sh` : message `Sauvegarde terminee avec succes.`
+- `ls -lh /mnt/backup/commun-*.tar.gz` : présence de deux archives (manuelle et script), chacune de 237 octets dans ce laboratoire de test.
+- `systemctl is-active cron` : service déclaré actif.
+
+**Planification ajoutée à la crontab de `root`** avec `sudo crontab -e`, puis vérifiée avec `sudo crontab -l` :
+
+```cron
+0 2 * * * /usr/bin/bash /usr/local/sbin/sauvegarde-commun.sh >> /var/log/sauvegarde-commun.log 2>&1
+```
+
+Cela programme l'exécution du script tous les jours à **02 h (heure système de la VM)** et collecte sa sortie standard ainsi que ses erreurs dans un journal. La VM doit être en fonctionnement à cette heure. **L'exécution réelle par cron à 02 h n'a pas encore été observée.**
+
+Pour tester la même commande de journalisation sans attendre le déclenchement planifié :
+
+```bash
+sudo bash -c '/usr/bin/bash /usr/local/sbin/sauvegarde-commun.sh >> /var/log/sauvegarde-commun.log 2>&1' && sudo tail -n 3 /var/log/sauvegarde-commun.log
+```
+
+Résultat observé :
+
+```text
+Sauvegarde terminee avec succes.
+```
+
+![Journal de sauvegarde affichant un succès](images/06-journal-sauvegarde.png)
+
+**Limites :** ce test confirme la bonne exécution manuelle et l'écriture du journal, pas le déclenchement automatique de cron. La sauvegarde est effectuée sans dispositif de cohérence applicative et aucun mécanisme de rétention/nettoyage des archives n'est encore défini. Le volume étant dans la même VM, une copie indépendante reste nécessaire.
+
+## 7. Limites et prochaines tâches TSSR
 
 - [x] Ajouter et identifier un disque dédié de 15 Gio.
 - [x] Partitionner `/dev/sdb` sans toucher au disque système.
@@ -159,8 +214,10 @@ Fichiers identiques
 - [x] Vérifier la présence du fichier de test dans l'archive.
 - [x] Restaurer dans un dossier distinct et confirmer l'identité octet par octet avec `cmp`.
 - [ ] Tester le montage automatique après redémarrage réel.
-- [ ] Examiner les **permissions et propriétaires** du contenu restauré (important pour Samba et l'intégration AD).
-- [ ] Automatiser une sauvegarde simple avec un contrôle préalable `mountpoint -q /mnt/backup` et une vérification minimale des erreurs.
+- [x] Comparer les **permissions et propriétaires** du fichier restauré et de l'original : `-rw-rw----`, propriétaire `IRONMAN\test.gre`, groupe `IRONMAN\gg_fs1_commun_rw`, taille 28 octets, identiques dans la capture de la séance.
+- [x] Créer le script Bash, vérifier sa syntaxe et exécuter une sauvegarde réussie.
+- [x] Ajouter la tâche quotidienne à 02 h à la crontab de `root`, vérifier son enregistrement et la journalisation en exécution manuelle.
+- [ ] Observer le déclenchement automatique effectif par cron à 02 h lorsque la VM est allumée.
 - [ ] Prévoir une **copie indépendante de la VM et de son hôte** ; un autre disque virtuel dans la même VM ne remplace pas une sauvegarde externe.
 - [ ] Préparer, à terme, une procédure de restauration plus complète et une politique de conservation.
 
@@ -168,6 +225,6 @@ Fichiers identiques
 
 ## Preuves
 
-[Voir les cinq captures authentiques de la manipulation](images/README.md).
+[Voir les six captures authentiques de la manipulation](images/README.md).
 
 [Retour au README principal](../../README.md) · [Épisode 06 — Sécurisation de l'infrastructure](../episode-06/README.md)

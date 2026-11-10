@@ -1,6 +1,6 @@
 # ALPINA RETAIL — Épisode 07 — Captures de sauvegarde et restauration
 
-**10 novembre 2026.** Cinq captures authentiques fournies au cours de la séance ; images compressées pour le dépôt.
+**10 novembre 2026.** Six captures authentiques fournies au cours de la séance ; images compressées pour le dépôt.
 
 | Capture | Information vérifiée |
 |---|---|
@@ -9,6 +9,7 @@
 | [03 — Montage ext4 confirmé](03-stockage-monte.png) | `df -hT /mnt/backup` → `/dev/sdb1`, ext4, 15 Go |
 | [04 — Liste de l'archive tar](04-archive-liste.png) | `commun/` et `commun/test-commun.txt` présents |
 | [05 — Restauration validée par cmp](05-fichier-restaure-identique.png) | Message `Fichiers identiques` après comparaison de l'original et de la copie restaurée |
+| [06 — Journal de sauvegarde](06-journal-sauvegarde.png) | Script lancé manuellement avec redirection vers le journal, message de succès consulté avec `tail` |
 
 ## Disque et stockage
 
@@ -24,6 +25,10 @@
 
 ![Comparaison après restauration](05-fichier-restaure-identique.png)
 
-**Limites :** la vérification `cmp` porte sur un fichier de test ; elle ne vaut pas validation des permissions d'accès Samba ou restauration après perte totale de VM. Le montage automatique est configuré, mais son fonctionnement après redémarrage n'a pas encore été contrôlé.
+## Automatisation et journal
+
+![Journal d'exécution du script de sauvegarde](06-journal-sauvegarde.png)
+
+**Limites :** la vérification `cmp` porte sur un fichier de test ; elle ne vaut pas restauration après perte totale de VM. Les propriétaires et permissions du fichier restauré ont été comparés dans la séance, mais n'ont pas fait l'objet d'une capture déposée ici. La crontab a été vérifiée en conversation ; le déclenchement automatique de 02 h n'a pas été observé. Le montage automatique est configuré, mais son fonctionnement après redémarrage n'a pas encore été contrôlé.
 
 [Revenir au compte rendu de l'épisode 07](../README.md)

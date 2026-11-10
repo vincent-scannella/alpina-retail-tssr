@@ -82,7 +82,9 @@ UUID=76eaaa35-082c-48f1-b8bb-62d463954c09 /mnt/backup ext4 defaults,nofail 0 2
 
 La vérification `sudo findmnt --verify --verbose` a reconnu correctement l'UUID et le type ext4 sur `/mnt/backup` ; elle a aussi signalé une incohérence **distincte** sur le CD/DVD virtuel et recommandé de recharger systemd. `sudo systemctl daemon-reload` a ensuite été exécutée sans erreur.
 
-**Non encore testé :** persistance du montage après un redémarrage réel de FS1. La ligne `fstab` est configurée et le disque était bien monté lors de la séance.
+**Test après redémarrage du 10 novembre 2026 :** `df -hT /mnt/backup` montre `/dev/sda1`, ext4, 15 Gio, monté sur `/mnt/backup`, alors que le disque s'appelait `/dev/sdb1` avant le redémarrage. `sudo blkid /dev/sda1` confirme le même label `ALPINA_BACKUP` et exactement le même UUID `76eaaa35-082c-48f1-b8bb-62d463954c09`. Le montage automatique par UUID est donc **validé**, indépendamment du changement de nom du périphérique.
+
+![Identification UUID du disque après redémarrage](images/07-montage-auto-uuid-verifie.png)
 
 ## 4. Sauvegarde manuelle du partage COMMUN
 
@@ -213,7 +215,7 @@ Sauvegarde terminee avec succes.
 - [x] Réaliser une sauvegarde manuelle `tar.gz` du partage `COMMUN`.
 - [x] Vérifier la présence du fichier de test dans l'archive.
 - [x] Restaurer dans un dossier distinct et confirmer l'identité octet par octet avec `cmp`.
-- [ ] Tester le montage automatique après redémarrage réel.
+- [x] Tester le montage automatique après redémarrage réel : `/mnt/backup` est remonté sur `/dev/sda1`, **UUID inchangé** (`76eaaa35-082c-48f1-b8bb-62d463954c09`) et label `ALPINA_BACKUP`. La variation de nom `/dev/sdb1` → `/dev/sda1` illustre l'intérêt du montage par UUID.
 - [x] Comparer les **permissions et propriétaires** du fichier restauré et de l'original : `-rw-rw----`, propriétaire `IRONMAN\test.gre`, groupe `IRONMAN\gg_fs1_commun_rw`, taille 28 octets, identiques dans la capture de la séance.
 - [x] Créer le script Bash, vérifier sa syntaxe et exécuter une sauvegarde réussie.
 - [x] Ajouter la tâche quotidienne à 02 h à la crontab de `root`, vérifier son enregistrement et la journalisation en exécution manuelle.
@@ -225,6 +227,6 @@ Sauvegarde terminee avec succes.
 
 ## Preuves
 
-[Voir les six captures authentiques de la manipulation](images/README.md).
+[Voir les sept captures authentiques de la manipulation](images/README.md).
 
 [Retour au README principal](../../README.md) · [Épisode 06 — Sécurisation de l'infrastructure](../episode-06/README.md)

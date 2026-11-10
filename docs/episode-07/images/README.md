@@ -1,6 +1,6 @@
 # ALPINA RETAIL — Épisode 07 — Captures de sauvegarde et restauration
 
-**10 novembre 2026.** Six captures authentiques fournies au cours de la séance ; images compressées pour le dépôt.
+**10 novembre 2026.** Sept captures authentiques fournies au cours de la séance ; images compressées pour le dépôt.
 
 | Capture | Information vérifiée |
 |---|---|
@@ -10,6 +10,7 @@
 | [04 — Liste de l'archive tar](04-archive-liste.png) | `commun/` et `commun/test-commun.txt` présents |
 | [05 — Restauration validée par cmp](05-fichier-restaure-identique.png) | Message `Fichiers identiques` après comparaison de l'original et de la copie restaurée |
 | [06 — Journal de sauvegarde](06-journal-sauvegarde.png) | Script lancé manuellement avec redirection vers le journal, message de succès consulté avec `tail` |
+| [07 — Montage automatique vérifié après redémarrage](07-montage-auto-uuid-verifie.png) | `blkid /dev/sda1` retrouve le label et l'UUID du disque d'abord détecté comme `/dev/sdb1` |
 
 ## Disque et stockage
 
@@ -18,6 +19,8 @@
 ![Détection du nouveau disque sous Debian](02-lsblk-nouveau-disque.png)
 
 ![Disque de sauvegarde monté](03-stockage-monte.png)
+
+![Identification du même disque par son UUID après redémarrage](07-montage-auto-uuid-verifie.png)
 
 ## Sauvegarde et restauration
 
@@ -29,6 +32,6 @@
 
 ![Journal d'exécution du script de sauvegarde](06-journal-sauvegarde.png)
 
-**Limites :** la vérification `cmp` porte sur un fichier de test ; elle ne vaut pas restauration après perte totale de VM. Les propriétaires et permissions du fichier restauré ont été comparés dans la séance, mais n'ont pas fait l'objet d'une capture déposée ici. La crontab a été vérifiée en conversation ; le déclenchement automatique de 02 h n'a pas été observé. Le montage automatique est configuré, mais son fonctionnement après redémarrage n'a pas encore été contrôlé.
+**Limites :** la vérification `cmp` porte sur un fichier de test ; elle ne vaut pas restauration après perte totale de VM. Les propriétaires et permissions du fichier restauré ont été comparés dans la séance, mais n'ont pas fait l'objet d'une capture déposée ici. La crontab a été vérifiée en conversation ; le déclenchement automatique de 02 h n'a pas été observé. Le montage automatique a été testé après redémarrage, le périphérique s'étant renommé en `/dev/sda1` sans changement d'UUID.
 
 [Revenir au compte rendu de l'épisode 07](../README.md)

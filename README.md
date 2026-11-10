@@ -12,7 +12,7 @@ Je conçois, déploie et dépanne progressivement une infrastructure informatiqu
 
 | Entreprise simulée | Laboratoire personnel | Progression |
 |---|---|---|
-| **4 sites** · 75 collaborateurs fictifs | **Windows 11** · VMware Workstation · **16 Go de RAM sur l'hôte** | **Épisodes 00 à 06 documentés**, sécurisation du siège en cours |
+| **4 sites** · 75 collaborateurs fictifs | **Windows 11** · VMware Workstation · **16 Go de RAM sur l'hôte** | **Épisodes 00 à 07 documentés**, sécurisation du siège en cours |
 
 **Ce qui est déjà vérifié :**
 
@@ -57,8 +57,9 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **04** | [Windows Server, AD DS, DNS et DHCP](docs/episode-04/README.md) | DC1, dépannage DNS, DHCP réel sur Windows 11, jonction à `ironman.test`, utilisateur AD et première GPO (application vérifiée ; verrouillage ensuite observé par l'auteur sans capture) |
 | **05** | [FS1 — Serveur de fichiers Debian Linux](docs/episode-05/README.md) | Samba/AD/Winbind, groupe de sécurité, partage `[COMMUN]` ; écriture et lecture fonctionnelles, permissions `660`, accès non autorisé refusé ; [22 captures authentiques](docs/episode-05/images/README.md) ; chantier Samba du siège validé le 09/11/2026 |
 | **06** | [Durcissement de l'infrastructure — siège Grenoble](docs/episode-06/README.md) | SSH/SMB sécurisés ; pare-feu Windows et comptes AD renforcés ; pfSense (WAN NAT, règles DNS/NTP/Web) ; source NTP du PDC vérifiée ; **incident DNS externe résolu par redirecteur pfSense**, validé sur DC1 et PC-TEST ; [16 captures](docs/episode-06/images/README.md). Contrôle DNS direct de PC-TEST vers pfSense conforme (timeout) ; filtrage IPv4 restrictif à poursuivre. |
+| **07** | [FS1 — Sauvegarder et restaurer le partage Samba](docs/episode-07/README.md) | Disque de sauvegarde virtuel 15 Gio, ext4 et montage `/mnt/backup` ; archive `tar.gz` de `[COMMUN]` vérifiée ; restauration isolée et comparaison `cmp` réussie ; [5 captures authentiques](docs/episode-07/images/README.md). Automatisation et copie hors VM à poursuivre. |
 
-**Preuves visuelles :** [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md) · [épisode 05 — 22 captures authentiques Debian / réseau / DNS / AD / SMB](docs/episode-05/images/README.md).
+**Preuves visuelles :** [épisode 07 — 5 captures authentiques de la sauvegarde et restauration FS1](docs/episode-07/images/README.md) · [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md) · [épisode 05 — 22 captures authentiques Debian / réseau / DNS / AD / SMB](docs/episode-05/images/README.md).
 
 ## Vue d'ensemble de l'entreprise fictive
 
@@ -108,7 +109,8 @@ Les compétences travaillées comprennent l'administration Windows Server, AD DS
 - [x] Confirmer Microsoft Defender sur DC1 ; ajuster pfSense au WAN VMware NAT, sauvegarder sa configuration et configurer les règles LAN DNS/NTP/Web.
 - [x] Configurer NTP externe sur le PDC Emulator, diagnostiquer l'échec DNS externe et rétablir la résolution via le redirecteur pfSense, validée depuis DC1 et PC-TEST.
 - [ ] Vérifier le blocage DNS direct depuis un poste client et poursuivre le filtrage IPv4 restrictif.
-- [ ] Poursuivre la conception et le déploiement progressif des autres serveurs, des sauvegardes, de la supervision et des futurs VPN intersites.
+- [x] Préparer un disque de sauvegarde dédié sur FS1, créer et vérifier une archive `tar.gz`, restaurer un fichier et confirmer son intégrité par `cmp` (épisode 07).
+- [ ] Automatiser la sauvegarde de FS1, vérifier le montage au redémarrage et prévoir une copie hors VM ; poursuivre la supervision et les futurs VPN intersites.
 
 ## À propos
 

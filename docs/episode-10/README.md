@@ -81,3 +81,39 @@ Capture observée dans **Supervision → Statut des ressources**, filtre `PFSENS
 ---
 
 [Retour au journal du projet](../../README.md) · [Épisode précédent : supervision Bash](../episode-09/README.md)
+
+## 6. Suivi complémentaire — 11 novembre 2026 (fin de séance)
+
+Après la validation ICMP, les contrôles du serveur `Centreon-central` ont fait l'objet d'un diagnostic ciblé.
+
+### CPU : contrôle fonctionnel
+
+- Le service `snmpd` était actif, mais les outils `snmpget` et `snmpwalk` étaient initialement absents ; installation du paquet Debian `snmp`.
+- Un `snmpget -v2c -c public localhost 1.3.6.1.2.1.1.1.0` retournait bien la description Linux.
+- Une requête sur `1.3.6.1.2.1.25.3.3.1.2` ne fournissait pas de métrique CPU ; la configuration de `snmpd` limitait `public` à la vue `systemonly`.
+- Le fichier `/etc/snmp/snmpd.conf` a été sauvegardé dans `/etc/snmp/snmpd.conf.bak` (présence et taille identique vérifiées). La ligne `rocommunity public default -V systemonly` a été remplacée par `rocommunity public 127.0.0.1 -V centreon`, puis `snmpd` redémarré.
+- Après modification, les compteurs `1.3.6.1.4.1.2021.11` (UCD-SNMP) étaient accessibles.
+- Test manuel du plugin Centreon avec `--mode=cpu --use-ucd` : `OK: CPU(s) average usage is 18.00 %`.
+- **Capture de la page Centreon, 11/11/2026 à 10:51 : service `Cpu` de `Centreon-central` en état `OK`, utilisation moyenne `18.50 %`, 2 CPU détectés.**
+
+**Point restant à confirmer :** la capture finale ne prouve pas comment l'option `--use-ucd` a été enregistrée dans la configuration Centreon. Vérifier ce réglage avant de considérer la correction persistante sur le long terme.
+
+### Mémoire : contrôle non résolu
+
+Sur la dernière capture de séance, le service `Memory` de `Centreon-central` affiche :
+
+```text
+UNKNOWN: SNMP GET Request: Can't get a single value.
+```
+
+Les contrôles `proc-broker-rrd` et `proc-broker-sql` sont `OK` ; ces états ne signifient pas que la supervision globale est réparée.
+
+### Prochaine séance
+
+1. Diagnostiquer la récupération des métriques RAM par le plugin Centreon et vérifier l'état `Memory`.
+2. Tester les contrôles de stockage/disques du serveur Centreon.
+3. Étendre la supervision CPU/RAM/disques aux autres machines actives (DC1, FS1, PC-TEST), selon leur disponibilité.
+4. Construire un tableau de bord Centreon à partir des métriques et états effectivement validés.
+5. Ajouter les captures authentiques des tests dans le dépôt après vérification de leur contenu et de l'absence de secrets.
+
+**Fin de séance :** 11/11/2026. La collecte CPU et le contrôle ICMP pfSense fonctionnent ; la RAM demeure `UNKNOWN`.

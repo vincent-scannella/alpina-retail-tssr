@@ -98,22 +98,32 @@ Après la validation ICMP, les contrôles du serveur `Centreon-central` ont fait
 
 **Point restant à confirmer :** la capture finale ne prouve pas comment l'option `--use-ucd` a été enregistrée dans la configuration Centreon. Vérifier ce réglage avant de considérer la correction persistante sur le long terme.
 
-### Mémoire : contrôle non résolu
+### Mémoire : contrôle fonctionnel — validation du 13/11/2026
 
-Sur la dernière capture de séance, le service `Memory` de `Centreon-central` affiche :
+Après reprise du laboratoire, la branche mémoire UCD-SNMP (`1.3.6.1.4.1.2021.4`) a retourné des métriques accessibles avec `snmpwalk -v2c -c public localhost 1.3.6.1.4.1.2021.4`.
 
-```text
-UNKNOWN: SNMP GET Request: Can't get a single value.
+Le plugin Centreon a ensuite été testé manuellement :
+
+```bash
+/usr/lib/centreon/plugins/centreon_linux_snmp.pl \
+  --plugin=os::linux::snmp::plugin \
+  --mode=memory \
+  --hostname=localhost \
+  --snmp-version=2c \
+  --snmp-community=public
 ```
 
-Les contrôles `proc-broker-rrd` et `proc-broker-sql` sont `OK` ; ces états ne signifient pas que la supervision globale est réparée.
+**Résultat du test manuel :** `OK` ; RAM totale 3,83 Go, utilisée 582,13 Mo (14,84 %), disponible 3,26 Go.
+
+**Capture de l'interface Centreon (13/11/2026) :** service `Memory` de `Centreon-central` **OK**, RAM totale 3,83 Go, utilisée 545,75 Mo (13,92 %), libre 3,30 Go. `proc-broker-rrd` et `proc-broker-sql` affichent également **OK**. L'écart entre mesures manuelle et Web est normal pour des contrôles effectués à des instants différents.
+
+**Statut : validé sur la capture, sans modification supplémentaire démontrée de la configuration du contrôle.** Capture d'interface fournie en conversation, non encore déposée sur GitHub.
 
 ### Prochaine séance
 
-1. Diagnostiquer la récupération des métriques RAM par le plugin Centreon et vérifier l'état `Memory`.
-2. Tester les contrôles de stockage/disques du serveur Centreon.
-3. Étendre la supervision CPU/RAM/disques aux autres machines actives (DC1, FS1, PC-TEST), selon leur disponibilité.
-4. Construire un tableau de bord Centreon à partir des métriques et états effectivement validés.
-5. Ajouter les captures authentiques des tests dans le dépôt après vérification de leur contenu et de l'absence de secrets.
+1. Tester les contrôles de stockage/disques du serveur Centreon.
+2. Étendre la supervision CPU/RAM/disques aux autres machines actives (DC1, FS1, PC-TEST), selon leur disponibilité.
+3. Construire un tableau de bord Centreon à partir des métriques et états effectivement validés.
+4. Ajouter les captures authentiques des tests dans le dépôt après vérification de leur contenu et de l'absence de secrets.
 
-**Fin de séance :** 11/11/2026. La collecte CPU et le contrôle ICMP pfSense fonctionnent ; la RAM demeure `UNKNOWN`.
+**Point de situation :** 13/11/2026. Contrôles ICMP pfSense, CPU Centreon et RAM Centreon fonctionnels ; stockage et tableau de bord restent à configurer et tester.

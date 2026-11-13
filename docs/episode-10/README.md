@@ -127,3 +127,13 @@ Le plugin Centreon a ensuite été testé manuellement :
 4. Ajouter les captures authentiques des tests dans le dépôt après vérification de leur contenu et de l'absence de secrets.
 
 **Point de situation :** 13/11/2026. Contrôles ICMP pfSense, CPU Centreon et RAM Centreon fonctionnels ; stockage et tableau de bord restent à configurer et tester.
+
+## 7. Vérification des disques — 13 novembre 2026
+
+Le service Centreon `Disk-/` est **OK** avec les mesures relevées : **19,49 Go** au total, **2,86 Go** utilisés (**14,69 %**) et **16,62 Go** disponibles.
+
+Diagnostic du message `UNKNOWN: No storage found. Can be: filters, cache file.` sur cinq contrôles de répertoires : la commande `df -hT` a confirmé une partition principale `/dev/sda1` montée sur `/` (ext4, environ 20 Go) et une partition `/dev/sda15` montée sur `/boot/efi` (vfat, environ 124 Mo). Les chemins suivants ne sont pas des systèmes de fichiers montés indépendamment : `/var/log`, `/var/lib/centreon`, `/var/lib/centreon-broker`, `/var/cache/centreon/backup` et `/var/lib/mysql`.
+
+Les cinq services de contrôle de stockage associés ont été **désactivés, pas supprimés**, dans la configuration Centreon. L'export et le rechargement du collecteur `Central` affichent les étapes de génération, déplacement et rechargement **OK** (100 %). Une capture finale de **Supervision → Statut des ressources**, filtre `Disk`, confirme que **seul `Disk-/` est affiché, en état OK**. Cela valide la réduction des fausses alertes pour ce laboratoire ; cela n'implique pas de supprimer les répertoires ni de désactiver leurs services applicatifs.
+
+**Prochaine étape :** créer un tableau de bord Centreon avec les indicateurs confirmés (disponibilité pfSense, CPU, RAM, espace disque du serveur Centreon) ; ajouter ensuite DC1, FS1 et PC-TEST au périmètre de collecte. Captures de preuve encore à déposer dans le dépôt après vérification.

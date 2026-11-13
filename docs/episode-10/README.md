@@ -160,3 +160,13 @@ La jauge disque affiche la métrique disponible `used (B)` convertie en GiB et *
 La capture authentique du tableau de bord est disponible dans la conversation, **pas encore déposée dans GitHub**.
 
 **Suite planifiée :** ajuster la mise en page, ajouter DC1 et FS1 puis PC-TEST à la supervision CPU/RAM/stockage, et vérifier les états et les seuils avant d'étendre le tableau de bord.
+
+## 9. Préparation de la supervision de DC1 — 13 novembre 2026
+
+L'hôte `DC1-GRE-SIEGE` (Windows Server 2025, contrôleur de domaine du laboratoire) a été **créé et activé dans la configuration de Centreon**, avec les paramètres vérifiés sur capture : adresse IP `10.10.10.10`, collecteur `Central`, modèle `generic-active-host`, commande de disponibilité héritée `base_host_alive`.
+
+**Important :** ce statut « ACTIVÉ » ne prouve pas une supervision opérationnelle. **Le service ICMP n'a pas encore été créé** : la dernière capture montre les filtres de recherche des services (`DC1-GRE-SIEGE` et `ICMP`) et aucun résultat. Aucun export de configuration ni test d'état UP/OK de DC1 n'a été confirmé à cette étape.
+
+**Point précis de reprise :** dans `Configuration → Services → Services par hôte`, cliquer sur **Ajouter** (et non remplir seulement les champs de recherche), puis créer le service `ICMP` sur `DC1-GRE-SIEGE` avec le modèle `Base-Ping-LAN-custom`, enregistrer, exporter la configuration et vérifier le résultat dans `Supervision → Statut des ressources`.
+
+Séance interrompue à la demande de l'utilisateur, sans réalisation des étapes suivantes. Capture de l'hôte créé disponible en conversation, non encore versée dans GitHub.

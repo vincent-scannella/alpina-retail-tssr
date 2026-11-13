@@ -137,3 +137,26 @@ Diagnostic du message `UNKNOWN: No storage found. Can be: filters, cache file.` 
 Les cinq services de contrôle de stockage associés ont été **désactivés, pas supprimés**, dans la configuration Centreon. L'export et le rechargement du collecteur `Central` affichent les étapes de génération, déplacement et rechargement **OK** (100 %). Une capture finale de **Supervision → Statut des ressources**, filtre `Disk`, confirme que **seul `Disk-/` est affiché, en état OK**. Cela valide la réduction des fausses alertes pour ce laboratoire ; cela n'implique pas de supprimer les répertoires ni de désactiver leurs services applicatifs.
 
 **Prochaine étape :** créer un tableau de bord Centreon avec les indicateurs confirmés (disponibilité pfSense, CPU, RAM, espace disque du serveur Centreon) ; ajouter ensuite DC1, FS1 et PC-TEST au périmètre de collecte. Captures de preuve encore à déposer dans le dépôt après vérification.
+
+## 8. Tableau de bord Centreon — créé et enregistré le 13 novembre 2026
+
+**Nom :** `ALPINA RETAIL | Supervision du siège — Grenoble`.
+
+Le tableau de bord personnalisé est **créé et sauvegardé** dans l'interface Centreon. La capture fournie le 13 novembre 2026 montre quatre widgets :
+
+| Widget | Source | Mesure / état observé |
+|---|---|---|
+| CPU — Serveur Centreon | `Centreon-central` / `Cpu` | Jauge : **22,5 %** |
+| RAM — Serveur Centreon | `Centreon-central` / `Memory` | Jauge : **15,16 %** |
+| Disque — Serveur Centreon | `Centreon-central` / `Disk-/` | Jauge : **2,86 GiB utilisés** |
+| Disponibilité — Équipements réseau | Service `ICMP` de `PFSENSE-GRE-SIEGE` | Tableau des ressources : **OK** |
+
+La jauge disque affiche la métrique disponible `used (B)` convertie en GiB et **non un pourcentage** ; ce choix a été conservé volontairement. Le tableau des ressources a initialement affiché « Aucun résultat trouvé » lors du filtrage sur pfSense et ICMP. Le réglage a été résolu par la configuration des filtres de statut et d'état ; le contrôle ICMP apparaît désormais **OK**, y compris lorsque tous les statuts sont sélectionnés pour afficher également les futures anomalies.
+
+**Améliorations de présentation restantes :** deux titres de jauges sont tronqués ; élargir le widget tableau pour afficher toutes les colonnes.
+
+**Portée de validation :** le tableau de bord affiche des mesures ponctuelles enregistrées ; la supervision du siège ne concerne encore que le serveur Centreon et la disponibilité ICMP du pare-feu. DC1, FS1 et PC-TEST ne sont **pas encore supervisés** dans ces widgets. Les autres alertes Centreon (processus/MySQL) restent à diagnostiquer.
+
+La capture authentique du tableau de bord est disponible dans la conversation, **pas encore déposée dans GitHub**.
+
+**Suite planifiée :** ajuster la mise en page, ajouter DC1 et FS1 puis PC-TEST à la supervision CPU/RAM/stockage, et vérifier les états et les seuils avant d'étendre le tableau de bord.

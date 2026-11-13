@@ -45,7 +45,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | PC-TEST-GRE | `10.10.10.100/24` (DHCP ; statique initiale `10.10.10.20`) | Bail, DNS, jonction AD, sessions et GPO vérifiés |
 | FS1 — Debian 12 | `10.10.10.30/24` (statique, VMnet1) | AD/Winbind et partage Samba validés ; SSH par clé ED25519 ; COMMUN chiffré via SMB 3.1.1 confirmé par Windows 11 le 09/11 |
 | Étendue Windows DHCP | `10.10.10.100` → `10.10.10.199` | Active ; bail client de 8 jours confirmé |
-| Centreon — VM Debian 13 | `10.10.10.40` | Interface Web accessible, pfSense UP et service ICMP OK le 11/11/2026 ; autres contrôles à fiabiliser |
+| Centreon — VM Debian 13 | `10.10.10.40` | PfSense ICMP OK, CPU/RAM/disque du serveur collectés ; tableau de bord Centreon enregistré le 13/11/2026 ; autres alertes à diagnostiquer |
 
 **À distinguer :** la connexion entre les quatre sites, les VPN et les autres serveurs de l'architecture cible sont pour le moment des **éléments de conception**, pas un environnement multisite opérationnel.
 
@@ -63,7 +63,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **07** | [FS1 — Sauvegarder et restaurer le partage Samba](docs/episode-07/README.md) | Disque de sauvegarde virtuel 15 Gio, ext4 et montage `/mnt/backup` **vérifié après redémarrage par UUID** ; sauvegarde `tar.gz` et restauration testées avec contenu et droits identiques ; script Bash sécurisé par contrôle du montage, cron quotidien à 02 h, journal testé ; [10 captures](docs/episode-07/images/README.md). Archives copiées via SCP vers DC1 et hash SHA-256 identique sur les deux serveurs ; exécution automatique réelle et copie hors hôte à vérifier. |
 | **08** | [Déploiement GPO du lecteur réseau COMMUN](docs/episode-08/README.md) | GPO dédiée, ciblage sur `GG_FS1_COMMUN_RW`, lien OU `UTILISATEURS` ; DNS FS1, lecteur `P:` visible sur Windows 11 ; fichier créé depuis Windows confirmé sur Debian avec identité AD et droits `660` ; [5 captures](docs/episode-08/images/README.md). Contre-test sur utilisateur hors groupe restant à réaliser. |
 | **09** | [Supervision Bash / cron et préparation de Centreon](docs/episode-09/README.md) | Contrôles ICMP pfSense/DC1, services Samba/Winbind/SSH, disque de sauvegarde ; [script Bash documenté](docs/episode-09/surveillance-alpina.sh), six tests manuels `OK`, cron toutes les 5 minutes avec déclenchement initial observé ; [4 captures](docs/episode-09/images/README.md). Centreon importé dans VMware sans démarrage ni configuration. |
-| **10** | [Centreon — supervision ICMP pfSense](docs/episode-10/README.md) | Hôte `PFSENSE-GRE-SIEGE` et service ICMP configurés ; commande Ping héritée vérifiée ; export Central réussi ; plugins Linux SNMP et MySQL installés ; UP/OK avec 0 % de perte le 11/11/2026. Autres contrôles en cours de diagnostic, capture ICMP encore à déposer. |
+| **10** | [Centreon — supervision ICMP pfSense et tableau de bord](docs/episode-10/README.md) | PfSense UP et ICMP OK ; collecte CPU/RAM/disque du serveur Centreon fonctionnelle ; tableau de bord avec 3 jauges et tableau ICMP enregistré le 13/11/2026. Autres contrôles à fiabiliser ; captures à déposer. |
 
 
 **Preuves visuelles :** [épisode 08 — 5 captures GPO/SMB](docs/episode-08/images/README.md) · [épisode 09 — 4 captures supervision/Centreon](docs/episode-09/images/README.md) · [épisode 07 — 10 captures authentiques de la sauvegarde et restauration FS1](docs/episode-07/images/README.md) · [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md) · [épisode 05 — 22 captures authentiques Debian / réseau / DNS / AD / SMB](docs/episode-05/images/README.md).
@@ -127,7 +127,8 @@ Les compétences travaillées comprennent l'administration Windows Server, AD DS
 - [ ] Tester le mappage GPO avec un utilisateur hors du groupe `GG_FS1_COMMUN_RW`.
 - [ ] Vérifier une exécution cron de la version enrichie de surveillance et réaliser un test `ALERTE` non destructif.
 - [x] Démarrer Centreon, accéder à son interface Web et vérifier le service ICMP pfSense : UP / OK, 0 % de perte le 11/11/2026 (épisode 10).
-- [ ] Fiabiliser les contrôles CPU, RAM, disques et services du serveur Centreon ; superviser DC1, FS1 et PC-TEST, puis créer un tableau de bord.
+- [x] Valider les contrôles CPU, RAM et disque principal de Centreon ; créer le tableau de bord du siège avec les trois jauges et le service ICMP de pfSense (13/11/2026).
+- [ ] Fiabiliser les autres contrôles de services et les alertes MySQL/processus ; superviser DC1, FS1 et PC-TEST, améliorer la mise en page du tableau de bord.
 - [ ] Vérifier l'exécution automatique réelle de la sauvegarde cron à 02 h et prévoir une copie hors de l'hôte VMware ; poursuivre les futurs VPN intersites.
 
 ## À propos

@@ -170,3 +170,20 @@ L'hôte `DC1-GRE-SIEGE` (Windows Server 2025, contrôleur de domaine du laborato
 **Point précis de reprise :** dans `Configuration → Services → Services par hôte`, cliquer sur **Ajouter** (et non remplir seulement les champs de recherche), puis créer le service `ICMP` sur `DC1-GRE-SIEGE` avec le modèle `Base-Ping-LAN-custom`, enregistrer, exporter la configuration et vérifier le résultat dans `Supervision → Statut des ressources`.
 
 Séance interrompue à la demande de l'utilisateur, sans réalisation des étapes suivantes. Capture de l'hôte créé disponible en conversation, non encore versée dans GitHub.
+
+## 10. DC1 — contrôle ICMP validé le 14 novembre 2026
+
+À la reprise, le service `ICMP` a été créé pour l'hôte `DC1-GRE-SIEGE` (Windows Server 2025, `10.10.10.10`). Le modèle choisi est `Base-Ping-LAN-custom` avec héritage de `base_centreon_ping` via `Base-Ping-LAN`. La liste des services a confirmé l'état **ACTIVÉ** pour les services ICMP de DC1 et de pfSense.
+
+L'export de configuration du collecteur **Central** a réussi (préparation, génération, déplacement des fichiers et rechargement de l'ordonnanceur : **OK**, progression 100 %).
+
+**Validation fonctionnelle :** capture du 14/11/2026 de `Supervision → Statut des ressources`, filtre `DC1-GRE-SIEGE` :
+
+| Ressource | État | Dernier résultat affiché |
+|---|---|---|
+| Hôte `DC1-GRE-SIEGE` | **Disponible / UP** | `OK - 10.10.10.10 rta 3.599ms lost 0%` |
+| Service `ICMP` | **OK** | `OK - 10.10.10.10 rta 3.404ms lost 0%` |
+
+**Périmètre :** disponibilité ICMP validée à cet instant, mais cela ne garantit pas la disponibilité des services applicatifs AD DS, DNS et DHCP. Capture fournie en conversation, pas encore déposée dans le dépôt GitHub.
+
+**Suite :** vérifier la disponibilité du connecteur Windows Centreon Monitoring Agent (CMA), puis préparer la supervision CPU, RAM et stockage de DC1, sans confondre disponibilité réseau et fonctionnement des services.

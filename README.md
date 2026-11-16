@@ -12,7 +12,7 @@ Je conçois, déploie et dépanne progressivement une infrastructure informatiqu
 
 | Entreprise simulée | Laboratoire personnel | Progression |
 |---|---|---|
-| **4 sites** · 75 collaborateurs fictifs | **Windows 11** · VMware Workstation · **16 Go de RAM sur l'hôte** | **Épisodes 00 à 10 : réalisations documentées** ; épisode 11 : étude de cas simulée. Windows CMA validé sur DC1, ICMP pfSense et contrôles Centreon vérifiés |
+| **4 sites** · 75 collaborateurs fictifs | **Windows 11** · VMware Workstation · **16 Go de RAM sur l'hôte** | **Épisodes 00 à 10 : réalisations documentées** ; épisode 11 : étude de cas simulée ; épisode 12 : GLPI préparé, non installé. Windows CMA validé sur DC1 ; ICMP pfSense vérifié |
 
 **Ce qui est déjà vérifié :**
 
@@ -63,8 +63,9 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **07** | [FS1 — Sauvegarder et restaurer le partage Samba](docs/episode-07/README.md) | Disque de sauvegarde virtuel 15 Gio, ext4 et montage `/mnt/backup` **vérifié après redémarrage par UUID** ; sauvegarde `tar.gz` et restauration testées avec contenu et droits identiques ; script Bash sécurisé par contrôle du montage, cron quotidien à 02 h, journal testé ; [10 captures](docs/episode-07/images/README.md). Archives copiées via SCP vers DC1 et hash SHA-256 identique sur les deux serveurs ; exécution automatique réelle et copie hors hôte à vérifier. |
 | **08** | [Déploiement GPO du lecteur réseau COMMUN](docs/episode-08/README.md) | GPO dédiée, ciblage sur `GG_FS1_COMMUN_RW`, lien OU `UTILISATEURS` ; DNS FS1, lecteur `P:` visible sur Windows 11 ; fichier créé depuis Windows confirmé sur Debian avec identité AD et droits `660` ; [5 captures](docs/episode-08/images/README.md). Contre-test sur utilisateur hors groupe restant à réaliser. |
 | **09** | [Supervision Bash / cron et préparation de Centreon](docs/episode-09/README.md) | Contrôles ICMP pfSense/DC1, services Samba/Winbind/SSH, disque de sauvegarde ; [script Bash documenté](docs/episode-09/surveillance-alpina.sh), six tests manuels `OK`, cron toutes les 5 minutes avec déclenchement initial observé ; [4 captures](docs/episode-09/images/README.md). Centreon importé dans VMware sans démarrage ni configuration. |
-| **10** | [Centreon — supervision réelle de pfSense et DC1](docs/episode-10/README.md) | ICMP pfSense/DC1 OK ; CPU/RAM/disque C: de DC1 **validés via Windows CMA le 16/11/2026** ; tableau de bord sauvegardé ; 6 alertes critiques et 8 états inconnus restent à diagnostiquer sur Centreon-central. |
+| **10** | [Centreon — supervision réelle de pfSense et DC1](docs/episode-10/README.md) | ICMP pfSense/DC1 OK ; CPU/RAM/disque C: de DC1 **validés via Windows CMA le 16/11/2026** ; tableau de bord sauvegardé ; 6 alertes critiques et 8 états inconnus restent à diagnostiquer sur Centreon-central. [Inventaire des six captures authentiques](docs/episode-10/images/README.md) (PNG en attente de dépôt). |
 | **11** | [FS1 — supervision Linux avec Centreon (simulation)](docs/episode-11/README.md) | **Étude de cas non exécutée** : architecture SNMPv3, services envisagés, tests d'acceptation et dépannage ; aucune mesure ni capture revendiquée. |
+| **12** | [GLPI — préparation de l'outil de support](docs/episode-12/README.md) | **Planifié, pas encore installé** : architecture, prérequis, sécurité et scénario de ticket à tester. |
 
 
 **Preuves visuelles :** [épisode 08 — 5 captures GPO/SMB](docs/episode-08/images/README.md) · [épisode 09 — 4 captures supervision/Centreon](docs/episode-09/images/README.md) · [épisode 07 — 10 captures authentiques de la sauvegarde et restauration FS1](docs/episode-07/images/README.md) · [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md) · [épisode 05 — 22 captures authentiques Debian / réseau / DNS / AD / SMB](docs/episode-05/images/README.md).
@@ -88,6 +89,12 @@ Les compétences travaillées comprennent l'administration Windows Server, AD DS
 **Exemple documenté :** dans l'[épisode 04](docs/episode-04/README.md), un test `nslookup` affichait initialement `Server: UnKnown` et un délai d'attente. L'inspection DNS a révélé l'absence de zone inversée et de PTR ; après leur création, les recherches directe et inverse ont réussi sans le message initial. Les captures **avant / après** sont présentes dans le dossier de l'épisode.
 
 > **Rigueur de validation :** une configuration affichée comme active ne remplace pas un test de fonctionnement côté client. Les erreurs, limites et étapes non vérifiées sont conservées dans les comptes rendus.
+
+## Jalon du 16 novembre 2026 — Centreon et prochaine étape GLPI
+
+Le [tableau de bord Centreon](docs/episode-10/README.md) présente les performances CPU, RAM et disque C: de DC1 ainsi que l'état des hôtes du siège. La connexion CMA et les quatre services Windows (CPU, MEMORY, DISK-C, ICMP) ont été vérifiés. **Les alertes de Centreon-central ne sont pas masquées ni résolues.**
+
+Le dossier [de référence](docs/suivi/etat-2026-11-16.md) distingue le travail réellement validé, les simulations et les travaux à terminer. La prochaine étape prévue est [GLPI (épisode 12)](docs/episode-12/README.md), non installé à ce jour.
 
 ## Prochains objectifs
 
@@ -131,7 +138,9 @@ Les compétences travaillées comprennent l'administration Windows Server, AD DS
 - [x] Valider les contrôles CPU, RAM et disque principal de Centreon ; créer le tableau de bord du siège avec les trois jauges et le service ICMP de pfSense (13/11/2026).
 - [x] Superviser DC1 via Windows CMA : CPU, RAM, disque C: et ICMP OK ; tableau de bord actualisé le 16/11/2026.
 - [x] Documenter un **scénario fictif** de supervision FS1 sous Centreon (épisode 11), **sans déploiement ni test**.
-- [ ] Fiabiliser les autres contrôles et alertes MySQL/processus de Centreon-central ; superviser réellement FS1 et PC-TEST si l'environnement est repris.
+- [ ] Fiabiliser les alertes MariaDB/processus/swap de Centreon-central (6 CRITICAL, 8 UNKNOWN au 16/11) ; superviser réellement FS1 et PC-TEST si le laboratoire est repris.
+- [ ] Ajouter à GitHub les six captures authentiques préparées pour l'épisode 10, après contrôle de confidentialité.
+- [ ] Installer GLPI sur une VM dédiée et tester le cycle d'un ticket ; [épisode 12 — préparation](docs/episode-12/README.md).
 - [ ] Vérifier l'exécution automatique réelle de la sauvegarde cron à 02 h et prévoir une copie hors de l'hôte VMware ; poursuivre les futurs VPN intersites.
 
 ## À propos

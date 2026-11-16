@@ -7,6 +7,16 @@
 
 Mettre en place un service d'assistance pour les collaborateurs fictifs d'ALPINA RETAIL : incidents, demandes, affectation aux techniciens, résolutions et historique. Centreon détecte des anomalies techniques ; GLPI permettra de suivre leur traitement sous forme de tickets. **Aucune liaison Centreon–GLPI n'est actuellement configurée.**
 
+## Version et compatibilité vérifiées (au 16 novembre 2026)
+
+La version **GLPI 12.0.2**, publiée le **12 novembre 2026**, figure dans les publications de sécurité du projet officiel : https://github.com/glpi-project/glpi/releases
+
+Selon l'annonce officielle de GLPI 12, les prérequis comprennent **PHP 8.3 minimum**, **MariaDB 10.11 minimum** (ou MySQL 8.0 minimum). Source : https://www.glpi-project.org/en/glpi-12-release/
+
+**Debian 13 « Trixie »** fournit PHP 8.4 et MariaDB 11.8 dans ses paquets de base ; c'est une option cohérente pour notre VM dédiée. Source : https://www.debian.org/releases/trixie/release-notes/whats-new.en.html
+
+La compatibilité complète de l'installation, des extensions et des plugins sera vérifiée lors du déploiement. Aucun de ces logiciels n'est encore installé dans une nouvelle VM GLPI.
+
 ## Architecture proposée (à confirmer)
 
 - Une machine virtuelle distincte pour GLPI, afin de séparer son serveur web et sa base des composants Centreon.

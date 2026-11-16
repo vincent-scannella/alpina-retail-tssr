@@ -187,3 +187,30 @@ L'export de configuration du collecteur **Central** a réussi (préparation, gé
 **Périmètre :** disponibilité ICMP validée à cet instant, mais cela ne garantit pas la disponibilité des services applicatifs AD DS, DNS et DHCP. Capture fournie en conversation, pas encore déposée dans le dépôt GitHub.
 
 **Suite :** vérifier la disponibilité du connecteur Windows Centreon Monitoring Agent (CMA), puis préparer la supervision CPU, RAM et stockage de DC1, sans confondre disponibilité réseau et fonctionnement des services.
+
+
+## 11. Supervision Windows CMA de DC1 — validée le 16 novembre 2026
+
+Le connecteur **Windows CMA** était installé dans Centreon et l'agent **Centreon Monitoring Agent** déployé sur `DC1-GRE-SIEGE` (Windows Server 2025, `10.10.10.10`). La mise en service a nécessité un diagnostic TLS (chaîne de certificats et identité du collecteur). Le serveur Centreon écoute sur `4317/TCP` ; une capture de `ss -plant` a confirmé une connexion **ESTABLISHED** entre `10.10.10.40:4317` et `10.10.10.10`. La communication applicative a ensuite été confirmée par les contrôles CPU et RAM, et pas seulement par cette connexion TCP.
+
+Le modèle d'hôte initial `generic-active-host` a été conservé pour préserver l'ICMP. Le modèle d'hôte `OS-Windows-Centreon-Monitoring-Agent-custom` existait dans Centreon mais n'était pas proposé dans le sélecteur de l'hôte : les **modèles de services CMA ont donc été appliqués directement** via `Configuration → Services → Services par hôte`.
+
+| Service DC1 | Modèle appliqué | État et preuve du 16/11/2026 |
+|---|---|---|
+| `ICMP` | `Base-Ping-LAN-custom` | `OK`, 0 % de perte |
+| `CPU` | `OS-Windows-CPU-Centreon-Monitoring-Agent-custom` | `OK`, utilisation moyenne affichée |
+| `MEMORY` | `OS-Windows-Memory-Centreon-Monitoring-Agent-custom` | `OK`, utilisation mémoire affichée |
+| `DISK-C` | `OS-Windows-Storage-Centreon-Monitoring-Agent-custom` | `OK`, graphe du volume `C:\\` disponible |
+
+**Incident sur le stockage :** le premier filtre `FILTERFS=^C:` entraînait `CRITICAL: No storage found (filters issue)`. Après ajustement en `^C.*$`, nouveau déploiement et vérification forcée, le service est passé à `OK: All storages are ok`. Le graphique affichait `used_C:\\` à **37,42 %** : cela confirme le contrôle réel du volume `C:`, et non uniquement un statut vert.
+
+**Tableau de bord final observé le 16/11/2026 :**
+
+- Jauge CPU DC1 : **17,67 %** à l'instant de la capture finale.
+- Jauge RAM DC1 : **72,92 %**.
+- Jauge disque C: DC1 : **37,43 %**.
+- Widget « Disponibilité des équipements » : `DC1-GRE-SIEGE` (4 services OK), `PFSENSE-GRE-SIEGE` (1 service OK), `Centreon-central` (hôte disponible, **14 services OK, 6 critiques et 8 inconnus**).
+
+Ces mesures sont **ponctuelles**, non des moyennes historiques. Le tableau de bord a été sauvegardé. Les alertes internes sur le serveur `Centreon-central` restent visibles : absence de swap actif, processus non détectés et échec d'authentification MariaDB (`centreon-engine@localhost`). Elles n'ont pas été résolues lors de cette séance. Les captures ont été fournies en conversation mais ne sont pas encore déposées dans le dépôt.
+
+**Suite envisagée :** l'épisode 11 documente une **simulation de procédure** pour la supervision de FS1, explicitement non déployée.

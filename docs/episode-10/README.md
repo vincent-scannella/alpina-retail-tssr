@@ -1,7 +1,23 @@
-# ALPINA RETAIL — Épisode 10 : Centreon et supervision ICMP de pfSense
+# ALPINA RETAIL — Épisode 10 : Centreon, pfSense et supervision Windows CMA
 
-**Date de validation : 11 novembre 2026**  
-**Statut : partiellement validé** — pfSense est supervisé par ICMP ; les autres contrôles Centreon restent à fiabiliser.
+**Période de réalisation : 11 au 16 novembre 2026**  
+**Bilan actuel :** ICMP de pfSense et DC1 validé ; CPU, RAM et disque C: de DC1 supervisés par CMA ; tableau de bord final enregistré. Les alertes internes de Centreon restent ouvertes.
+
+> Les sections 1 à 10 ci-dessous constituent un journal chronologique. Les mentions « à faire » d'une séance passée ont parfois été réalisées lors d'une séance ultérieure. Le bilan final est présenté dans les sections 11 et 12.
+
+### Résultats contrôlés le 16 novembre
+
+| Ressource | Résultat observé |
+|---|---|
+| DC1-GRE-SIEGE / Windows Server 2025 | Hôte disponible, ICMP OK |
+| CMA Windows | Connexion TCP 4317 établie et métriques reçues |
+| CPU | OK ; jauge à **17,67 %** sur le tableau de bord final |
+| MEMORY | OK ; jauge à **72,92 %** |
+| DISK-C | OK ; occupation du volume C: à **37,43 %** |
+| PFSENSE-GRE-SIEGE | Disponible, ICMP OK |
+| Centreon-central | Disponible, avec **6 services CRITICAL et 8 UNKNOWN** encore à analyser |
+
+**Dossier de preuves :** [inventaire des captures sélectionnées](images/README.md). Les PNG authentiques restent à déposer sur GitHub.
 
 ## 1. Objectif
 
@@ -214,3 +230,26 @@ Le modèle d'hôte initial `generic-active-host` a été conservé pour préserv
 Ces mesures sont **ponctuelles**, non des moyennes historiques. Le tableau de bord a été sauvegardé. Les alertes internes sur le serveur `Centreon-central` restent visibles : absence de swap actif, processus non détectés et échec d'authentification MariaDB (`centreon-engine@localhost`). Elles n'ont pas été résolues lors de cette séance. Les captures ont été fournies en conversation mais ne sont pas encore déposées dans le dépôt.
 
 **Suite envisagée :** l'épisode 11 documente une **simulation de procédure** pour la supervision de FS1, explicitement non déployée.
+
+
+## 12. Relecture finale et préparation de GLPI — 16 novembre 2026
+
+### Supervision réellement fonctionnelle
+
+Le 16/11, le graphique du disque C: affiche la métrique d'utilisation **37,42 %**, puis **37,43 %** sur la capture finale du tableau de bord. Les contrôles **CPU**, **MEMORY**, **DISK-C** et **ICMP** de DC1 sont en état OK. Le filtrage du service disque a été ajusté après l'erreur « No storage found (filters issue) ». Ce résultat valide la collecte de valeurs Windows, et pas seulement l'ouverture du port TCP 4317.
+
+Le tableau de bord nommé **ALPINA RETAIL | Supervision du siège — Grenoble** a été sauvegardé avec trois jauges de DC1 et une vue par hôte incluant **DC1**, **pfSense** et **Centreon-central**.
+
+### Alertes non résolues
+
+Le bilan final conserve **6 services CRITICAL et 8 UNKNOWN** sur Centreon-central. Ont notamment été observés : absence de swap actif, contrôles de processus rapportant zéro processus, accès MariaDB refusé à centreon-engine@localhost, et commande Broker-Stats en échec. Les essais de connexion MariaDB avec le compte administrateur ont échoué. Aucun mot de passe n'a été réinitialisé et aucune résolution ne doit être revendiquée.
+
+**Sécurité :** un ancien extrait de journal partagé pendant le diagnostic contenait un mot de passe de base de données en clair. Cette capture ne doit pas être publiée ; une rotation du secret est recommandée s'il est encore utilisé.
+
+### Photographies de preuve
+
+Six captures réelles ont été sélectionnées : connexion CMA, erreur disque avant correction, contrôles DC1 au vert, graphique disque C:, tableau de bord final, alertes Centreon restantes. Voir l'[index des preuves](images/README.md). Les images elles-mêmes sont encore à publier dans GitHub ; elles sont disponibles dans une archive remise dans la conversation.
+
+### Étape suivante
+
+L'[épisode 12](../episode-12/README.md) décrit uniquement la **préparation** de GLPI pour la gestion des incidents et des tickets. **Aucune installation GLPI n'a encore été réalisée.** L'[épisode 11](../episode-11/README.md) sur la supervision de FS1 reste explicitement **simulé, non exécuté**.

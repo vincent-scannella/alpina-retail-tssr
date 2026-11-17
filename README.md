@@ -28,7 +28,7 @@ Je conçois, déploie et dépanne progressivement une infrastructure informatiqu
 
 ## Correspondance avec le titre professionnel TSSR
 
-Chaque compétence du titre est reliée à ce qui est réellement fait dans le laboratoire. Les compétences non couvertes sont indiquées comme telles.
+Compétences du titre travaillées dans ce laboratoire, reliées à ce qui est réellement fait. Le tableau ne couvre pas tout le référentiel.
 
 | Compétence du titre | Dans ce laboratoire | État |
 |---|---|---|
@@ -40,7 +40,6 @@ Chaque compétence du titre est reliée à ce qui est réellement fait dans le l
 | Automatiser des tâches à l'aide de scripts | Scripts Bash de sauvegarde et de surveillance, planifiés par cron ([07](docs/episode-07/README.md), [09](docs/episode-09/README.md)) | **Validé** en test manuel ; sauvegarde automatique de 02 h à vérifier |
 | Maintenir et sécuriser les accès à internet et les interconnexions des réseaux | pfSense : règles LAN DNS/NTP/Web, filtrage ICMP testé, redirecteur DNS ([03](docs/episode-03/README.md), [06](docs/episode-06/README.md)) | **Partiel** : VPN intersites en conception |
 | Mettre en place, assurer et tester les sauvegardes et les restaurations des éléments de l'infrastructure | Archive `tar.gz`, restauration testée, copie SCP contrôlée par SHA-256 ([07](docs/episode-07/README.md)) ; sauvegarde chiffrée de la configuration pfSense ([03](docs/episode-03/README.md)) | **Validé** ; copie hors hôte à prévoir |
-| Exploiter et maintenir les services de déploiement des postes de travail | Aucun service de déploiement installé | **Non couvert** |
 
 **En complément du référentiel :** supervision de pfSense et DC1 avec Centreon ([épisode 10](docs/episode-10/README.md)).
 

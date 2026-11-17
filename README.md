@@ -26,15 +26,35 @@ Je conçois, déploie et dépanne progressivement une infrastructure informatiqu
 
 [**Voir les preuves pfSense — épisode 03**](docs/episode-03/README.md) · [**Voir les 40 captures Windows Server / AD / DNS / DHCP / GPO — épisode 04**](docs/episode-04/README.md)
 
+## Correspondance avec le titre professionnel TSSR
+
+Chaque compétence du titre est reliée à ce qui est réellement fait dans le laboratoire. Les compétences non couvertes sont indiquées comme telles.
+
+| Compétence du titre | Dans ce laboratoire | État |
+|---|---|---|
+| Assurer le support utilisateur en centre de services | GLPI préparé, cycle d'un ticket à tester ([épisode 12](docs/episode-12/README.md)) | **Prévu** |
+| Exploiter des serveurs Windows et un domaine Active Directory | DC1, AD DS, DNS, DHCP, GPO, politique de mots de passe ([04](docs/episode-04/README.md), [06](docs/episode-06/README.md), [08](docs/episode-08/README.md)) | **Validé** |
+| Exploiter des serveurs Linux | FS1 Debian 12, Samba/Winbind joint au domaine, SSH par clé ([05](docs/episode-05/README.md), [06](docs/episode-06/README.md)) | **Validé** |
+| Exploiter un réseau IP | Adressage IPv4, NAT/PAT, DNS, DHCP, diagnostics `ping` et `nslookup` ([03](docs/episode-03/README.md), [04](docs/episode-04/README.md)) | **Validé** |
+| Maintenir des serveurs dans une infrastructure virtualisée | VM créées et exploitées sous VMware Workstation, sur un poste de 16 Go de RAM ([02](docs/episode-02/README.md), [03](docs/episode-03/README.md)) | **Partiel** : pas de serveur de virtualisation dédié |
+| Automatiser des tâches à l'aide de scripts | Scripts Bash de sauvegarde et de surveillance, planifiés par cron ([07](docs/episode-07/README.md), [09](docs/episode-09/README.md)) | **Validé** en test manuel ; sauvegarde automatique de 02 h à vérifier |
+| Maintenir et sécuriser les accès à internet et les interconnexions des réseaux | pfSense : règles LAN DNS/NTP/Web, filtrage ICMP testé, redirecteur DNS ([03](docs/episode-03/README.md), [06](docs/episode-06/README.md)) | **Partiel** : VPN intersites en conception |
+| Mettre en place, assurer et tester les sauvegardes et les restaurations des éléments de l'infrastructure | Archive `tar.gz`, restauration testée, copie SCP contrôlée par SHA-256 ([07](docs/episode-07/README.md)) ; sauvegarde chiffrée de la configuration pfSense ([03](docs/episode-03/README.md)) | **Validé** ; copie hors hôte à prévoir |
+| Exploiter et maintenir les services de déploiement des postes de travail | Aucun service de déploiement installé | **Non couvert** |
+
+**En complément du référentiel :** supervision de pfSense et DC1 avec Centreon ([épisode 10](docs/episode-10/README.md)).
+
+*Intitulés des compétences : fiche [RNCP37682](https://www.francecompetences.fr/recherche/rncp/37682/), France Compétences, consultée le 17/11/2026.*
+
 ## Architecture actuelle du laboratoire
 
 La topologie suivante décrit les composants **créés dans VMware**, et non les futurs réseaux de toutes les boutiques.
 
-![Topologie réelle du laboratoire du siège de Grenoble : Internet, VMware NAT VMnet8, pfSense, VMnet1, DC1 Windows Server et PC-TEST-GRE](docs/topologie-laboratoire-siege.svg)
+![Topologie réelle du laboratoire du siège de Grenoble : Internet, VMware NAT VMnet8, pfSense, VMnet1, DC1 Windows Server, PC-TEST-GRE, FS1 Debian et Centreon](docs/topologie-laboratoire-siege-2026-11-16.svg)
 
-*Schéma historique de synthèse au 3 novembre 2026 — il ne représente pas encore FS1 ni l'appliance Centreon importée le 10 novembre. Équipement du laboratoire réellement créé à cette date. **DHCP client, jonction AD et application de la GPO vérifiés** ; verrouillage automatique observé par l'auteur sans capture ni mesure chronométrée précise. [Ouvrir le schéma vectoriel en grand](docs/topologie-laboratoire-siege.svg).*
+*Synthèse au 16 novembre 2026 : machines réellement créées au siège. La supervision de FS1 dans Centreon n'est pas déployée ([épisode 11](docs/episode-11/README.md), simulation). Verrouillage automatique de `PC-TEST-GRE` observé sans capture ni mesure chronométrée. [Ouvrir le schéma en grand](docs/topologie-laboratoire-siege-2026-11-16.svg) · [version du 3 novembre](docs/topologie-laboratoire-siege.svg).*
 
-*Le poste `PC-TEST-GRE`, initialement configuré en statique sur `10.10.10.20`, utilise maintenant un **bail DHCP `10.10.10.100` délivré par DC1**. Les trois VM ont été allumées simultanément pour les essais du 3 novembre, malgré les 16 Go de RAM de l'hôte.*
+*Le poste `PC-TEST-GRE`, initialement configuré en statique sur `10.10.10.20`, utilise maintenant un **bail DHCP `10.10.10.100` délivré par DC1**. Les trois premières VM ont été allumées simultanément pour les essais du 3 novembre, malgré les 16 Go de RAM de l'hôte.*
 
 ### Repères d'adressage du siège
 
@@ -111,7 +131,7 @@ Le dossier [de référence](docs/suivi/etat-2026-11-16.md) distingue le travail 
 
 ## À propos
 
-**Auteur : Vincent Scannella — Technicien Supérieur Systèmes et Réseaux (TSSR).**
+**Auteur : Vincent Scannella — titulaire du titre professionnel Technicien Supérieur Systèmes et Réseaux (TSSR), obtenu en octobre 2026.**
 
 Ce dépôt est un **portfolio de mise en pratique** destiné à montrer une méthode de travail : installer, vérifier, diagnostiquer et produire une documentation exploitable. Les données, utilisateurs et sites de l'entreprise sont fictifs ; les captures de laboratoire sont authentiques et sélectionnées pour ne pas divulguer de secrets.
 

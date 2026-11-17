@@ -2,7 +2,7 @@
 
 **Statut : inventaire publié. Les fichiers PNG restent à déposer dans GitHub.**
 
-Ces six captures proviennent des tests réalisés le 16 novembre 2026. Elles ont été sélectionnées et regroupées dans une archive de transfert, disponible dans la conversation.
+Ces six captures proviennent des tests réalisés le 16 novembre 2026. Elles ont été sélectionnées et regroupées dans une archive de transfert, non encore publiée dans ce dépôt.
 
 | Nom du fichier PNG à déposer | Information vérifiable |
 |---|---|

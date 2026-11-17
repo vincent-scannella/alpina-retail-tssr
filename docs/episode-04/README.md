@@ -281,16 +281,16 @@ Après la validation de l'application de la GPO sur `PC-TEST-GRE`, l'auteur indi
 
 ### 3.7. Vérification de SYSVOL et NETLOGON depuis le poste client — 3 novembre 2026
 
-Le poste Windows 11 du laboratoire a accédé au chemin UNC `\\dc1-gre-siege\SYSVOL` dans l'Explorateur de fichiers. La capture transmise dans la conversation de travail montre le fil d'Ariane **Réseau > dc1-gre-siege > SYSVOL** et le dossier **`ironman.test`** visible, sans message d'erreur.
+Le poste Windows 11 du laboratoire a accédé au chemin UNC `\\dc1-gre-siege\SYSVOL` dans l'Explorateur de fichiers. La capture réalisée montre le fil d'Ariane **Réseau > dc1-gre-siege > SYSVOL** et le dossier **`ironman.test`** visible, sans message d'erreur.
 
 - **Résultat validé :** partage `SYSVOL` accessible depuis le poste client via SMB ; le dossier du domaine est listé.
-- **Preuve :** capture reçue dans la conversation le 03/11/2026 ; **non encore téléversée dans le dépôt GitHub**, le présent journal constitue la trace textuelle publique.
+- **Preuve :** capture du 03/11/2026 ; **non encore téléversée dans le dépôt GitHub**, le présent journal constitue la trace textuelle publique.
 - **Limite du contrôle SYSVOL :** l'accès au partage et la liste du dossier du domaine sont démontrés ; la lecture des fichiers internes de stratégie n'a pas été testée.
 
-**Test NETLOGON — complément du 03/11/2026 :** depuis le même poste Windows 11, le partage UNC `\\dc1-gre-siege\NETLOGON` a été ouvert dans l'Explorateur. La capture reçue dans la conversation montre **Réseau > dc1-gre-siege > NETLOGON** et le message **« Le dossier est vide »**, sans erreur d'accès.
+**Test NETLOGON — complément du 03/11/2026 :** depuis le même poste Windows 11, le partage UNC `\\dc1-gre-siege\NETLOGON` a été ouvert dans l'Explorateur. La capture montre **Réseau > dc1-gre-siege > NETLOGON** et le message **« Le dossier est vide »**, sans erreur d'accès.
 
 - **Résultat validé :** accès réseau au partage `NETLOGON` via SMB ; aucun script n'est visible dans ce dossier.
-- **Preuve :** capture transmise dans la conversation du 03/11/2026 ; **elle n'est pas encore déposée dans le dépôt GitHub**.
+- **Preuve :** capture du 03/11/2026 ; **elle n'est pas encore déposée dans le dépôt GitHub**.
 - **Portée :** les partages `SYSVOL` et `NETLOGON` sont accessibles depuis un poste client ; ceci ne démontre pas le bon fonctionnement de scripts de connexion ni l'état de réplication de l'annuaire.
 
 ### 3.8. Découverte du contrôleur de domaine depuis Windows 11 — 3 novembre 2026
@@ -312,7 +312,7 @@ nltest /dsgetdc:ironman.test
 
 **Interprétation :** la découverte de DC1 par le poste client fonctionne et retourne les informations de localisation attendues. Les indicateurs décrivent les rôles annoncés par le DC et ne constituent pas un diagnostic approfondi de chaque service. Le canal sécurisé entre la machine et le domaine est contrôlé séparément dans le test suivant.
 
-**Preuve :** capture reçue dans la conversation de travail du 03/11/2026 ; **non encore déposée en fichier image sur GitHub**.
+**Preuve :** capture du 03/11/2026 ; **non encore déposée en fichier image sur GitHub**.
 
 ### 3.9. Vérification du canal sécurisé Active Directory — 3 novembre 2026
 
@@ -326,21 +326,21 @@ Test-ComputerSecureChannel -Verbose
 
 **Conclusion :** la relation de confiance du compte ordinateur avec le domaine `ironman.test` fonctionne pour ce test, depuis le client. Ce contrôle ne constitue pas à lui seul un audit complet des protocoles AD, de DNS ou de la réplication.
 
-**Preuve :** capture de la console fournie le 03/11/2026 dans la conversation de travail ; **image non téléversée dans le dépôt GitHub**.
+**Preuve :** capture de la console du 03/11/2026 ; **image non téléversée dans le dépôt GitHub**.
 
 ### 3.10. Accès au répertoire des GPO dans SYSVOL — 3 novembre 2026
 
 Depuis le poste Windows 11, l'Explorateur a ouvert le chemin réseau `\\dc1-gre-siege\SYSVOL\ironman.test\Policies`.
 
 - **Résultat observé :** accès réussi au répertoire `Policies` ; **trois dossiers nommés par des GUID** sont visibles, sans message d'erreur.
-- **Preuve :** capture fournie dans la conversation du 03/11/2026 (non encore téléversée sur GitHub).
+- **Preuve :** capture du 03/11/2026 (non encore téléversée sur GitHub).
 - **Portée du test :** l'énumération des dossiers de stratégies via SMB est vérifiée ; la lecture du fichier `GPT.INI` de la Default Domain Policy est confirmée dans la section 3.11.
 
 ### 3.11. Consultation du dossier d'une GPO — 3 novembre 2026
 
 Depuis `PC-TEST-GRE`, l'Explorateur Windows a ouvert le dossier identifié par le GUID **`{31B2F340-016D-11D2-945F-00C04FB984F9}`**, correspondant à la **Default Domain Policy**, sous `SYSVOL/ironman.test/Policies`.
 
-**Éléments visibles dans la capture fournie en conversation :**
+**Éléments visibles dans la capture :**
 - dossier `MACHINE` ;
 - dossier `USER` ;
 - fichier affiché `GPT`, de taille indiquée **1 Ko** (l'extension est masquée par l'Explorateur, ce qui est cohérent avec `GPT.INI`).
@@ -354,7 +354,7 @@ Depuis `PC-TEST-GRE`, l'Explorateur Windows a ouvert le dossier identifié par l
 Version=3
 ```
 
-La lecture du contenu du fichier de la **Default Domain Policy** via SYSVOL est donc vérifiée. Cela confirme un accès en lecture à ce fichier, **sans prouver à lui seul l'application de la GPO** (vérifiée séparément par `gpresult`). Capture reçue dans la conversation, **non encore déposée en image sur GitHub**.
+La lecture du contenu du fichier de la **Default Domain Policy** via SYSVOL est donc vérifiée. Cela confirme un accès en lecture à ce fichier, **sans prouver à lui seul l'application de la GPO** (vérifiée séparément par `gpresult`). Capture **non encore déposée en image sur GitHub**.
 
 ## 4. Configuration IPv4 confirmée depuis `ipconfig /all`
 
@@ -462,13 +462,13 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Exécuter `dcdiag /test:DNS` : Connectivity, DNS serveur et DNS domaine réussis dans la sortie fournie.
 - [x] Vérifier avec `net share` la publication des partages `SYSVOL` et `NETLOGON` sur DC1.
 - [x] Vérifier avec `dcdiag /test:Services` : tests Connectivity et Services réussis.
-- [x] Vérifier l'accès au partage `SYSVOL` depuis Windows 11 : ouverture du chemin `\\dc1-gre-siege\SYSVOL` et affichage du dossier `ironman.test` (capture fournie dans la conversation ; non téléversée sur GitHub).
-- [x] Vérifier l'accès client au partage `NETLOGON` : ouverture du partage et affichage du dossier vide, sans erreur (capture fournie en conversation, non déposée sur GitHub).
-- [x] Vérifier la découverte du contrôleur de domaine depuis `PC-TEST-GRE` avec `nltest /dsgetdc:ironman.test` : DC1 `10.10.10.10` trouvé, commande réussie (capture fournie en conversation, non déposée sur GitHub).
-- [x] Vérifier le canal sécurisé poste-domaine depuis Windows 11 : `Test-ComputerSecureChannel -Verbose` renvoie `True` et confirme la relation de confiance avec `ironman.test` (capture transmise en conversation, pas encore déposée sur GitHub).
-- [x] Accéder depuis Windows 11 au répertoire `\\dc1-gre-siege\SYSVOL\ironman.test\Policies` : trois dossiers GUID visibles (capture transmise en conversation, non déposée sur GitHub).
-- [x] Ouvrir depuis Windows 11 le répertoire de la `Default Domain Policy` (`{31B2F340-016D-11D2-945F-00C04FB984F9}`) et voir `MACHINE`, `USER` et le fichier `GPT` (capture en conversation, non déposée sur GitHub).
-- [x] Vérifier la lecture du fichier `GPT.INI` de la Default Domain Policy depuis Windows 11 : `[General]` et `Version=3` visibles dans le Bloc-notes (capture transmise en conversation, non encore déposée sur GitHub).
+- [x] Vérifier l'accès au partage `SYSVOL` depuis Windows 11 : ouverture du chemin `\\dc1-gre-siege\SYSVOL` et affichage du dossier `ironman.test` (capture non publiée).
+- [x] Vérifier l'accès client au partage `NETLOGON` : ouverture du partage et affichage du dossier vide, sans erreur (capture non publiée).
+- [x] Vérifier la découverte du contrôleur de domaine depuis `PC-TEST-GRE` avec `nltest /dsgetdc:ironman.test` : DC1 `10.10.10.10` trouvé, commande réussie (capture non publiée).
+- [x] Vérifier le canal sécurisé poste-domaine depuis Windows 11 : `Test-ComputerSecureChannel -Verbose` renvoie `True` et confirme la relation de confiance avec `ironman.test` (capture non publiée).
+- [x] Accéder depuis Windows 11 au répertoire `\\dc1-gre-siege\SYSVOL\ironman.test\Policies` : trois dossiers GUID visibles (capture non publiée).
+- [x] Ouvrir depuis Windows 11 le répertoire de la `Default Domain Policy` (`{31B2F340-016D-11D2-945F-00C04FB984F9}`) et voir `MACHINE`, `USER` et le fichier `GPT` (capture non publiée).
+- [x] Vérifier la lecture du fichier `GPT.INI` de la Default Domain Policy depuis Windows 11 : `[General]` et `Version=3` visibles dans le Bloc-notes (capture non publiée).
 - [ ] Approfondir les diagnostics AD DS ; cette lecture ne vaut pas audit des autres fichiers de GPO ni vérification de réplication.
 - [x] Vérifier l'application d'une première GPO ordinateur par `gpupdate`, le Registre et `gpresult`.
 - [x] Observer le verrouillage automatique en situation réelle : fonctionnement déclaré observé par l'auteur le 03/11/2026, sans capture ni mesure précise de la durée (900 s configurées et confirmées séparément).
@@ -486,7 +486,7 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Joindre Windows 11 Pro au domaine `ironman.test` ; authentifier un administrateur et l'utilisateur standard `test.gre` ; ranger les objets dans les OU ; vérifier la première GPO côté ordinateur.
 - [x] Publier et documenter **40 captures réelles** (23 initiales et 17 de la séance du 3 novembre 2026), avec résultats observés et limites explicites.
 
-**Traçabilité :** les tests instrumentés et les captures authentiques sont distingués des observations rapportées. Le verrouillage automatique a été **observé selon l'auteur**, sans capture ni relevé chronométré ; l'accès client à `SYSVOL` est démontré par une capture fournie dans la conversation (non déposée sur GitHub) ; `NETLOGON` est également accessible depuis Windows 11 (capture transmise en conversation, non déposée sur GitHub).
+**Traçabilité :** les tests instrumentés et les captures authentiques sont distingués des observations rapportées. Le verrouillage automatique a été **observé selon l'auteur**, sans capture ni relevé chronométré ; l'accès client à `SYSVOL` est démontré par une capture non publiée ; `NETLOGON` est également accessible depuis Windows 11 (capture non publiée).
 
 ---
 

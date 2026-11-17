@@ -46,7 +46,7 @@ Liste complète des objectifs du laboratoire, dans l'ordre chronologique. Le [so
 - [x] Transférer les archives du partage FS1 vers DC1 avec SCP et vérifier l'intégrité SHA-256 d'une copie.
 - [x] Déployer la GPO `GPO_ALPINA_Lecteur_COMMUN` : lecteur `P:` sur Windows 11, ciblage AD et écriture sur Debian vérifiés (épisode 08).
 - [x] Mettre en place un script de surveillance Bash (ICMP, services, montage/capacité disque), six contrôles manuels réussis ; planification cron 5 minutes et exécution initiale constatée (épisode 09).
-- [x] Importer la VM `CENTREON-GRE-SIEGE` dans VMware Workstation ; import confirmé par l'opérateur (sans démarrage).
+- [x] Importer la VM `CENTREON-GRE-SIEGE` dans VMware Workstation ; import constaté dans VMware (sans démarrage).
 - [x] Démarrer Centreon, accéder à son interface Web et vérifier le service ICMP pfSense : UP / OK, 0 % de perte le 11/11/2026 (épisode 10).
 - [x] Valider les contrôles CPU, RAM et disque principal de Centreon ; créer le tableau de bord du siège avec les trois jauges et le service ICMP de pfSense (13/11/2026).
 - [x] Superviser DC1 via Windows CMA : CPU, RAM, disque C: et ICMP OK ; tableau de bord actualisé le 16/11/2026.

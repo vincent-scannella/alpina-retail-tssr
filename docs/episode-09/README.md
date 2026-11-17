@@ -100,7 +100,7 @@ sudo shutdown -h now
 Le téléchargement de l'appliance Centreon prévue pour VMware a été confirmé, puis l'assistant d'importation de VMware Workstation a été utilisé.
 
 - **Nom de la VM annoncé après import :** `CENTREON-GRE-SIEGE`.
-- **État confirmé par l'opérateur :** VM visible dans VMware à l'issue de l'import.
+- **État constaté :** VM visible dans VMware à l'issue de l'import.
 - **Version visée lors du téléchargement :** Centreon 26.10, appliance Debian 13, **à vérifier depuis la VM au premier démarrage**.
 - **Configuration réseau prévue, non appliquée :** VMnet1 ; IP proposée `10.10.10.40/24`, passerelle `10.10.10.1`, DNS `10.10.10.10`.
 

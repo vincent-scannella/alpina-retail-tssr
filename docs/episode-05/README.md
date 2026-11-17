@@ -43,7 +43,7 @@ Les mots de passe et les identifiants de machine ne sont pas publiés.
    - `Architecture: x86-64`
    - `Virtualization: vmware`
 
-**Preuves disponibles :** **22 captures d'écran authentiques des 05 et 09/11/2026 sont déposées dans [`images/`](images/README.md)** pour documenter le réseau, DNS, l'intégration AD et les tests du partage Samba. La capture `hostnamectl` du 03/11/2026 a été fournie en conversation, mais n'est pas déposée sur GitHub. Les preuves visuelles sélectionnées sont des captures d'origine, sans reconstruction ni modification du texte.
+**Preuves disponibles :** **22 captures d'écran authentiques des 05 et 09/11/2026 sont déposées dans [`images/`](images/README.md)** pour documenter le réseau, DNS, l'intégration AD et les tests du partage Samba. La capture `hostnamectl` du 03/11/2026 n'est pas déposée sur GitHub. Les preuves visuelles sélectionnées sont des captures d'origine, sans reconstruction ni modification du texte.
 
 ## 3. Réseau et administration Linux — manipulations du 05/11/2026
 

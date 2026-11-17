@@ -77,7 +77,7 @@ Capture observée dans **Supervision → Statut des ressources**, filtre `PFSENS
 
 **Conclusion limitée à ce contrôle :** le collecteur Centreon a réussi à vérifier la disponibilité réseau de pfSense avec **0 % de perte de paquets** lors de la dernière exécution affichée. Cela ne démontre pas à lui seul l'état du pare-feu, de ses interfaces ou de ses autres services.
 
-> **Preuve visuelle :** la capture de la page de ressources a été fournie en conversation le 11/11/2026. **Elle reste à déposer dans le dépôt GitHub** pour rendre la validation directement consultable depuis cet épisode.
+> **Preuve visuelle :** la capture de la page de ressources date du 11/11/2026. **Elle reste à déposer dans le dépôt GitHub** pour rendre la validation directement consultable depuis cet épisode.
 
 ## 5. État d'avancement
 
@@ -133,7 +133,7 @@ Le plugin Centreon a ensuite été testé manuellement :
 
 **Capture de l'interface Centreon (13/11/2026) :** service `Memory` de `Centreon-central` **OK**, RAM totale 3,83 Go, utilisée 545,75 Mo (13,92 %), libre 3,30 Go. `proc-broker-rrd` et `proc-broker-sql` affichent également **OK**. L'écart entre mesures manuelle et Web est normal pour des contrôles effectués à des instants différents.
 
-**Statut : validé sur la capture, sans modification supplémentaire démontrée de la configuration du contrôle.** Capture d'interface fournie en conversation, non encore déposée sur GitHub.
+**Statut : validé sur la capture, sans modification supplémentaire démontrée de la configuration du contrôle.** Capture d'interface non encore déposée sur GitHub.
 
 ### Prochaine séance
 
@@ -173,7 +173,7 @@ La jauge disque affiche la métrique disponible `used (B)` convertie en GiB et *
 
 **Portée de validation :** le tableau de bord affiche des mesures ponctuelles enregistrées ; la supervision du siège ne concerne encore que le serveur Centreon et la disponibilité ICMP du pare-feu. DC1, FS1 et PC-TEST ne sont **pas encore supervisés** dans ces widgets. Les autres alertes Centreon (processus/MySQL) restent à diagnostiquer.
 
-La capture authentique du tableau de bord est disponible dans la conversation, **pas encore déposée dans GitHub**.
+La capture authentique du tableau de bord existe, mais n'est **pas encore déposée dans GitHub**.
 
 **Suite planifiée :** ajuster la mise en page, ajouter DC1 et FS1 puis PC-TEST à la supervision CPU/RAM/stockage, et vérifier les états et les seuils avant d'étendre le tableau de bord.
 
@@ -185,7 +185,7 @@ L'hôte `DC1-GRE-SIEGE` (Windows Server 2025, contrôleur de domaine du laborato
 
 **Point précis de reprise :** dans `Configuration → Services → Services par hôte`, cliquer sur **Ajouter** (et non remplir seulement les champs de recherche), puis créer le service `ICMP` sur `DC1-GRE-SIEGE` avec le modèle `Base-Ping-LAN-custom`, enregistrer, exporter la configuration et vérifier le résultat dans `Supervision → Statut des ressources`.
 
-Séance interrompue à la demande de l'utilisateur, sans réalisation des étapes suivantes. Capture de l'hôte créé disponible en conversation, non encore versée dans GitHub.
+Séance interrompue, sans réalisation des étapes suivantes. Capture de l'hôte créé non encore versée dans GitHub.
 
 ## 10. DC1 — contrôle ICMP validé le 14 novembre 2026
 
@@ -200,7 +200,7 @@ L'export de configuration du collecteur **Central** a réussi (préparation, gé
 | Hôte `DC1-GRE-SIEGE` | **Disponible / UP** | `OK - 10.10.10.10 rta 3.599ms lost 0%` |
 | Service `ICMP` | **OK** | `OK - 10.10.10.10 rta 3.404ms lost 0%` |
 
-**Périmètre :** disponibilité ICMP validée à cet instant, mais cela ne garantit pas la disponibilité des services applicatifs AD DS, DNS et DHCP. Capture fournie en conversation, pas encore déposée dans le dépôt GitHub.
+**Périmètre :** disponibilité ICMP validée à cet instant, mais cela ne garantit pas la disponibilité des services applicatifs AD DS, DNS et DHCP. Capture pas encore déposée dans le dépôt GitHub.
 
 **Suite :** vérifier la disponibilité du connecteur Windows Centreon Monitoring Agent (CMA), puis préparer la supervision CPU, RAM et stockage de DC1, sans confondre disponibilité réseau et fonctionnement des services.
 
@@ -227,7 +227,7 @@ Le modèle d'hôte initial `generic-active-host` a été conservé pour préserv
 - Jauge disque C: DC1 : **37,43 %**.
 - Widget « Disponibilité des équipements » : `DC1-GRE-SIEGE` (4 services OK), `PFSENSE-GRE-SIEGE` (1 service OK), `Centreon-central` (hôte disponible, **14 services OK, 6 critiques et 8 inconnus**).
 
-Ces mesures sont **ponctuelles**, non des moyennes historiques. Le tableau de bord a été sauvegardé. Les alertes internes sur le serveur `Centreon-central` restent visibles : absence de swap actif, processus non détectés et échec d'authentification MariaDB (`centreon-engine@localhost`). Elles n'ont pas été résolues lors de cette séance. Les captures ont été fournies en conversation mais ne sont pas encore déposées dans le dépôt.
+Ces mesures sont **ponctuelles**, non des moyennes historiques. Le tableau de bord a été sauvegardé. Les alertes internes sur le serveur `Centreon-central` restent visibles : absence de swap actif, processus non détectés et échec d'authentification MariaDB (`centreon-engine@localhost`). Elles n'ont pas été résolues lors de cette séance. Les captures ne sont pas encore déposées dans le dépôt.
 
 **Suite envisagée :** l'épisode 11 documente une **simulation de procédure** pour la supervision de FS1, explicitement non déployée.
 
@@ -248,7 +248,7 @@ Le bilan final conserve **6 services CRITICAL et 8 UNKNOWN** sur Centreon-centra
 
 ### Photographies de preuve
 
-Six captures réelles ont été sélectionnées : connexion CMA, erreur disque avant correction, contrôles DC1 au vert, graphique disque C:, tableau de bord final, alertes Centreon restantes. Voir l'[index des preuves](images/README.md). Les images elles-mêmes sont encore à publier dans GitHub ; elles sont disponibles dans une archive remise dans la conversation.
+Six captures réelles ont été sélectionnées : connexion CMA, erreur disque avant correction, contrôles DC1 au vert, graphique disque C:, tableau de bord final, alertes Centreon restantes. Voir l'[index des preuves](images/README.md). Les images elles-mêmes sont encore à publier dans GitHub.
 
 ### Étape suivante
 

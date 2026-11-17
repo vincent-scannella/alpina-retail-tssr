@@ -20,7 +20,7 @@
 
 ALPINA RETAIL est une **PME entièrement fictive** spécialisée dans le prêt-à-porter et les accessoires. Son organisation sert de contexte aux futurs exercices de support utilisateurs, d'administration systèmes et de gestion des accès.
 
-![Organigramme et organisation ALPINA RETAIL](IMG_0878.png)
+![Organigramme et organisation ALPINA RETAIL](images/organigramme.png)
 
 *Organigramme du scénario métier : fonctions et responsabilités simulées, pas comptes Active Directory ou salariés réels.*
 

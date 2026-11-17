@@ -1,4 +1,4 @@
-![Bannière ALPINA RETAIL](IMG_0869.png)
+![Bannière ALPINA RETAIL](banniere-alpina-retail.png)
 
 # ALPINA RETAIL — Laboratoire systèmes & réseaux
 
@@ -17,7 +17,7 @@ Je conçois, déploie et dépanne progressivement une infrastructure informatiqu
 **Ce qui est déjà vérifié :**
 
 - **Réseau et sécurité :** pfSense CE 2.9.0 configuré ; LAN/WAN, accès Internet depuis Windows 11, NAT/PAT observé, filtrage ICMP ciblé testé puis retiré, sauvegarde de configuration chiffrée conservée hors GitHub.
-- **Windows Server et AD DS :** Windows Server 2025, forêt `ironman.test`, promotion de `DC1-GRE-SIEGE`, tests `dcdiag` ciblés réussis ; partages `SYSVOL` et `NETLOGON` accessibles depuis Windows 11 et découverte du DC par `nltest /dsgetdc:ironman.test` réussie et canal sécurisé vérifié par PowerShell (`True`) et lecture de `GPT.INI` depuis SYSVOL (`Version=3`) ; captures fournies en conversation, pas encore déposées sur GitHub.
+- **Windows Server et AD DS :** Windows Server 2025, forêt `ironman.test`, promotion de `DC1-GRE-SIEGE`, tests `dcdiag` ciblés réussis ; partages `SYSVOL` et `NETLOGON` accessibles depuis Windows 11 et découverte du DC par `nltest /dsgetdc:ironman.test` réussie et canal sécurisé vérifié par PowerShell (`True`) et lecture de `GPT.INI` depuis SYSVOL (`Version=3`) ; captures de ces derniers contrôles non publiées.
 - **DNS et dépannage :** résolution des noms internes et externes ; diagnostic du message `Server: UnKnown`, création d'une zone inversée et d'un enregistrement PTR, contre-test réussi.
 - **DHCP :** serveur autorisé dans Active Directory, étendue `DHCP-GRE-SIEGE` active ; **bail `10.10.10.100/24` de huit jours reçu et options vérifiées sur le client Windows 11**.
 - **Debian FS1 (épisode 05) :** Debian 12 sur `VMnet1` (`10.10.10.30/24`) ; AD `ironman.test` joint ; Winbind/NSS reconnaît utilisateurs et groupes AD ; groupe `GG_FS1_COMMUN_RW` et permissions Linux `2770` en place ; **partage `COMMUN` accessible en lecture/écriture depuis Windows 11**, contenu relu sur Debian, propriétaire/groupe et permissions `660` observés ; **refus SMB `NT_STATUS_ACCESS_DENIED`** obtenu avec un compte non autorisé le 09/11/2026. L'accès SSH de FS1 est renforcé par clé ED25519 ; Samba impose désormais la signature serveur et le chiffrement SMB3 du partage COMMUN (SMB 3.1.1, `Encrypted=True` côté Windows 11) ; le durcissement global reste en cours.
@@ -26,15 +26,35 @@ Je conçois, déploie et dépanne progressivement une infrastructure informatiqu
 
 [**Voir les preuves pfSense — épisode 03**](docs/episode-03/README.md) · [**Voir les 40 captures Windows Server / AD / DNS / DHCP / GPO — épisode 04**](docs/episode-04/README.md)
 
+## Correspondance avec le titre professionnel TSSR
+
+Chaque compétence du titre est reliée à ce qui est réellement fait dans le laboratoire. Les compétences non couvertes sont indiquées comme telles.
+
+| Compétence du titre | Dans ce laboratoire | État |
+|---|---|---|
+| Assurer le support utilisateur en centre de services | GLPI préparé, cycle d'un ticket à tester ([épisode 12](docs/episode-12/README.md)) | **Prévu** |
+| Exploiter des serveurs Windows et un domaine Active Directory | DC1, AD DS, DNS, DHCP, GPO, politique de mots de passe ([04](docs/episode-04/README.md), [06](docs/episode-06/README.md), [08](docs/episode-08/README.md)) | **Validé** |
+| Exploiter des serveurs Linux | FS1 Debian 12, Samba/Winbind joint au domaine, SSH par clé ([05](docs/episode-05/README.md), [06](docs/episode-06/README.md)) | **Validé** |
+| Exploiter un réseau IP | Adressage IPv4, NAT/PAT, DNS, DHCP, diagnostics `ping` et `nslookup` ([03](docs/episode-03/README.md), [04](docs/episode-04/README.md)) | **Validé** |
+| Maintenir des serveurs dans une infrastructure virtualisée | VM créées et exploitées sous VMware Workstation, sur un poste de 16 Go de RAM ([02](docs/episode-02/README.md), [03](docs/episode-03/README.md)) | **Partiel** : pas de serveur de virtualisation dédié |
+| Automatiser des tâches à l'aide de scripts | Scripts Bash de sauvegarde et de surveillance, planifiés par cron ([07](docs/episode-07/README.md), [09](docs/episode-09/README.md)) | **Validé** en test manuel ; sauvegarde automatique de 02 h à vérifier |
+| Maintenir et sécuriser les accès à internet et les interconnexions des réseaux | pfSense : règles LAN DNS/NTP/Web, filtrage ICMP testé, redirecteur DNS ([03](docs/episode-03/README.md), [06](docs/episode-06/README.md)) | **Partiel** : VPN intersites en conception |
+| Mettre en place, assurer et tester les sauvegardes et les restaurations des éléments de l'infrastructure | Archive `tar.gz`, restauration testée, copie SCP contrôlée par SHA-256 ([07](docs/episode-07/README.md)) ; sauvegarde chiffrée de la configuration pfSense ([03](docs/episode-03/README.md)) | **Validé** ; copie hors hôte à prévoir |
+| Exploiter et maintenir les services de déploiement des postes de travail | Aucun service de déploiement installé | **Non couvert** |
+
+**En complément du référentiel :** supervision de pfSense et DC1 avec Centreon ([épisode 10](docs/episode-10/README.md)).
+
+*Intitulés des compétences : fiche [RNCP37682](https://www.francecompetences.fr/recherche/rncp/37682/), France Compétences, consultée le 17/11/2026.*
+
 ## Architecture actuelle du laboratoire
 
 La topologie suivante décrit les composants **créés dans VMware**, et non les futurs réseaux de toutes les boutiques.
 
-![Topologie réelle du laboratoire du siège de Grenoble : Internet, VMware NAT VMnet8, pfSense, VMnet1, DC1 Windows Server et PC-TEST-GRE](docs/topologie-laboratoire-siege.svg)
+![Topologie réelle du laboratoire du siège de Grenoble : Internet, VMware NAT VMnet8, pfSense, VMnet1, DC1 Windows Server, PC-TEST-GRE, FS1 Debian et Centreon](docs/topologie-laboratoire-siege-2026-11-16.svg)
 
-*Schéma historique de synthèse au 3 novembre 2026 — il ne représente pas encore FS1 ni l'appliance Centreon importée le 10 novembre. Équipement du laboratoire réellement créé à cette date. **DHCP client, jonction AD et application de la GPO vérifiés** ; verrouillage automatique observé par l'auteur sans capture ni mesure chronométrée précise. [Ouvrir le schéma vectoriel en grand](docs/topologie-laboratoire-siege.svg).*
+*Synthèse au 16 novembre 2026 : machines réellement créées au siège. La supervision de FS1 dans Centreon n'est pas déployée ([épisode 11](docs/episode-11/README.md), simulation). Verrouillage automatique de `PC-TEST-GRE` observé sans capture ni mesure chronométrée. [Ouvrir le schéma en grand](docs/topologie-laboratoire-siege-2026-11-16.svg) · [version du 3 novembre](docs/topologie-laboratoire-siege.svg).*
 
-*Le poste `PC-TEST-GRE`, initialement configuré en statique sur `10.10.10.20`, utilise maintenant un **bail DHCP `10.10.10.100` délivré par DC1**. Les trois VM ont été allumées simultanément pour les essais du 3 novembre, malgré les 16 Go de RAM de l'hôte.*
+*Le poste `PC-TEST-GRE`, initialement configuré en statique sur `10.10.10.20`, utilise maintenant un **bail DHCP `10.10.10.100` délivré par DC1**. Les trois premières VM ont été allumées simultanément pour les essais du 3 novembre, malgré les 16 Go de RAM de l'hôte.*
 
 ### Repères d'adressage du siège
 
@@ -57,13 +77,13 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **01** | [Organisation et organigramme](docs/episode-01/README.md) | Répartition des 75 collaborateurs simulés, organigramme et [dossier PDF](docs/episode-01/Alpina_Retail_Organisation_Episode_01.pdf) |
 | **02** | [Cahier des charges informatique](docs/episode-02/README.md) | Besoins métier, architecture cible, droits d'accès et limites du laboratoire |
 | **03** | [Pare-feu pfSense et poste Windows 11](docs/episode-03/README.md) | Installation, adressage, NAT/PAT, filtrage ICMP, tests réseau et sauvegarde chiffrée |
-| **04** | [Windows Server, AD DS, DNS et DHCP](docs/episode-04/README.md) | DC1, dépannage DNS, DHCP réel sur Windows 11, jonction à `ironman.test`, utilisateur AD et première GPO (application vérifiée ; verrouillage ensuite observé par l'auteur sans capture) |
-| **05** | [FS1 — Serveur de fichiers Debian Linux](docs/episode-05/README.md) | Samba/AD/Winbind, groupe de sécurité, partage `[COMMUN]` ; écriture et lecture fonctionnelles, permissions `660`, accès non autorisé refusé ; [22 captures authentiques](docs/episode-05/images/README.md) ; chantier Samba du siège validé le 09/11/2026 |
-| **06** | [Durcissement de l'infrastructure — siège Grenoble](docs/episode-06/README.md) | SSH/SMB sécurisés ; pare-feu Windows et comptes AD renforcés ; pfSense (WAN NAT, règles DNS/NTP/Web) ; source NTP du PDC vérifiée ; **incident DNS externe résolu par redirecteur pfSense**, validé sur DC1 et PC-TEST ; [16 captures](docs/episode-06/images/README.md). Contrôle DNS direct de PC-TEST vers pfSense conforme (timeout) ; filtrage IPv4 restrictif à poursuivre. |
-| **07** | [FS1 — Sauvegarder et restaurer le partage Samba](docs/episode-07/README.md) | Disque de sauvegarde virtuel 15 Gio, ext4 et montage `/mnt/backup` **vérifié après redémarrage par UUID** ; sauvegarde `tar.gz` et restauration testées avec contenu et droits identiques ; script Bash sécurisé par contrôle du montage, cron quotidien à 02 h, journal testé ; [10 captures](docs/episode-07/images/README.md). Archives copiées via SCP vers DC1 et hash SHA-256 identique sur les deux serveurs ; exécution automatique réelle et copie hors hôte à vérifier. |
-| **08** | [Déploiement GPO du lecteur réseau COMMUN](docs/episode-08/README.md) | GPO dédiée, ciblage sur `GG_FS1_COMMUN_RW`, lien OU `UTILISATEURS` ; DNS FS1, lecteur `P:` visible sur Windows 11 ; fichier créé depuis Windows confirmé sur Debian avec identité AD et droits `660` ; [5 captures](docs/episode-08/images/README.md). Contre-test sur utilisateur hors groupe restant à réaliser. |
-| **09** | [Supervision Bash / cron et préparation de Centreon](docs/episode-09/README.md) | Contrôles ICMP pfSense/DC1, services Samba/Winbind/SSH, disque de sauvegarde ; [script Bash documenté](docs/episode-09/surveillance-alpina.sh), six tests manuels `OK`, cron toutes les 5 minutes avec déclenchement initial observé ; [4 captures](docs/episode-09/images/README.md). Centreon importé dans VMware sans démarrage ni configuration. |
-| **10** | [Centreon — supervision réelle de pfSense et DC1](docs/episode-10/README.md) | ICMP pfSense/DC1 OK ; CPU/RAM/disque C: de DC1 **validés via Windows CMA le 16/11/2026** ; tableau de bord sauvegardé ; 6 alertes critiques et 8 états inconnus restent à diagnostiquer sur Centreon-central. [Inventaire des six captures authentiques](docs/episode-10/images/README.md) (PNG en attente de dépôt). |
+| **04** | [Windows Server, AD DS, DNS et DHCP](docs/episode-04/README.md) | DC1, dépannage DNS, DHCP réel sur Windows 11, jonction à `ironman.test`, utilisateur AD et première GPO (application vérifiée ; verrouillage ensuite observé sans capture) |
+| **05** | [FS1 — Serveur de fichiers Debian Linux](docs/episode-05/README.md) | Samba/AD/Winbind ; partage `[COMMUN]` en lecture/écriture depuis Windows 11, accès non autorisé refusé ; [22 captures](docs/episode-05/images/README.md) |
+| **06** | [Durcissement de l'infrastructure — siège Grenoble](docs/episode-06/README.md) | SSH/SMB, pare-feu Windows, comptes AD et règles pfSense renforcés ; **incident DNS externe résolu par redirecteur pfSense** ; [16 captures](docs/episode-06/images/README.md). Filtrage IPv4 restrictif à poursuivre. |
+| **07** | [FS1 — Sauvegarder et restaurer le partage Samba](docs/episode-07/README.md) | Disque dédié monté par UUID ; sauvegarde `tar.gz` et restauration testées ; script Bash et cron quotidien ; copie SCP vers DC1 avec hash SHA-256 identique ; [10 captures](docs/episode-07/images/README.md). Exécution automatique réelle et copie hors hôte à vérifier. |
+| **08** | [Déploiement GPO du lecteur réseau COMMUN](docs/episode-08/README.md) | Lecteur `P:` déployé par GPO ciblée sur `GG_FS1_COMMUN_RW` ; écriture depuis Windows 11 confirmée sur Debian ; [5 captures](docs/episode-08/images/README.md). Contre-test hors groupe à réaliser. |
+| **09** | [Supervision Bash / cron et préparation de Centreon](docs/episode-09/README.md) | [Script Bash documenté](docs/episode-09/surveillance-alpina.sh) : ICMP, services et disque de sauvegarde ; six tests manuels `OK`, cron toutes les 5 minutes ; [4 captures](docs/episode-09/images/README.md) |
+| **10** | [Centreon — supervision réelle de pfSense et DC1](docs/episode-10/README.md) | ICMP pfSense/DC1 OK ; CPU/RAM/disque C: de DC1 **validés via Windows CMA le 16/11/2026** ; 6 alertes critiques et 8 états inconnus à diagnostiquer sur Centreon-central ; [six captures inventoriées](docs/episode-10/images/README.md), PNG non encore publiés |
 | **11** | [FS1 — supervision Linux avec Centreon (simulation)](docs/episode-11/README.md) | **Étude de cas non exécutée** : architecture SNMPv3, services envisagés, tests d'acceptation et dépannage ; aucune mesure ni capture revendiquée. |
 | **12** | [GLPI — préparation de l'outil de support](docs/episode-12/README.md) | **Planifié, pas encore installé** : architecture, prérequis, sécurité et scénario de ticket à tester. |
 
@@ -98,54 +118,20 @@ Le dossier [de référence](docs/suivi/etat-2026-11-16.md) distingue le travail 
 
 ## Prochains objectifs
 
-- [x] Définir l'entreprise fictive, son organisation et ses besoins informatiques.
-- [x] Installer pfSense et valider la connectivité IP, le NAT/PAT et un scénario de filtrage.
-- [x] Déployer `DC1-GRE-SIEGE`, créer `ironman.test` et vérifier les services AD DS / DNS ciblés.
-- [x] Créer et activer l'étendue DHCP du siège ; contrôler sa plage et ses options.
-- [x] Confirmer la durée du bail de **8 jours** et l'attribution DHCP à `PC-TEST-GRE` (`ipconfig /all`).
-- [x] Joindre Windows 11 au domaine, authentifier des comptes AD et vérifier l'application d'une GPO ordinateur à 900 secondes.
-- [x] Observer le verrouillage automatique sur `PC-TEST-GRE` (retour de l'auteur du 03/11/2026 ; pas de capture ni de chronométrage précis).
-- [x] Vérifier depuis Windows 11 les partages `SYSVOL` et `NETLOGON` (captures transmises en conversation, non encore déposées sur GitHub).
-- [x] Vérifier la découverte du contrôleur de domaine avec `nltest` depuis Windows 11 (`DC1-GRE-SIEGE`, `10.10.10.10`).
-- [x] Vérifier le canal sécurisé de `PC-TEST-GRE` avec `Test-ComputerSecureChannel -Verbose` : `True` le 03/11/2026 (capture en conversation, non encore déposée sur GitHub).
-- [x] Lire depuis Windows 11 le fichier `GPT.INI` de la Default Domain Policy via SYSVOL (`[General]`, `Version=3` ; capture fournie dans la conversation, non encore déposée sur GitHub).
 - [ ] Approfondir les diagnostics AD DS et les contrôles des autres fichiers de stratégies.
-- [x] Installer Debian 12 sur `FS1-GRE-SIEGE`, réussir la connexion console et vérifier l'identité via `hostnamectl` (capture en conversation, non encore sur GitHub).
-- [x] Raccorder FS1 au réseau LAN, configurer IPv4/DNS et vérifier les pings et l'accès SSH après redémarrage.
-- [x] Vérifier DNS SRV LDAP/Kerberos, installer Samba/Winbind et joindre FS1 à `ironman.test` (`net ads join`).
-- [x] Vérifier la relation de confiance `net ads testjoin` et l'énumération des utilisateurs IRONMAN via Winbind après diagnostic.
-- [x] Résoudre les identités AD par NSS sur Debian, attribuer le groupe de sécurité et les permissions au dossier COMMUN, et ouvrir le partage depuis Windows 11.
-- [x] Créer et enregistrer un fichier depuis Windows 11 ; vérifier sa lecture sur Debian, son propriétaire AD, son groupe et les permissions `660`.
-- [x] Confirmer le refus d'accès SMB (`NT_STATUS_ACCESS_DENIED`) pour `IRONMAN\Administrateur`, compte sans autorisation dans le scénario.
-- [x] Durcir SSH sur FS1 : désactiver `PermitRootLogin`, mots de passe et clavier interactif ; vérifier une nouvelle connexion ED25519 après rechargement.
-- [x] Durcir Samba sur FS1 : signature serveur requise, chiffrement SMB3 obligatoire pour COMMUN, partages invités désactivés, ouverture du partage vérifiée sur Windows 11 (`Encrypted=True`, SMB 3.1.1).
-- [x] Vérifier le pare-feu de domaine de DC1 : actif et politique `BlockInbound,AllowOutbound`.
-- [x] Renforcer la politique de mots de passe du domaine `ironman.test` : longueur minimale 14, complexité activée, verrouillage après 10 échecs pendant 15 minutes, compteur réinitialisé après 15 minutes.
-- [x] Confirmer Microsoft Defender sur DC1 ; ajuster pfSense au WAN VMware NAT, sauvegarder sa configuration et configurer les règles LAN DNS/NTP/Web.
-- [x] Configurer NTP externe sur le PDC Emulator, diagnostiquer l'échec DNS externe et rétablir la résolution via le redirecteur pfSense, validée depuis DC1 et PC-TEST.
-- [x] Vérifier le refus DNS direct du poste client vers pfSense (timeout constaté dans l'épisode 06).
 - [ ] Poursuivre le filtrage IPv4 restrictif sur pfSense.
-- [x] Préparer un disque de sauvegarde dédié sur FS1, créer et vérifier une archive `tar.gz`, restaurer un fichier et confirmer son intégrité par `cmp` (épisode 07).
-- [x] Créer un script Bash de sauvegarde, le tester, enregistrer une tâche quotidienne cron à 02 h et confirmer l'écriture dans le journal.
-- [x] Vérifier le montage automatique du disque de sauvegarde par UUID après redémarrage de FS1.
-- [x] Transférer les archives du partage FS1 vers DC1 avec SCP et vérifier l'intégrité SHA-256 d'une copie.
-- [x] Déployer la GPO `GPO_ALPINA_Lecteur_COMMUN` : lecteur `P:` sur Windows 11, ciblage AD et écriture sur Debian vérifiés (épisode 08).
-- [x] Mettre en place un script de surveillance Bash (ICMP, services, montage/capacité disque), six contrôles manuels réussis ; planification cron 5 minutes et exécution initiale constatée (épisode 09).
-- [x] Importer la VM `CENTREON-GRE-SIEGE` dans VMware Workstation ; import confirmé par l'opérateur (sans démarrage).
 - [ ] Tester le mappage GPO avec un utilisateur hors du groupe `GG_FS1_COMMUN_RW`.
 - [ ] Vérifier une exécution cron de la version enrichie de surveillance et réaliser un test `ALERTE` non destructif.
-- [x] Démarrer Centreon, accéder à son interface Web et vérifier le service ICMP pfSense : UP / OK, 0 % de perte le 11/11/2026 (épisode 10).
-- [x] Valider les contrôles CPU, RAM et disque principal de Centreon ; créer le tableau de bord du siège avec les trois jauges et le service ICMP de pfSense (13/11/2026).
-- [x] Superviser DC1 via Windows CMA : CPU, RAM, disque C: et ICMP OK ; tableau de bord actualisé le 16/11/2026.
-- [x] Documenter un **scénario fictif** de supervision FS1 sous Centreon (épisode 11), **sans déploiement ni test**.
 - [ ] Fiabiliser les alertes MariaDB/processus/swap de Centreon-central (6 CRITICAL, 8 UNKNOWN au 16/11) ; superviser réellement FS1 et PC-TEST si le laboratoire est repris.
 - [ ] Ajouter à GitHub les six captures authentiques préparées pour l'épisode 10, après contrôle de confidentialité.
 - [ ] Installer GLPI sur une VM dédiée et tester le cycle d'un ticket ; [épisode 12 — préparation](docs/episode-12/README.md).
 - [ ] Vérifier l'exécution automatique réelle de la sauvegarde cron à 02 h et prévoir une copie hors de l'hôte VMware ; poursuivre les futurs VPN intersites.
 
+**36 objectifs déjà atteints :** [voir l'historique complet](docs/suivi/objectifs.md).
+
 ## À propos
 
-**Auteur : Vincent Scannella — Technicien Supérieur Systèmes et Réseaux (TSSR).**
+**Auteur : Vincent Scannella — titulaire du titre professionnel Technicien Supérieur Systèmes et Réseaux (TSSR), obtenu en octobre 2026.**
 
 Ce dépôt est un **portfolio de mise en pratique** destiné à montrer une méthode de travail : installer, vérifier, diagnostiquer et produire une documentation exploitable. Les données, utilisateurs et sites de l'entreprise sont fictifs ; les captures de laboratoire sont authentiques et sélectionnées pour ne pas divulguer de secrets.
 

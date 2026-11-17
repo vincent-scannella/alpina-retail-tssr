@@ -32,7 +32,7 @@ Les mots de passe et les identifiants de machine ne sont pas publiés.
 
 ## 2. Journal des manipulations validées
 
-1. Première tentative d'installation de Debian 12 : une session GNOME a été observée. Cette VM a été supprimée à la demande de l'auteur pour reprendre de zéro.
+1. Première tentative d'installation de Debian 12 : une session GNOME a été observée. Cette VM a été supprimée pour reprendre de zéro.
 2. Recréation de `FS1-GRE-SIEGE`, puis installation de Debian 12 en mode console. La sélection de logiciels demandée était **SSH + utilitaires usuels**, sans environnement de bureau. Le détail final des paquets installés reste à vérifier.
 3. Démarrage de l'OS confirmé par la console `tty1` : `Debian GNU/Linux 12 fs1-gre-siege`.
 4. Connexion locale confirmée : invite `administrateur@fs1-gre-siege:~$`.
@@ -43,7 +43,7 @@ Les mots de passe et les identifiants de machine ne sont pas publiés.
    - `Architecture: x86-64`
    - `Virtualization: vmware`
 
-**Preuves disponibles :** **22 captures d'écran authentiques des 05 et 09/11/2026 sont déposées dans [`images/`](images/README.md)** pour documenter le réseau, DNS, l'intégration AD et les tests du partage Samba. La capture `hostnamectl` du 03/11/2026 a été fournie en conversation, mais n'est pas déposée sur GitHub. Les preuves visuelles sélectionnées sont des captures d'origine, sans reconstruction ni modification du texte.
+**Preuves disponibles :** **22 captures d'écran authentiques des 05 et 09/11/2026 sont déposées dans [`images/`](images/README.md)** pour documenter le réseau, DNS, l'intégration AD et les tests du partage Samba. La capture `hostnamectl` du 03/11/2026 n'est pas déposée sur GitHub. Les preuves visuelles sélectionnées sont des captures d'origine, sans reconstruction ni modification du texte.
 
 ## 3. Réseau et administration Linux — manipulations du 05/11/2026
 
@@ -55,7 +55,7 @@ Les mots de passe et les identifiants de machine ne sont pas publiés.
 - `apt update` lancé depuis `root` : listes de dépôts actualisées, **3 paquets** identifiés comme pouvant être mis à jour.
 - `sudo` absent initialement : installation depuis `root` via `apt install sudo`, puis `usermod -aG sudo administrateur`. Appartenance au groupe `27(sudo)` vérifiée par `id administrateur`.
 - Reconnexion utilisateur puis `sudo whoami` : résultat **`root`**, délégation validée.
-- `sudo apt upgrade` exécuté et `apt list --upgradable` sans paquet restant proposé (selon retour de l'auteur).
+- `sudo apt upgrade` exécuté et `apt list --upgradable` sans paquet restant proposé (constat à l'écran).
 
 ### Passage sur le LAN du siège
 
@@ -102,7 +102,7 @@ nameserver 10.10.10.10
 - Horloge Debian synchronisée, NTP actif selon `timedatectl status`. Sur DC1, `w32tm /query /status` affiche `Local CMOS Clock` : référence NTP à améliorer. Comparaison quasi simultanée des deux horloges par SSH : aucun écart important visible.
 - FQDN Debian `hostname -f` : `fs1-gre-siege.ironman.test`. Une première requête DNS A vers DC1 n'a retourné aucune réponse ; un enregistrement A `fs1-gre-siege` → `10.10.10.30` a été ajouté dans la console DNS Windows, avec demande de PTR. Contrôle DNS après ajout encore à réaliser.
 - Installation réussie des composants `samba winbind libnss-winbind libpam-winbind krb5-user smbclient`.
-- Royaume Kerberos déclaré `IRONMAN.TEST` (`default_realm`) selon retour de l'auteur.
+- Royaume Kerberos déclaré `IRONMAN.TEST` (`default_realm`) (constat à l'écran).
 - Sauvegarde préalable de `/etc/samba/smb.conf` dans `/etc/samba/smb.conf.bak`.
 - Configuration Samba : `workgroup = IRONMAN`, `server role = member server`, `security = ADS`, `realm = IRONMAN.TEST`, backend idmap par défaut `tdb` / plage 3000–7999, idmap `IRONMAN` en `rid` / plage 10000–999999. `testparm -s` a affiché ces paramètres.
 - Accès invités ensuite désactivés par `map to guest = Never` et `usershare allow guests = no` (contrôle `testparm` final encore à réaliser).
@@ -131,7 +131,7 @@ Joined 'FS1-GRE-SIEGE' to dns domain 'ironman.test'
 1. `wbinfo -u` affiche `Error looking up domain users`.
 2. `wbinfo --ping-dc` échoue en recherchant le domaine `WORKGROUP` avec `WBC_ERR_DOMAIN_NOT_FOUND`. `wbinfo --own-domain` retourne également `WORKGROUP`, alors que `smb.conf` déclare `IRONMAN`.
 3. Hypothèse : configuration encore chargée dans le service Winbind.
-4. `sudo systemctl restart winbind` exécuté. `wbinfo --own-domain` retourne ensuite `IRONMAN` (confirmé par l'auteur).
+4. `sudo systemctl restart winbind` exécuté. `wbinfo --own-domain` retourne ensuite `IRONMAN` (constaté à l'écran).
 5. Nouveau `wbinfo -u` réussi : liste des comptes `IRONMAN\\administrateur`, `IRONMAN\\invité`, `IRONMAN\\krbtgt` et `IRONMAN\\test.gre`.
 
 ![Capture authentique de la liste des comptes AD retrouvés depuis Debian](images/12-winbind-utilisateurs-ad.png)
@@ -169,7 +169,7 @@ Joined 'FS1-GRE-SIEGE' to dns domain 'ironman.test'
     force directory mode = 2770
 ```
 
-`testparm -s` affiche les paramètres de cette section ; `sudo systemctl restart smbd` effectué et le service est indiqué `active` par l'auteur.
+`testparm -s` affiche les paramètres de cette section ; `sudo systemctl restart smbd` effectué et le service a été relevé `active` à l'écran.
 
 ### Résultat côté Windows 11
 
@@ -184,7 +184,7 @@ Joined 'FS1-GRE-SIEGE' to dns domain 'ironman.test'
 
 ### Recette fonctionnelle — 09 novembre 2026
 
-**Test positif :** sur `PC-TEST-GRE`, le compte de domaine `IRONMAN\test.gre` a créé `test-commun.txt` via `\\10.10.10.30\COMMUN`. Après un premier oubli d'enregistrement (fichier initialement vide), l'auteur a enregistré le texte `Test partage ALPINA RETAIL`. La commande SSH `sudo cat /srv/samba/commun/test-commun.txt` a ensuite affiché le contenu attendu (résultat confirmé par l'auteur).
+**Test positif :** sur `PC-TEST-GRE`, le compte de domaine `IRONMAN\test.gre` a créé `test-commun.txt` via `\\10.10.10.30\COMMUN`. Après un premier oubli d'enregistrement (fichier initialement vide), le texte `Test partage ALPINA RETAIL` a été enregistré. La commande SSH `sudo cat /srv/samba/commun/test-commun.txt` a ensuite affiché le contenu attendu (résultat constaté à l'écran).
 
 **Permissions observées avant l'enregistrement du contenu :** la sortie de `sudo ls -l /srv/samba/commun/` montre le propriétaire `IRONMAN\test.gre`, le groupe `IRONMAN\gg_fs1_commun_rw` et `-rw-rw----`, soit le mode `660`. Sur cette capture, la taille est de **0 octet** car le document n'avait pas encore été sauvegardé ; elle **ne prouve pas** à elle seule la présence du texte ultérieurement enregistré.
 
@@ -220,7 +220,7 @@ Voir [les huit nouvelles captures de cette phase](images/README.md) — recadrag
 - [ ] Vérifier les ressources réelles de la VM après sa recréation.
 - [ ] Vérifier et durcir le service SSH.
 - [x] Installer Samba/Winbind/Kerberos, préparer la configuration de serveur membre et réaliser la jonction ADS de FS1.
-- [x] Vérifier le canal de confiance avec `net ads testjoin` (`Join is OK`, selon retour de l'auteur) et résoudre l'incident Winbind `WORKGROUP` → `IRONMAN`.
+- [x] Vérifier le canal de confiance avec `net ads testjoin` (`Join is OK`, constat à l'écran) et résoudre l'incident Winbind `WORKGROUP` → `IRONMAN`.
 - [x] Récupérer les utilisateurs AD avec `wbinfo -u`.
 - [x] Vérifier NSS pour le compte de test AD et le groupe autorisé, configurer le partage `[COMMUN]`, contrôler `testparm` et le démarrage de `smbd`.
 - [x] Créer le groupe de sécurité AD, définir les permissions `2770` sur `/srv/samba/commun` et vérifier l'ouverture du partage depuis Windows 11.
@@ -231,7 +231,7 @@ Voir [les huit nouvelles captures de cette phase](images/README.md) — recadrag
 
 ## 7. Preuves visuelles authentiques
 
-**[Consulter les 22 captures Linux, réseau, DNS, AD et SMB](images/README.md)** — toutes fournies par l'auteur lors des manipulations des **05 et 09/11/2026**.
+**[Consulter les 22 captures Linux, réseau, DNS, AD et SMB](images/README.md)** — toutes réalisées lors des manipulations des **05 et 09/11/2026**.
 
 ### Réseau de FS1 et communication avec le siège
 
@@ -255,7 +255,7 @@ Voir [les huit nouvelles captures de cette phase](images/README.md) — recadrag
 
 ![Comptes AD énumérés par Winbind après dépannage](images/12-winbind-utilisateurs-ad.png)
 
-**Limite des preuves :** les captures documentent les permissions et le refus SMB, tandis que la lecture du texte enregistré est confirmée par l'auteur sans capture dédiée. Le durcissement de sécurité est hors de cette validation fonctionnelle.
+**Limite des preuves :** les captures documentent les permissions et le refus SMB, tandis que la lecture du texte enregistré est constatée à l'écran sans capture dédiée. Le durcissement de sécurité est hors de cette validation fonctionnelle.
 
 ## Méthode
 

@@ -43,6 +43,6 @@
 
 ![Hash sur FS1 via SSH](10-sha256-fs1.png)
 
-**Limites :** la vérification `cmp` porte sur un fichier de test ; elle ne vaut pas restauration après perte totale de VM. Les propriétaires et permissions du fichier restauré ont été comparés dans la séance, mais n'ont pas fait l'objet d'une capture déposée ici. La crontab a été vérifiée en conversation ; le déclenchement automatique de 02 h n'a pas été observé. Le montage automatique a été testé après redémarrage, le périphérique s'étant renommé en `/dev/sda1` sans changement d'UUID.
+**Limites :** la vérification `cmp` porte sur un fichier de test ; elle ne vaut pas restauration après perte totale de VM. Les propriétaires et permissions du fichier restauré ont été comparés dans la séance, mais n'ont pas fait l'objet d'une capture déposée ici. La crontab a été vérifiée pendant la séance ; le déclenchement automatique de 02 h n'a pas été observé. Le montage automatique a été testé après redémarrage, le périphérique s'étant renommé en `/dev/sda1` sans changement d'UUID.
 
 [Revenir au compte rendu de l'épisode 07](../README.md)

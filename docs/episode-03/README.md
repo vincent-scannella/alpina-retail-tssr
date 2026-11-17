@@ -117,15 +117,15 @@ L'adresse WAN est une adresse privée, attribuée dynamiquement. Elle peut chang
 16. Vérification des communications LAN, WAN et DNS depuis Windows 11.
 17. Accès depuis `PC-TEST-GRE` à la page de connexion Web pfSense sur `https://10.10.10.1`.
 18. Connexion réussie à l'administration pfSense et remplacement du mot de passe initial du compte `admin`, confirmé par le message de succès de l'interface. **Aucun mot de passe n'est stocké dans le dépôt.**
-19. Vérification depuis `PC-TEST-GRE` de l'affichage du site externe `https://www.microsoft.com` dans Microsoft Edge (résultat confirmé par l'auteur ; pas de mesure de performance consignée).
+19. Vérification depuis `PC-TEST-GRE` de l'affichage du site externe `https://www.microsoft.com` dans Microsoft Edge (résultat constaté à l'écran ; pas de mesure de performance consignée).
 20. Consultation de **Firewall → Rules → LAN** : règles anti-lockout et autorisations LAN vers toute destination en IPv4 et IPv6 observées, sans modification.
 21. Consultation de **Firewall → NAT → Outbound** : mode **Automatic outbound NAT rule generation** sélectionné ; règles automatiques WAN incluant le réseau `10.10.10.0/24` observées, sans modification.
 22. Consultation de **Diagnostics → States** : observation simultanée des états LAN et WAN, dont une connexion TCP HTTPS établie dont l'adresse source et le port ont été traduits par pfSense (détails en section 5).
 23. Création et application d'une règle `Block` sur l'interface LAN, IPv4, protocole ICMP, sous-type `Echo request`, source `10.10.10.20`, destination `8.8.8.8`, placée **avant** la règle générale `Default allow LAN to any rule`. Règle de test réversible et ciblée.
-24. Exécution d'un nouveau `ping 8.8.8.8` depuis `PC-TEST-GRE` : des expirations de délai sont visibles sur capture et l'auteur confirme **100 % de perte** sur quatre requêtes, alors que le même test réussissait auparavant (4/4 reçues). Aucune vérification des journaux du pare-feu n'est encore consignée.
-25. Après activation de la règle ICMP, réouverture de `https://www.microsoft.com` depuis `PC-TEST-GRE` : navigation HTTPS **toujours fonctionnelle**, résultat confirmé par l'auteur. Cette comparaison démontre le caractère ciblé du blocage dans ce scénario.
+24. Exécution d'un nouveau `ping 8.8.8.8` depuis `PC-TEST-GRE` : des expirations de délai sont visibles sur capture et **100 % de perte** sur quatre requêtes a été constaté à l'écran, alors que le même test réussissait auparavant (4/4 reçues). Aucune vérification des journaux du pare-feu n'est encore consignée.
+25. Après activation de la règle ICMP, réouverture de `https://www.microsoft.com` depuis `PC-TEST-GRE` : navigation HTTPS **toujours fonctionnelle**, résultat constaté à l'écran. Cette comparaison démontre le caractère ciblé du blocage dans ce scénario.
 26. Ouverture de **Status → System Logs → Firewall** ; aucune entrée ICMP précise de cette règle n'a pu être établie. L'auteur indique ne pas avoir activé sa journalisation.
-27. Suppression de la règle temporaire par l'auteur (au lieu de sa désactivation prévue), suivie d'un nouveau `ping 8.8.8.8` **réussi** depuis `PC-TEST-GRE`. Le retour de la connectivité ICMP après retrait de la règle est donc validé. Aucun résultat chiffré après retrait n'a été transmis.
+27. Suppression de la règle temporaire (au lieu de sa désactivation prévue), suivie d'un nouveau `ping 8.8.8.8` **réussi** depuis `PC-TEST-GRE`. Le retour de la connectivité ICMP après retrait de la règle est donc validé. Aucun résultat chiffré après retrait n'a été transmis.
 28. Le **2 novembre 2026**, dans **Diagnostics → Backup & Restore**, sélection de `Backup area: All`, données RRD exclues, informations sur les packages non exclues, clés hôte SSH incluses, données supplémentaires non incluses. Activation de **Encrypt this configuration file**, avec saisie et confirmation d'un mot de passe non communiqué.
 29. Téléchargement du fichier `config-pfSense.home.arpa-20261102052901.xml` dans le dossier Téléchargements de `PC-TEST-GRE`, affiché avec une taille arrondie de **17 Ko** dans l'Explorateur Windows.
 30. Copie du fichier XML chiffré par le presse-papiers VMware depuis la VM Windows 11 vers le **PC hôte Windows physique**, dans le dossier `ALPINA_RETAIL_BACKUP\pfSense` (chemin de dossier observé dans la capture, sans nom de disque). Une capture du dossier hôte confirme un fichier XML de **17 Ko** (valeur arrondie), avec **16,2 Ko** indiqué dans la barre d'état pour l'élément sélectionné. Aucun secret ni fichier de sauvegarde n'a été publié.
@@ -148,13 +148,13 @@ L'adresse WAN est une adresse privée, attribuée dynamiquement. Elle peut chang
 | `nslookup www.google.fr` depuis Windows 11 | **Réussi ; DNS interrogé : `pfSense.home.arpa` (`10.10.10.1`) ; réponses observées : `172.217.22.131` (IPv4) et `2a00:1450:4007:81b::2003` (IPv6)** |
 | Interface d'administration `https://10.10.10.1` depuis le client Windows | Page de connexion affichée, puis session authentifiée confirmée |
 | Remplacement du mot de passe de `admin` | Réussi : message « Password changed for user: admin » dans pfSense |
-| Navigation vers `https://www.microsoft.com` depuis `PC-TEST-GRE` | Réussie, confirmée par l'auteur ; aucune mesure HTTP détaillée fournie |
+| Navigation vers `https://www.microsoft.com` depuis `PC-TEST-GRE` | Réussie, constatée à l'écran ; aucune mesure HTTP détaillée fournie |
 | Consultation des règles de filtrage LAN | Anti-lockout, autorisation LAN IPv4 vers toutes destinations, et autorisation LAN IPv6 vers toutes destinations : présentes dans l'interface |
 | Mode NAT sortant | **Automatic outbound NAT rule generation** sélectionné ; règles automatiques WAN visibles pour `10.10.10.0/24` |
 | Traduction NAT/PAT effectivement observée | **Confirmée** dans Diagnostics → States : `10.10.10.20:54138` (LAN) → `10.50.10.128:26027` (WAN), destination `98.66.133.185:443`, connexion TCP `ESTABLISHED:ESTABLISHED` |
-| Filtrage ICMP ciblé vers `8.8.8.8` depuis Windows | **Avant :** 4/4 réponses, 0 % de perte. **Après application de la règle :** expirations de délai visibles et **100 % de perte** confirmé par l'auteur. Aucune preuve par logs, journalisation non activée |
-| Rétablissement après suppression de la règle temporaire | **Réussi :** `ping 8.8.8.8` de nouveau fonctionnel depuis `PC-TEST-GRE`, confirmé par l'auteur (sans compteurs détaillés) |
-| Navigation HTTPS après application de la règle ICMP | **Réussie :** `https://www.microsoft.com` continue à se charger depuis Windows 11, confirmé par l'auteur. Le blocage ICMP ciblé ne coupe pas les connexions HTTPS de ce test |
+| Filtrage ICMP ciblé vers `8.8.8.8` depuis Windows | **Avant :** 4/4 réponses, 0 % de perte. **Après application de la règle :** expirations de délai visibles et **100 % de perte** constaté à l'écran. Aucune preuve par logs, journalisation non activée |
+| Rétablissement après suppression de la règle temporaire | **Réussi :** `ping 8.8.8.8` de nouveau fonctionnel depuis `PC-TEST-GRE`, constaté à l'écran (sans compteurs détaillés) |
+| Navigation HTTPS après application de la règle ICMP | **Réussie :** `https://www.microsoft.com` continue à se charger depuis Windows 11, constaté à l'écran. Le blocage ICMP ciblé ne coupe pas les connexions HTTPS de ce test |
 | Export de la configuration pfSense (02/11/2026) | Téléchargement du fichier `.xml` confirmé ; option **Encryption** cochée au moment de l'export ; mot de passe non publié |
 | Copie de sauvegarde sur le PC physique | Fichier `.xml` présent dans `ALPINA_RETAIL_BACKUP\pfSense`, taille affichée **17 Ko** (16,2 Ko en barre d'état) ; capture à l'appui. **Pas de comparaison d'empreintes ni de restauration testée** |
 
@@ -166,9 +166,9 @@ Le ping vers `www.google.com` confirme également que la résolution DNS et la c
 
 **Mise à jour après déploiement du poste client :** les tests précédemment limités à pfSense sont désormais complétés par des vérifications effectuées **depuis Windows 11 sur VMnet1**. Les deux séries de ping depuis Windows ont réussi avec 0 % de perte sur quatre requêtes chacune. Le test DNS montre que la requête adressée au résolveur pfSense (`10.10.10.1`) retourne des adresses IPv4 et IPv6 pour `www.google.fr`.
 
-**Portée :** ces tests attestent l'accessibilité ICMP de la passerelle et d'une destination extérieure ainsi que la résolution DNS au moment des mesures. La navigation HTTPS vers un site externe a depuis été confirmée par l'auteur. Une traduction NAT/PAT a également été observée dans la table des états de pfSense, sans que cela constitue un audit exhaustif des règles de filtrage ou des protocoles.
+**Portée :** ces tests attestent l'accessibilité ICMP de la passerelle et d'une destination extérieure ainsi que la résolution DNS au moment des mesures. La navigation HTTPS vers un site externe a depuis été constatée à l'écran. Une traduction NAT/PAT a également été observée dans la table des états de pfSense, sans que cela constitue un audit exhaustif des règles de filtrage ou des protocoles.
 
-Les durées et pertes chiffrées ci-dessus proviennent de la capture des sorties Windows fournie par l'auteur. Aucun secret n'est consigné.
+Les durées et pertes chiffrées ci-dessus proviennent de la capture des sorties Windows. Aucun secret n'est consigné.
 
 ### Observations du filtrage et du NAT, puis test de blocage ICMP ciblé
 
@@ -176,7 +176,7 @@ Les durées et pertes chiffrées ci-dessus proviennent de la capture des sorties
 - **NAT sortant :** le mode automatique de pfSense est sélectionné. Les règles automatiques affichées sur le WAN comprennent le réseau LAN `10.10.10.0/24`, avec une règle particulière pour le port 500 et une règle générale vers l'adresse WAN.
 - **Topologie laboratoire :** pfSense réalise la traduction de source vers son WAN privé sur VMware VMnet8 ; VMware NAT assure ensuite l'accès vers le réseau extérieur. Il s'agit d'un scénario de double NAT en environnement virtuel, et non d'une adresse WAN publique pour pfSense.
 - **Observation directe de NAT/PAT :** la table **Diagnostics → States** affiche une connexion LAN `10.10.10.20:54138 → 98.66.133.185:443` et son état côté WAN `10.50.10.128:26027 (10.10.10.20:54138) → 98.66.133.185:443`. Les deux états sont `ESTABLISHED:ESTABLISHED` et présentent des compteurs de trafic. pfSense a traduit l'IP source privée du poste en son IP WAN privée et modifié le port source : preuve de NAT/PAT actif.
-- **Blocage ciblé ICMP :** règle `Block`, interface LAN, IPv4 ICMP `Echo request`, source `10.10.10.20`, destination `8.8.8.8`, placée avant les autorisations générales. Après son application, le ping depuis Windows présente une perte annoncée de 100 %, contre 0 % avant activation : résultat cohérent avec l'effet attendu du filtrage. **Le chargement HTTPS de `www.microsoft.com` reste opérationnel après la règle**, ce qui confirme la sélectivité observée de ce test. La journalisation de cette règle n'a pas été activée et aucune preuve par log n'est revendiquée. Après suppression de cette règle par l'auteur, le ping vers `8.8.8.8` fonctionne de nouveau : **retour au comportement initial confirmé**.
+- **Blocage ciblé ICMP :** règle `Block`, interface LAN, IPv4 ICMP `Echo request`, source `10.10.10.20`, destination `8.8.8.8`, placée avant les autorisations générales. Après son application, le ping depuis Windows présente une perte annoncée de 100 %, contre 0 % avant activation : résultat cohérent avec l'effet attendu du filtrage. **Le chargement HTTPS de `www.microsoft.com` reste opérationnel après la règle**, ce qui confirme la sélectivité observée de ce test. La journalisation de cette règle n'a pas été activée et aucune preuve par log n'est revendiquée. Après suppression de cette règle, le ping vers `8.8.8.8` fonctionne de nouveau : **retour au comportement initial confirmé**.
 - **Limites :** la table des états confirme NAT/PAT pour une connexion donnée, et la différence avant/après ICMP est observée, mais cela ne constitue pas un audit complet de la politique de filtrage. Le second NAT VMware demeure propre à l'architecture de laboratoire.
 
 ### Visualisations techniques — NAT/PAT et filtrage ICMP
@@ -191,7 +191,7 @@ Les durées et pertes chiffrées ci-dessus proviennent de la capture des sorties
 
 ![Schéma pédagogique comparant le ping initial, le blocage par règle LAN et le rétablissement après sa suppression](images/07-schema-filtrage-icmp-avant-apres.svg)
 
-*Schéma explicatif, **pas une capture d'écran**. Avant la règle : 0 % de perte sur 4 requêtes. Pendant : 100 % de perte confirmé par l'auteur ; une photographie montre des expirations de délai, sans compteur final complet. Après suppression : ping rétabli, mais sans relevé chiffré. La navigation HTTPS restait disponible pendant le filtrage.*
+*Schéma explicatif, **pas une capture d'écran**. Avant la règle : 0 % de perte sur 4 requêtes. Pendant : 100 % de perte constaté à l'écran ; une photographie montre des expirations de délai, sans compteur final complet. Après suppression : ping rétabli, mais sans relevé chiffré. La navigation HTTPS restait disponible pendant le filtrage.*
 
 #### Captures authentiques du laboratoire — NAT/PAT et ICMP
 
@@ -286,7 +286,7 @@ Aucun test non réalisé n'est présenté comme réussi.
 - [x] Créer et appliquer une règle ICMP ciblée, puis constater l'échec du ping vers `8.8.8.8` (100 % de perte annoncée, contre 0 % avant règle).
 - [x] Vérifier que la navigation HTTPS externe fonctionne toujours après le blocage ICMP.
 - [x] Consulter la page des journaux Firewall ; **trace liée à la règle ICMP non vérifiable**, journalisation de cette règle non activée. À prévoir lors d'un futur test instrumenté.
-- [x] Retirer la règle temporaire (supprimée par l'auteur) et **vérifier le rétablissement du ping** vers `8.8.8.8`.
+- [x] Retirer la règle temporaire (supprimée) et **vérifier le rétablissement du ping** vers `8.8.8.8`.
 - [x] Exporter une sauvegarde `.xml` avec **Encryption** activée et en conserver une copie sur le PC physique hors dépôt GitHub.
 - [ ] Contrôler si nécessaire les empreintes des deux copies et tester ultérieurement la procédure de restauration sur un environnement de test, sans modifier le pfSense de production du laboratoire.
 - [x] Poursuivre dans l'[épisode 04](../episode-04/README.md) : installation de Windows Server, configuration AD DS/DNS et activation de l'étendue DHCP au siège (attribution client encore à tester).

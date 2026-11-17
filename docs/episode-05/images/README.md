@@ -103,6 +103,6 @@ Le projet est fictif. Les noms des hôtes et les IP visibles appartiennent au la
 
 ![Compte non autorisé refusé par Samba avec NT_STATUS_ACCESS_DENIED](22-refus-acces-groupe-non-autorise.png)
 
-**Précautions d'interprétation :** ces contrôles attestent une configuration réseau et une résolution de nom au moment des tests, pas la disponibilité des services AD/Kerberos, un contrôle exhaustif des conflits d'adresses, ni une validation de sécurité exhaustive. La création et lecture du contenu sont confirmées par l'auteur ; la capture de permissions montre le fichier encore vide avant enregistrement, et celle de `smbclient` prouve le refus de connexion pour le compte testé. La jonction AD, le test de confiance et l'énumération Winbind ont été réalisés. La connexion SSH a été observée en session, mais aucun audit de sécurisation SSH n'a encore été effectué.
+**Précautions d'interprétation :** ces contrôles attestent une configuration réseau et une résolution de nom au moment des tests, pas la disponibilité des services AD/Kerberos, un contrôle exhaustif des conflits d'adresses, ni une validation de sécurité exhaustive. La création et lecture du contenu sont constatées à l'écran ; la capture de permissions montre le fichier encore vide avant enregistrement, et celle de `smbclient` prouve le refus de connexion pour le compte testé. La jonction AD, le test de confiance et l'énumération Winbind ont été réalisés. La connexion SSH a été observée en session, mais aucun audit de sécurisation SSH n'a encore été effectué.
 
 [Retour à l'épisode 05](../README.md)

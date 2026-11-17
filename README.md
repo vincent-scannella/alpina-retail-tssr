@@ -132,7 +132,7 @@ Le dossier [de référence au 16/11](docs/suivi/etat-2026-11-16.md) reste une ph
 - [ ] Publier des captures authentiques de l'épisode 12 après contrôle de confidentialité.
 - [ ] Vérifier l'exécution automatique réelle de la sauvegarde cron à 02 h et prévoir une copie hors de l'hôte VMware ; poursuivre les futurs VPN intersites.
 
-**37 objectifs atteints dans le suivi du laboratoire ; 7 travaux complémentaires ouverts**, à traiter seulement en cas de reprise ou de V2 : [historique détaillé](docs/suivi/objectifs.md). Ces travaux ne remettent pas en cause la clôture pédagogique du périmètre V1.
+**37 objectifs atteints dans le suivi du laboratoire ; 9 travaux complémentaires ouverts**, à traiter seulement en cas de reprise ou de V2 : [historique détaillé](docs/suivi/objectifs.md). Ces travaux ne remettent pas en cause la clôture pédagogique du périmètre V1.
 
 ## À propos
 

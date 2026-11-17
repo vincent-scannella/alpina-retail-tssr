@@ -82,7 +82,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **07** | [FS1 — Sauvegarder et restaurer le partage Samba](docs/episode-07/README.md) | Disque dédié monté par UUID ; sauvegarde `tar.gz` et restauration testées ; script Bash et cron quotidien ; copie SCP vers DC1 avec hash SHA-256 identique ; [10 captures](docs/episode-07/images/README.md). Exécution automatique réelle et copie hors hôte à vérifier. |
 | **08** | [Déploiement GPO du lecteur réseau COMMUN](docs/episode-08/README.md) | Lecteur `P:` déployé par GPO ciblée sur `GG_FS1_COMMUN_RW` ; écriture depuis Windows 11 confirmée sur Debian ; [5 captures](docs/episode-08/images/README.md). Contre-test hors groupe à réaliser. |
 | **09** | [Supervision Bash / cron et préparation de Centreon](docs/episode-09/README.md) | [Script Bash documenté](docs/episode-09/surveillance-alpina.sh) : ICMP, services et disque de sauvegarde ; six tests manuels `OK`, cron toutes les 5 minutes ; [4 captures](docs/episode-09/images/README.md) |
-| **10** | [Centreon — supervision réelle de pfSense et DC1](docs/episode-10/README.md) | ICMP pfSense/DC1 OK ; CPU/RAM/disque C: de DC1 **validés via Windows CMA le 16/11/2026** ; 6 alertes critiques et 8 états inconnus à diagnostiquer sur Centreon-central ; [six captures inventoriées](docs/episode-10/images/README.md), PNG non encore publiés |
+| **10** | [Centreon — supervision réelle de pfSense et DC1](docs/episode-10/README.md) | ICMP pfSense/DC1 OK ; CPU/RAM/disque C: de DC1 **validés via Windows CMA le 16/11/2026** ; 6 alertes critiques et 8 états inconnus à diagnostiquer sur Centreon-central ; [six captures inventoriées](docs/episode-10/images/README.md), fichiers d'origine non conservés |
 | **11** | [FS1 — supervision Linux avec Centreon (simulation)](docs/episode-11/README.md) | **Étude de cas non exécutée** : architecture SNMPv3, services envisagés, tests d'acceptation et dépannage ; aucune mesure ni capture revendiquée. |
 | **12** | [GLPI — préparation de l'outil de support](docs/episode-12/README.md) | **Planifié, pas encore installé** : architecture, prérequis, sécurité et scénario de ticket à tester. |
 
@@ -97,13 +97,11 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 
 Les collaborateurs sont principalement représentés par des **besoins métier, des rôles et, progressivement, des comptes de test**. Il n'est pas prévu de démarrer 75 postes ou de simuler 75 personnes en activité simultanément.
 
-## Démarche TSSR et compétences mobilisées
+## Démarche de travail
 
 Chaque épisode technique suit la même logique :
 
 **Besoin → architecture → configuration → vérification → diagnostic → documentation.**
-
-Les compétences travaillées comprennent l'administration Windows Server, AD DS, DNS, DHCP, la virtualisation, les réseaux IPv4, le routage/NAT, les règles de filtrage et le dépannage d'incidents.
 
 **Exemple documenté :** dans l'[épisode 04](docs/episode-04/README.md), un test `nslookup` affichait initialement `Server: UnKnown` et un délai d'attente. L'inspection DNS a révélé l'absence de zone inversée et de PTR ; après leur création, les recherches directe et inverse ont réussi sans le message initial. Les captures **avant / après** sont présentes dans le dossier de l'épisode.
 
@@ -122,7 +120,7 @@ Le dossier [de référence](docs/suivi/etat-2026-11-16.md) distingue le travail 
 - [ ] Tester le mappage GPO avec un utilisateur hors du groupe `GG_FS1_COMMUN_RW`.
 - [ ] Vérifier une exécution cron de la version enrichie de surveillance et réaliser un test `ALERTE` non destructif.
 - [ ] Fiabiliser les alertes MariaDB/processus/swap de Centreon-central (6 CRITICAL, 8 UNKNOWN au 16/11) ; superviser réellement FS1 et PC-TEST si le laboratoire est repris.
-- [ ] Ajouter à GitHub les six captures authentiques préparées pour l'épisode 10, après contrôle de confidentialité.
+- [ ] Refaire des captures Centreon pour l'épisode 10 : les six captures d'origine n'ont pas été conservées.
 - [ ] Installer GLPI sur une VM dédiée et tester le cycle d'un ticket ; [épisode 12 — préparation](docs/episode-12/README.md).
 - [ ] Vérifier l'exécution automatique réelle de la sauvegarde cron à 02 h et prévoir une copie hors de l'hôte VMware ; poursuivre les futurs VPN intersites.
 

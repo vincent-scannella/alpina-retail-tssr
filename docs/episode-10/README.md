@@ -17,7 +17,7 @@
 | PFSENSE-GRE-SIEGE | Disponible, ICMP OK |
 | Centreon-central | Disponible, avec **6 services CRITICAL et 8 UNKNOWN** encore à analyser |
 
-**Dossier de preuves :** [inventaire des captures sélectionnées](images/README.md). Les PNG authentiques restent à déposer sur GitHub.
+**Dossier de preuves :** [inventaire des captures sélectionnées](images/README.md). Les six captures d'origine du 16/11/2026 n'ont pas été conservées.
 
 ## 1. Objectif
 
@@ -227,7 +227,7 @@ Le modèle d'hôte initial `generic-active-host` a été conservé pour préserv
 - Jauge disque C: DC1 : **37,43 %**.
 - Widget « Disponibilité des équipements » : `DC1-GRE-SIEGE` (4 services OK), `PFSENSE-GRE-SIEGE` (1 service OK), `Centreon-central` (hôte disponible, **14 services OK, 6 critiques et 8 inconnus**).
 
-Ces mesures sont **ponctuelles**, non des moyennes historiques. Le tableau de bord a été sauvegardé. Les alertes internes sur le serveur `Centreon-central` restent visibles : absence de swap actif, processus non détectés et échec d'authentification MariaDB (`centreon-engine@localhost`). Elles n'ont pas été résolues lors de cette séance. Les captures ne sont pas encore déposées dans le dépôt.
+Ces mesures sont **ponctuelles**, non des moyennes historiques. Le tableau de bord a été sauvegardé. Les alertes internes sur le serveur `Centreon-central` restent visibles : absence de swap actif, processus non détectés et échec d'authentification MariaDB (`centreon-engine@localhost`). Elles n'ont pas été résolues lors de cette séance. Les captures de cette séance n'ont pas été conservées.
 
 **Suite envisagée :** l'épisode 11 documente une **simulation de procédure** pour la supervision de FS1, explicitement non déployée.
 
@@ -248,7 +248,7 @@ Le bilan final conserve **6 services CRITICAL et 8 UNKNOWN** sur Centreon-centra
 
 ### Photographies de preuve
 
-Six captures réelles ont été sélectionnées : connexion CMA, erreur disque avant correction, contrôles DC1 au vert, graphique disque C:, tableau de bord final, alertes Centreon restantes. Voir l'[index des preuves](images/README.md). Les images elles-mêmes sont encore à publier dans GitHub.
+Six captures réelles ont été sélectionnées : connexion CMA, erreur disque avant correction, contrôles DC1 au vert, graphique disque C:, tableau de bord final, alertes Centreon restantes. Voir l'[index des preuves](images/README.md). Les images elles-mêmes n'ont pas été conservées.
 
 ### Étape suivante
 

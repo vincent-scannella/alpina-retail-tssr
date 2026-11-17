@@ -1,8 +1,8 @@
 # ALPINA RETAIL — Historique des objectifs
 
-Liste complète des objectifs du laboratoire, dans l'ordre chronologique. Le [sommaire](../../README.md#prochains-objectifs) ne reprend que les objectifs encore ouverts.
+Suivi historique des réalisations et des travaux complémentaires du laboratoire. **La V1 est clôturée le 17 novembre 2026 sur le périmètre testé**, sans déclarer ces travaux ouverts réalisés. Voir le [bilan final](../episode-13/README.md).
 
-## Objectifs ouverts (8)
+## Objectifs ouverts (7 — hors périmètre de clôture V1)
 
 - [ ] Approfondir les diagnostics AD DS et les contrôles des autres fichiers de stratégies.
 - [ ] Poursuivre le filtrage IPv4 restrictif sur pfSense.
@@ -10,10 +10,9 @@ Liste complète des objectifs du laboratoire, dans l'ordre chronologique. Le [so
 - [ ] Vérifier une exécution cron de la version enrichie de surveillance et réaliser un test `ALERTE` non destructif.
 - [ ] Fiabiliser les alertes MariaDB/processus/swap de Centreon-central (6 CRITICAL, 8 UNKNOWN au 16/11) ; superviser réellement FS1 et PC-TEST si le laboratoire est repris.
 - [ ] Refaire des captures Centreon pour l'épisode 10 : les six captures d'origine n'ont pas été conservées.
-- [ ] Installer GLPI sur une VM dédiée et tester le cycle d'un ticket ; [épisode 12 — préparation](../episode-12/README.md).
 - [ ] Vérifier l'exécution automatique réelle de la sauvegarde cron à 02 h et prévoir une copie hors de l'hôte VMware ; poursuivre les futurs VPN intersites.
 
-## Objectifs atteints (36)
+## Objectifs atteints (37)
 
 - [x] Définir l'entreprise fictive, son organisation et ses besoins informatiques.
 - [x] Installer pfSense et valider la connectivité IP, le NAT/PAT et un scénario de filtrage.
@@ -51,5 +50,6 @@ Liste complète des objectifs du laboratoire, dans l'ordre chronologique. Le [so
 - [x] Valider les contrôles CPU, RAM et disque principal de Centreon ; créer le tableau de bord du siège avec les trois jauges et le service ICMP de pfSense (13/11/2026).
 - [x] Superviser DC1 via Windows CMA : CPU, RAM, disque C: et ICMP OK ; tableau de bord actualisé le 16/11/2026.
 - [x] Documenter un **scénario fictif** de supervision FS1 sous Centreon (épisode 11), **sans déploiement ni test**.
+- [x] Installer GLPI 12.0.2 sur Debian 13 (VM dédiée), sécuriser les comptes de démonstration et réaliser le cycle du ticket n°1 de Camille Martin jusqu'à **Clos** le 17/11/2026 ; incident AD/Samba **fictif**, sans réparation réelle ([épisode 12](../episode-12/README.md)).
 
 [Retour au sommaire](../../README.md)

@@ -2,7 +2,7 @@
 
 Suivi historique des réalisations et des travaux complémentaires du laboratoire. **La V1 est clôturée le 17 novembre 2026 sur le périmètre testé**, sans déclarer ces travaux ouverts réalisés. Voir le [bilan final](../episode-13/README.md).
 
-## Objectifs ouverts (7 — hors périmètre de clôture V1)
+## Objectifs ouverts (9 — hors périmètre de clôture V1)
 
 - [ ] Approfondir les diagnostics AD DS et les contrôles des autres fichiers de stratégies.
 - [ ] Poursuivre le filtrage IPv4 restrictif sur pfSense.
@@ -10,6 +10,8 @@ Suivi historique des réalisations et des travaux complémentaires du laboratoir
 - [ ] Vérifier une exécution cron de la version enrichie de surveillance et réaliser un test `ALERTE` non destructif.
 - [ ] Fiabiliser les alertes MariaDB/processus/swap de Centreon-central (6 CRITICAL, 8 UNKNOWN au 16/11) ; superviser réellement FS1 et PC-TEST si le laboratoire est repris.
 - [ ] Refaire des captures Centreon pour l'épisode 10 : les six captures d'origine n'ont pas été conservées.
+- [ ] Activer HTTPS pour GLPI avant tout accès hors laboratoire ; évaluer 2FA, sauvegardes GLPI et avertissements de fuseau horaire / prérequis encore ouverts.
+- [ ] Déposer des captures authentiques de l'épisode 12 après contrôle des informations sensibles.
 - [ ] Vérifier l'exécution automatique réelle de la sauvegarde cron à 02 h et prévoir une copie hors de l'hôte VMware ; poursuivre les futurs VPN intersites.
 
 ## Objectifs atteints (37)

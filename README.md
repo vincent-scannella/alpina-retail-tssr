@@ -12,9 +12,11 @@ Je conçois, déploie et dépanne progressivement une infrastructure informatiqu
 
 | Entreprise simulée | Laboratoire personnel | Progression |
 |---|---|---|
-| **4 sites** · 75 collaborateurs fictifs | **Windows 11** · VMware Workstation · **16 Go de RAM sur l'hôte** | **Épisodes 00 à 10 : réalisations documentées** ; épisode 11 : étude de cas simulée ; épisode 12 : GLPI préparé, non installé. Windows CMA validé sur DC1 ; ICMP pfSense vérifié |
+| **4 sites** · 75 collaborateurs fictifs | **Windows 11** · VMware Workstation · **16 Go de RAM sur l'hôte** | **Épisodes 00 à 10 et 12 : travaux réels documentés** ; épisode 11 : étude de cas simulée. GLPI installé, ticket n°1 clôturé le 17/11/2026 ; DC1 supervisé par CMA, ICMP pfSense validé |
 
 **Ce qui est déjà vérifié :**
+
+- **Support / GLPI :** VM Debian 13 `GLPI-GRE-SIEGE` (`10.10.10.50`) et application GLPI 12.0.2 installées ; compte technicien et compte Self-Service testés ; premier ticket Helpdesk ouvert, attribué, résolu dans le scénario et clos après approbation le **17/11/2026**. La panne Samba/AD était **fictive** et n'a pas été reproduite sur le réseau réel.
 
 - **Réseau et sécurité :** pfSense CE 2.9.0 configuré ; LAN/WAN, accès Internet depuis Windows 11, NAT/PAT observé, filtrage ICMP ciblé testé puis retiré, sauvegarde de configuration chiffrée conservée hors GitHub.
 - **Windows Server et AD DS :** Windows Server 2025, forêt `ironman.test`, promotion de `DC1-GRE-SIEGE`, tests `dcdiag` ciblés réussis ; partages `SYSVOL` et `NETLOGON` accessibles depuis Windows 11 et découverte du DC par `nltest /dsgetdc:ironman.test` réussie et canal sécurisé vérifié par PowerShell (`True`) et lecture de `GPT.INI` depuis SYSVOL (`Version=3`) ; captures de ces derniers contrôles non publiées.
@@ -32,7 +34,7 @@ Compétences du titre travaillées dans ce laboratoire, reliées à ce qui est r
 
 | Compétence du titre | Dans ce laboratoire | État |
 |---|---|---|
-| Assurer le support utilisateur en centre de services | GLPI préparé, cycle d'un ticket à tester ([épisode 12](docs/episode-12/README.md)) | **Prévu** |
+| Assurer le support utilisateur en centre de services | GLPI 12.0.2 installé sur Debian 13 ; comptes Self-Service / Technicien ; ticket n°1 ouvert, affecté, documenté, approuvé puis clos ([épisode 12](docs/episode-12/README.md)). Incident AD/Samba fictif. | **Cycle GLPI validé ; panne technique simulée** |
 | Exploiter des serveurs Windows et un domaine Active Directory | DC1, AD DS, DNS, DHCP, GPO, politique de mots de passe ([04](docs/episode-04/README.md), [06](docs/episode-06/README.md), [08](docs/episode-08/README.md)) | **Validé** |
 | Exploiter des serveurs Linux | FS1 Debian 12, Samba/Winbind joint au domaine, SSH par clé ([05](docs/episode-05/README.md), [06](docs/episode-06/README.md)) | **Validé** |
 | Exploiter un réseau IP | Adressage IPv4, NAT/PAT, DNS, DHCP, diagnostics `ping` et `nslookup` ([03](docs/episode-03/README.md), [04](docs/episode-04/README.md)) | **Validé** |
@@ -65,6 +67,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | FS1 — Debian 12 | `10.10.10.30/24` (statique, VMnet1) | AD/Winbind et partage Samba validés ; SSH par clé ED25519 ; COMMUN chiffré via SMB 3.1.1 confirmé par Windows 11 le 09/11 |
 | Étendue Windows DHCP | `10.10.10.100` → `10.10.10.199` | Active ; bail client de 8 jours confirmé |
 | Centreon — VM Debian 13 | `10.10.10.40` | ICMP pfSense/DC1 OK ; CPU/RAM/disque de DC1 supervisés via CMA ; tableau de bord enregistré le 16/11/2026 ; alertes internes Centreon à diagnostiquer |
+| GLPI-GRE-SIEGE — VM Debian 13 | `10.10.10.50/24` (VMnet1) | Apache, PHP 8.4, MariaDB, GLPI 12.0.2 opérationnels ; ticket n°1 clos le 17/11/2026 (scénario fictif) |
 
 **À distinguer :** la connexion entre les quatre sites, les VPN et les autres serveurs de l'architecture cible sont pour le moment des **éléments de conception**, pas un environnement multisite opérationnel.
 
@@ -84,7 +87,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **09** | [Supervision Bash / cron et préparation de Centreon](docs/episode-09/README.md) | [Script Bash documenté](docs/episode-09/surveillance-alpina.sh) : ICMP, services et disque de sauvegarde ; six tests manuels `OK`, cron toutes les 5 minutes ; [4 captures](docs/episode-09/images/README.md) |
 | **10** | [Centreon — supervision réelle de pfSense et DC1](docs/episode-10/README.md) | ICMP pfSense/DC1 OK ; CPU/RAM/disque C: de DC1 **validés via Windows CMA le 16/11/2026** ; 6 alertes critiques et 8 états inconnus à diagnostiquer sur Centreon-central ; [six captures inventoriées](docs/episode-10/images/README.md), fichiers d'origine non conservés |
 | **11** | [FS1 — supervision Linux avec Centreon (simulation)](docs/episode-11/README.md) | **Étude de cas non exécutée** : architecture SNMPv3, services envisagés, tests d'acceptation et dépannage ; aucune mesure ni capture revendiquée. |
-| **12** | [GLPI — préparation de l'outil de support](docs/episode-12/README.md) | **Planifié, pas encore installé** : architecture, prérequis, sécurité et scénario de ticket à tester. |
+| **12** | [GLPI — support utilisateurs et ticket Helpdesk](docs/episode-12/README.md) | **Réellement installé** : Debian 13, Apache, PHP 8.4, MariaDB et GLPI 12.0.2. Ticket n°1 créé par Camille Martin, pris en charge par Support Informatique, solution simulée approuvée, ticket **Clos le 17/11/2026 à 10:04:55**. Panne Samba non reproduite. |
 
 
 **Preuves visuelles :** [épisode 08 — 5 captures GPO/SMB](docs/episode-08/images/README.md) · [épisode 09 — 4 captures supervision/Centreon](docs/episode-09/images/README.md) · [épisode 07 — 10 captures authentiques de la sauvegarde et restauration FS1](docs/episode-07/images/README.md) · [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md) · [épisode 05 — 22 captures authentiques Debian / réseau / DNS / AD / SMB](docs/episode-05/images/README.md).
@@ -111,7 +114,7 @@ Chaque épisode technique suit la même logique :
 
 Le [tableau de bord Centreon](docs/episode-10/README.md) présente les performances CPU, RAM et disque C: de DC1 ainsi que l'état des hôtes du siège. La connexion CMA et les quatre services Windows (CPU, MEMORY, DISK-C, ICMP) ont été vérifiés. **Les alertes de Centreon-central ne sont pas masquées ni résolues.**
 
-Le dossier [de référence](docs/suivi/etat-2026-11-16.md) distingue le travail réellement validé, les simulations et les travaux à terminer. La prochaine étape prévue est [GLPI (épisode 12)](docs/episode-12/README.md), non installé à ce jour.
+Le dossier [de référence au 16/11](docs/suivi/etat-2026-11-16.md) distingue le travail réellement validé, les simulations et les travaux à terminer. **Mise à jour du 17/11 :** [GLPI a été installé et le ticket n°1 clôturé](docs/episode-12/README.md) ; les limites de sécurité et l'absence de panne réellement reproduite sont documentées.
 
 ## Prochains objectifs
 
@@ -121,7 +124,9 @@ Le dossier [de référence](docs/suivi/etat-2026-11-16.md) distingue le travail 
 - [ ] Vérifier une exécution cron de la version enrichie de surveillance et réaliser un test `ALERTE` non destructif.
 - [ ] Fiabiliser les alertes MariaDB/processus/swap de Centreon-central (6 CRITICAL, 8 UNKNOWN au 16/11) ; superviser réellement FS1 et PC-TEST si le laboratoire est repris.
 - [ ] Refaire des captures Centreon pour l'épisode 10 : les six captures d'origine n'ont pas été conservées.
-- [ ] Installer GLPI sur une VM dédiée et tester le cycle d'un ticket ; [épisode 12 — préparation](docs/episode-12/README.md).
+- [x] Installer GLPI sur une VM dédiée et vérifier un cycle complet de ticket (demandeur, attribution, solution, approbation, clôture) ; [épisode 12 — réalisation](docs/episode-12/README.md). L'incident AD/Samba est simulé.
+- [ ] Mettre GLPI en HTTPS avant tout accès hors laboratoire ; évaluer 2FA et sauvegarde GLPI ; vérifier les avertissements de fuseau horaire et autres prérequis non résolus.
+- [ ] Publier des captures authentiques de l'épisode 12 après contrôle de confidentialité.
 - [ ] Vérifier l'exécution automatique réelle de la sauvegarde cron à 02 h et prévoir une copie hors de l'hôte VMware ; poursuivre les futurs VPN intersites.
 
 **36 objectifs déjà atteints :** [voir l'historique complet](docs/suivi/objectifs.md).

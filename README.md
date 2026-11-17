@@ -2,6 +2,9 @@
 
 # ALPINA RETAIL — Laboratoire systèmes & réseaux
 
+**Version 1 clôturée le 17 novembre 2026 — périmètre testé : siège fictif de Grenoble.**  
+[**Consulter le bilan final et la clôture V1**](docs/episode-13/README.md) · [GLPI : ticket Helpdesk n°1 clos](docs/episode-12/README.md)
+
 **Projet personnel TSSR · Infrastructure multisite fictive · Documentation technique et preuves de validation**
 
 Je conçois, déploie et dépanne progressivement une infrastructure informatique inspirée des besoins d'une PME du prêt-à-porter. Le projet associe **architecture réseau, Windows Server, Active Directory, DNS, DHCP, pfSense, virtualisation et support utilisateurs**.
@@ -12,7 +15,7 @@ Je conçois, déploie et dépanne progressivement une infrastructure informatiqu
 
 | Entreprise simulée | Laboratoire personnel | Progression |
 |---|---|---|
-| **4 sites** · 75 collaborateurs fictifs | **Windows 11** · VMware Workstation · **16 Go de RAM sur l'hôte** | **Épisodes 00 à 10 et 12 : travaux réels documentés** ; épisode 11 : étude de cas simulée. GLPI installé, ticket n°1 clôturé le 17/11/2026 ; DC1 supervisé par CMA, ICMP pfSense validé |
+| **4 sites** · 75 collaborateurs fictifs | **Windows 11** · VMware Workstation · **16 Go de RAM sur l'hôte** | **Épisodes 00 à 10 et 12 : travaux réels documentés** ; épisode 11 : simulation non exécutée ; épisode 13 : bilan final de la V1. GLPI et ticket n°1 clos ; supervision CMA/ICMP validée dans ses limites |
 
 **Ce qui est déjà vérifié :**
 
@@ -53,7 +56,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 
 ![Topologie réelle du laboratoire du siège de Grenoble : Internet, VMware NAT VMnet8, pfSense, VMnet1, DC1 Windows Server, PC-TEST-GRE, FS1 Debian et Centreon](docs/topologie-laboratoire-siege-2026-11-16.svg)
 
-*Synthèse au 16 novembre 2026 : machines réellement créées au siège. La supervision de FS1 dans Centreon n'est pas déployée ([épisode 11](docs/episode-11/README.md), simulation). Verrouillage automatique de `PC-TEST-GRE` observé sans capture ni mesure chronométrée. [Ouvrir le schéma en grand](docs/topologie-laboratoire-siege-2026-11-16.svg) · [version du 3 novembre](docs/topologie-laboratoire-siege.svg).*
+*Schéma historique au 16 novembre 2026, **avant l'ajout de GLPI-GRE-SIEGE (10.10.10.50)**. La [topologie logique complétée figure dans le bilan final V1](docs/episode-13/README.md). La supervision de FS1 dans Centreon n'est pas déployée ([épisode 11](docs/episode-11/README.md), simulation). Verrouillage automatique de `PC-TEST-GRE` observé sans capture ni mesure chronométrée. [Ouvrir le schéma en grand](docs/topologie-laboratoire-siege-2026-11-16.svg) · [version du 3 novembre](docs/topologie-laboratoire-siege.svg).*
 
 *Le poste `PC-TEST-GRE`, initialement configuré en statique sur `10.10.10.20`, utilise maintenant un **bail DHCP `10.10.10.100` délivré par DC1**. Les trois premières VM ont été allumées simultanément pour les essais du 3 novembre, malgré les 16 Go de RAM de l'hôte.*
 
@@ -88,6 +91,7 @@ La topologie suivante décrit les composants **créés dans VMware**, et non les
 | **10** | [Centreon — supervision réelle de pfSense et DC1](docs/episode-10/README.md) | ICMP pfSense/DC1 OK ; CPU/RAM/disque C: de DC1 **validés via Windows CMA le 16/11/2026** ; 6 alertes critiques et 8 états inconnus à diagnostiquer sur Centreon-central ; [six captures inventoriées](docs/episode-10/images/README.md), fichiers d'origine non conservés |
 | **11** | [FS1 — supervision Linux avec Centreon (simulation)](docs/episode-11/README.md) | **Étude de cas non exécutée** : architecture SNMPv3, services envisagés, tests d'acceptation et dépannage ; aucune mesure ni capture revendiquée. |
 | **12** | [GLPI — support utilisateurs et ticket Helpdesk](docs/episode-12/README.md) | **Réellement installé** : Debian 13, Apache, PHP 8.4, MariaDB et GLPI 12.0.2. Ticket n°1 créé par Camille Martin, pris en charge par Support Informatique, solution simulée approuvée, ticket **Clos le 17/11/2026 à 10:04:55**. Panne Samba non reproduite. |
+| **13** | [Bilan final et clôture de la V1](docs/episode-13/README.md) | Synthèse des réalisations testées, architecture du laboratoire, compétences TSSR, incidents rencontrés, limites et points ouverts conservés pour une éventuelle V2. |
 
 
 **Preuves visuelles :** [épisode 08 — 5 captures GPO/SMB](docs/episode-08/images/README.md) · [épisode 09 — 4 captures supervision/Centreon](docs/episode-09/images/README.md) · [épisode 07 — 10 captures authentiques de la sauvegarde et restauration FS1](docs/episode-07/images/README.md) · [épisode 03 — 8 captures authentiques et 2 schémas pédagogiques](docs/episode-03/images/README.md) · [épisode 04 — 40 captures Windows Server / AD DS / DNS / DHCP / GPO](docs/episode-04/images/README.md) · [épisode 05 — 22 captures authentiques Debian / réseau / DNS / AD / SMB](docs/episode-05/images/README.md).
@@ -110,13 +114,13 @@ Chaque épisode technique suit la même logique :
 
 > **Rigueur de validation :** une configuration affichée comme active ne remplace pas un test de fonctionnement côté client. Les erreurs, limites et étapes non vérifiées sont conservées dans les comptes rendus.
 
-## Jalon du 16 novembre 2026 — Centreon et prochaine étape GLPI
+## Jalons finaux : Centreon (16/11) et GLPI (17/11)
 
 Le [tableau de bord Centreon](docs/episode-10/README.md) présente les performances CPU, RAM et disque C: de DC1 ainsi que l'état des hôtes du siège. La connexion CMA et les quatre services Windows (CPU, MEMORY, DISK-C, ICMP) ont été vérifiés. **Les alertes de Centreon-central ne sont pas masquées ni résolues.**
 
-Le dossier [de référence au 16/11](docs/suivi/etat-2026-11-16.md) distingue le travail réellement validé, les simulations et les travaux à terminer. **Mise à jour du 17/11 :** [GLPI a été installé et le ticket n°1 clôturé](docs/episode-12/README.md) ; les limites de sécurité et l'absence de panne réellement reproduite sont documentées.
+Le dossier [de référence au 16/11](docs/suivi/etat-2026-11-16.md) reste une photographie historique. Le **17/11**, [GLPI a été installé et le ticket n°1 clôturé](docs/episode-12/README.md) ; la panne AD/Samba du scénario n'a pas été réellement reproduite. **Le [bilan final V1](docs/episode-13/README.md) est la synthèse de clôture à consulter en priorité.**
 
-## Prochains objectifs
+## Points ouverts hors du périmètre clôturé
 
 - [ ] Approfondir les diagnostics AD DS et les contrôles des autres fichiers de stratégies.
 - [ ] Poursuivre le filtrage IPv4 restrictif sur pfSense.
@@ -124,17 +128,16 @@ Le dossier [de référence au 16/11](docs/suivi/etat-2026-11-16.md) distingue le
 - [ ] Vérifier une exécution cron de la version enrichie de surveillance et réaliser un test `ALERTE` non destructif.
 - [ ] Fiabiliser les alertes MariaDB/processus/swap de Centreon-central (6 CRITICAL, 8 UNKNOWN au 16/11) ; superviser réellement FS1 et PC-TEST si le laboratoire est repris.
 - [ ] Refaire des captures Centreon pour l'épisode 10 : les six captures d'origine n'ont pas été conservées.
-- [x] Installer GLPI sur une VM dédiée et vérifier un cycle complet de ticket (demandeur, attribution, solution, approbation, clôture) ; [épisode 12 — réalisation](docs/episode-12/README.md). L'incident AD/Samba est simulé.
 - [ ] Mettre GLPI en HTTPS avant tout accès hors laboratoire ; évaluer 2FA et sauvegarde GLPI ; vérifier les avertissements de fuseau horaire et autres prérequis non résolus.
 - [ ] Publier des captures authentiques de l'épisode 12 après contrôle de confidentialité.
 - [ ] Vérifier l'exécution automatique réelle de la sauvegarde cron à 02 h et prévoir une copie hors de l'hôte VMware ; poursuivre les futurs VPN intersites.
 
-**36 objectifs déjà atteints :** [voir l'historique complet](docs/suivi/objectifs.md).
+**37 objectifs atteints dans le suivi du laboratoire ; 7 travaux complémentaires ouverts**, à traiter seulement en cas de reprise ou de V2 : [historique détaillé](docs/suivi/objectifs.md). Ces travaux ne remettent pas en cause la clôture pédagogique du périmètre V1.
 
 ## À propos
 
 **Auteur : Vincent Scannella — titulaire du titre professionnel Technicien Supérieur Systèmes et Réseaux (TSSR), obtenu en octobre 2026.**
 
-Ce dépôt est un **portfolio de mise en pratique** destiné à montrer une méthode de travail : installer, vérifier, diagnostiquer et produire une documentation exploitable. Les données, utilisateurs et sites de l'entreprise sont fictifs ; les captures de laboratoire sont authentiques et sélectionnées pour ne pas divulguer de secrets.
+Ce dépôt est un **portfolio de mise en pratique** destiné à montrer une méthode de travail : installer, vérifier, diagnostiquer et produire une documentation exploitable. Les sites et les personnes de l'entreprise sont fictifs ; certaines VM et opérations sont réelles. **Les captures disponibles sont authentiques, mais toutes n'ont pas encore été déposées dans GitHub**. Les résultats simulés sont explicitement identifiés. La V1 a été clôturée comme laboratoire pédagogique, pas comme infrastructure de production.
 
 [Profil LinkedIn](https://fr.linkedin.com/in/vincent-scannella)

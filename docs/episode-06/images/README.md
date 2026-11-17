@@ -1,6 +1,6 @@
 # ALPINA RETAIL — Épisode 06 — Preuves visuelles SSH, Samba, pare-feu et Active Directory
 
-**09–10 novembre 2026.** Seize captures authentiques transmises par l'auteur, liées au [compte rendu de l'épisode 06](../README.md).
+**09–10 novembre 2026.** Seize captures authentiques, liées au [compte rendu de l'épisode 06](../README.md).
 
 | Capture | Ce qu'elle montre |
 |---|---|
@@ -63,4 +63,4 @@
 
 ![PC-TEST : pas de réponse du DNS pfSense en accès direct](16-client-dns-direct-pfsense-refuse.png)
 
-**Limites :** la connexion SSH par clé a été confirmée par l'auteur après rechargement, mais n'a pas fait l'objet d'une capture dédiée. Aucune clé privée ni passphrase n'est incluse. La deuxième capture est compressée pour le dépôt sans changement des valeurs affichées. La capture 04 précède la dernière modification de la configuration des partages invités. Les quatorze captures ajoutées après la mise en place de SSH proviennent des séances authentiques et ont été compressées pour le dépôt. La capture 09 a une palette réduite pour respecter une taille raisonnable.
+**Limites :** la connexion SSH par clé a été constatée à l'écran après rechargement, mais n'a pas fait l'objet d'une capture dédiée. Aucune clé privée ni passphrase n'est incluse. La deuxième capture est compressée pour le dépôt sans changement des valeurs affichées. La capture 04 précède la dernière modification de la configuration des partages invités. Les quatorze captures ajoutées après la mise en place de SSH proviennent des séances authentiques et ont été compressées pour le dépôt. La capture 09 a une palette réduite pour respecter une taille raisonnable.

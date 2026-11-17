@@ -21,7 +21,7 @@ Liste complète des objectifs du laboratoire, dans l'ordre chronologique. Le [so
 - [x] Créer et activer l'étendue DHCP du siège ; contrôler sa plage et ses options.
 - [x] Confirmer la durée du bail de **8 jours** et l'attribution DHCP à `PC-TEST-GRE` (`ipconfig /all`).
 - [x] Joindre Windows 11 au domaine, authentifier des comptes AD et vérifier l'application d'une GPO ordinateur à 900 secondes.
-- [x] Observer le verrouillage automatique sur `PC-TEST-GRE` (retour de l'auteur du 03/11/2026 ; pas de capture ni de chronométrage précis).
+- [x] Observer le verrouillage automatique sur `PC-TEST-GRE` (observation du 03/11/2026 ; pas de capture ni de chronométrage précis).
 - [x] Vérifier depuis Windows 11 les partages `SYSVOL` et `NETLOGON` (captures non publiées).
 - [x] Vérifier la découverte du contrôleur de domaine avec `nltest` depuis Windows 11 (`DC1-GRE-SIEGE`, `10.10.10.10`).
 - [x] Vérifier le canal sécurisé de `PC-TEST-GRE` avec `Test-ComputerSecureChannel -Verbose` : `True` le 03/11/2026 (capture non publiée).

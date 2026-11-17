@@ -78,7 +78,7 @@ kbdinteractiveauthentication no
 
 La configuration a été appliquée avec `sudo systemctl reload ssh`.
 
-**Contrôle fonctionnel final :** depuis une **nouvelle** fenêtre PowerShell de DC1, l'auteur a établi une nouvelle session sur FS1 avec la clé privée ED25519 et une passphrase ; la connexion a réussi **après** le rechargement. L'ancienne session SSH était restée ouverte comme précaution.
+**Contrôle fonctionnel final :** depuis une **nouvelle** fenêtre PowerShell de DC1, une nouvelle session a été établie sur FS1 avec la clé privée ED25519 et une passphrase ; la connexion a réussi **après** le rechargement. L'ancienne session SSH était restée ouverte comme précaution.
 
 **Conclusion :** la configuration SSH est valide et la connexion distante par clé fonctionne ; cela ne constitue pas un audit exhaustif du système (ACL de clés, journalisation, mises à jour, règles de filtrage SSH, rotation des clés et PRA restent hors périmètre de ce jalon).
 
@@ -98,7 +98,7 @@ server signing = default
 
 ### Paramètres appliqués sur FS1
 
-Dans la section `[global]` de `/etc/samba/smb.conf`, l'auteur a défini :
+Dans la section `[global]` de `/etc/samba/smb.conf`, les paramètres suivants ont été définis :
 
 ```ini
 server signing = mandatory
@@ -230,7 +230,7 @@ Paramètres **vérifiés sur capture le 09/11/2026** :
 - Pare-feu `pfSense-GRE-SIEGE` : LAN `10.10.10.1`, WAN `10.50.10.128` sur VMware NAT (VMnet8).
 - WAN privé : option `Block private networks and loopback addresses` désactivée pour le WAN sur adresse RFC 1918, `Block bogon networks` conservée. Pas de règle d'autorisation WAN explicite visible lors du contrôle.
 - SSH pfSense désactivé après rétablissement de l'accès Web ; accès HTTPS conservé.
-- Sauvegarde XML complète chiffrée téléchargée par l'auteur, **non publiée** dans ce dépôt (document sensible).
+- Sauvegarde XML complète chiffrée téléchargée, **non publiée** dans ce dépôt (document sensible).
 - Alias `ALPINA_DC1` → `10.10.10.10` ; alias `ALPINA_WEB_PORTS` → `80`, `443`.
 - Sur LAN, de haut en bas : autorisation NTP `UDP/123` depuis DC1 ; autorisation DNS `TCP/UDP 53` depuis DC1 ; blocage DNS classique `TCP/UDP 53` depuis `LAN subnets` ; autorisation Web `TCP 80/443` depuis `LAN subnets` ; règle générale IPv4 `Default allow LAN to any` encore **active** ; règle IPv6 par défaut **désactivée**.
 - L'ordre est essentiel : l'autorisation DNS DC1 doit être **au-dessus** du blocage DNS visant le LAN.

@@ -1,7 +1,7 @@
 # ALPINA RETAIL — Épisode 04 : Windows Server 2025, Active Directory, DNS et DHCP
 
 > **Dates des opérations :** 2 et 3 novembre 2026  
-> **Statut :** DC1, AD DS, DNS et DHCP opérationnels dans le laboratoire ; **bail DHCP obtenu sur Windows 11, jonction au domaine, ouverture de session AD et application d'une GPO ordinateur vérifiés le 3 novembre 2026**. Verrouillage automatique observé ultérieurement par l'auteur sur le poste client (déclaration du 03/11/2026) ; aucune capture et aucun chronométrage précis fournis.  
+> **Statut :** DC1, AD DS, DNS et DHCP opérationnels dans le laboratoire ; **bail DHCP obtenu sur Windows 11, jonction au domaine, ouverture de session AD et application d'une GPO ordinateur vérifiés le 3 novembre 2026**. Verrouillage automatique observé ensuite sur le poste client (03/11/2026) ; aucune capture et aucun chronométrage précis fournis.  
 > **Périmètre :** laboratoire TSSR personnel au siège fictif de Grenoble.
 
 ## En bref
@@ -12,7 +12,7 @@
 | **Active Directory** | Forêt `ironman.test`, contrôles `dcdiag` réussis, `PC-TEST-GRE` joint au domaine ; authentification `IRONMAN\administrateur` et `IRONMAN\test.gre` observée | Accès client à `SYSVOL`/`NETLOGON`, découverte du DC (`nltest`) et canal sécurisé (`True`) confirmés le 03/11/2026 |
 | **DNS** | SRV LDAP, recherches directes/inverses, `dcdiag /test:DNS` et DNS externe réussis ; requêtes `nslookup` depuis le poste client vérifiées | Pas d'audit DNS exhaustif |
 | **DHCP** | Serveur `10.10.10.10` : bail **`10.10.10.100/24`** délivré au client, passerelle `10.10.10.1`, DNS `10.10.10.10`, suffixe `ironman.test` et bail de **8 jours** | Un seul poste client a été testé |
-| **GPO** | `GPO-GRE-POSTES-VERROUILLAGE-15MIN` liée à `POSTES`, mise à jour réussie ; `gpresult` la liste ; `InactivityTimeoutSecs = 0x384` | Verrouillage automatique déclaré observé par l'auteur ; pas de capture ni de mesure chronométrée précise |
+| **GPO** | `GPO-GRE-POSTES-VERROUILLAGE-15MIN` liée à `POSTES`, mise à jour réussie ; `gpresult` la liste ; `InactivityTimeoutSecs = 0x384` | Verrouillage automatique observé ; pas de capture ni de mesure chronométrée précise |
 
 **Sommaire :** [Architecture](#1-objectif-et-architecture) · [VM Windows Server](#2-machine-virtuelle) · [Journal des manipulations](#3-installation-et-configuration-réellement-effectuées) · [Configuration IPv4](#4-configuration-ipv4-confirmée-depuis-ipconfig-all) · [Tests réseau](#5-tests-réseau-et-résultats) · [Contrôles AD DS/DNS](#6-validations-ad-ds-et-dns) · [Captures](#7-preuves-visuelles-publiées) · [Suite](#8-étapes-restantes)
 
@@ -26,7 +26,7 @@ Créer un premier serveur Windows pour préparer les services d'identité et d'i
 
 ![Schéma du laboratoire actuel : pfSense, Windows Server AD DS DNS DHCP et poste Windows 11 sur VMnet1](../topologie-laboratoire-siege.svg)
 
-*Topologie du laboratoire actualisée au 3 novembre 2026 : client `PC-TEST-GRE` en DHCP (`10.10.10.100`), joint au domaine `ironman.test`. Première GPO ordinateur appliquée ; verrouillage ensuite observé manuellement par l'auteur, sans capture ni chronométrage précis. [Voir le schéma vectoriel en grand](../topologie-laboratoire-siege.svg).*
+*Topologie du laboratoire actualisée au 3 novembre 2026 : client `PC-TEST-GRE` en DHCP (`10.10.10.100`), joint au domaine `ironman.test`. Première GPO ordinateur appliquée ; verrouillage ensuite observé manuellement, sans capture ni chronométrage précis. [Voir le schéma vectoriel en grand](../topologie-laboratoire-siege.svg).*
 
 La liaison entre la VM Windows et pfSense est assurée par **VMnet1 (Host-only)**. Le WAN pfSense est raccordé au NAT de VMware. Cette architecture représente une maquette, pas un environnement de production.
 
@@ -83,7 +83,7 @@ Ce journal conserve les **manipulations réellement effectuées et leurs observa
 
 *Capture — Rôle AD DS installé ; promotion restant encore à effectuer à cet instant.*
 16. Lancement de l'assistant de promotion et sélection de **« Ajouter une nouvelle forêt »** ; domaine racine choisi : **`ironman.test`**, nom DNS de laboratoire distinct du nom de l'entreprise fictive.
-17. Options choisies : **niveau fonctionnel de forêt et de domaine Windows Server 2025**, serveur DNS et catalogue global cochés, RODC décoché ; mot de passe DSRM défini par l'auteur, non publié.
+17. Options choisies : **niveau fonctionnel de forêt et de domaine Windows Server 2025**, serveur DNS et catalogue global cochés, RODC décoché ; mot de passe DSRM défini, non publié.
 18. Avertissement de non-création d'une délégation DNS dans la zone parente : attendu pour cette forêt de laboratoire indépendante, sans délégation parente configurée.
 19. Nom NetBIOS confirmé : **`IRONMAN`**. Les paramètres et chemins d'accès ont été parcourus ; aucune valeur de chemin particulière n'est revendiquée faute de capture.
 20. Contrôle des prérequis **réussi** : l'assistant indique que « toutes les vérifications de la configuration requise ont donné satisfaction » malgré l'avertissement DNS non bloquant.
@@ -91,7 +91,7 @@ Ce journal conserve les **manipulations réellement effectuées et leurs observa
 ![Vérification des prérequis de promotion Active Directory réussie](images/06-promotion-prerequis-reussis.png)
 
 *Capture — Les conditions préalables à la promotion de DC1 sont validées.*
-21. Promotion lancée, puis **redémarrage de Windows Server**. L'écran de connexion affiche **`IRONMAN\Administrateur`** ; ouverture de session effectuée par l'auteur.
+21. Promotion lancée, puis **redémarrage de Windows Server**. L'écran de connexion affiche **`IRONMAN\Administrateur`** ; ouverture de session effectuée.
 22. Dans **Gestionnaire de serveur → Serveur local**, observation du nom **`DC1-GRE-SIEGE`**, du **domaine `ironman.test`**, de l'adresse **`10.10.10.10`** et du profil de pare-feu **Domaine : actif**. Ces preuves confirment le rattachement à la nouvelle forêt après promotion, **sans valider encore l'ensemble des services AD DS et DNS**.
 23. Exécution de **`dcdiag /test:Advertising`** depuis une invite de commandes sur DC1 : l'outil trouve le serveur associé, reconnaît la forêt AD et affiche **« Le test Connectivity de DC1-GRE-SIEGE a réussi »**, puis **« Le test Advertising de DC1-GRE-SIEGE a réussi »**. Aucun échec dans le résultat visible de ce test ciblé ; il ne s'agit pas d'un diagnostic exhaustif du DNS ou de l'annuaire.
 ### 3.3. Vérifier et dépanner le DNS
@@ -269,13 +269,13 @@ gpresult /scope computer /r
 
 ![gpresult confirme la GPO de verrouillage dans les stratégies ordinateur appliquées](images/40-gpo-gpresult-ordinateur.png)
 
-**Bilan de validation :** le **DHCP client**, la **résolution DNS**, la **localisation du DC via SRV**, la **jonction au domaine**, les **sessions AD** et la **réception du paramètre GPO** sont vérifiés sur `PC-TEST-GRE`. **Complément déclaré le 03/11/2026 :** l'auteur a ensuite observé le verrouillage automatique du poste après inactivité. Ce retour constitue un test fonctionnel rapporté, **sans capture d'écran et sans mesure chronométrée précise** ; les paramètres à 900 secondes restent prouvés par les captures 36 à 40.
+**Bilan de validation :** le **DHCP client**, la **résolution DNS**, la **localisation du DC via SRV**, la **jonction au domaine**, les **sessions AD** et la **réception du paramètre GPO** sont vérifiés sur `PC-TEST-GRE`. **Complément du 03/11/2026 :** le verrouillage automatique du poste après inactivité a ensuite été observé. Cette observation constitue un test fonctionnel sans preuve instrumentée, **sans capture d'écran et sans mesure chronométrée précise** ; les paramètres à 900 secondes restent prouvés par les captures 36 à 40.
 
-### 3.6. Contrôle complémentaire du verrouillage — retour de l'auteur (3 novembre 2026)
+### 3.6. Contrôle complémentaire du verrouillage — observation du 3 novembre 2026
 
-Après la validation de l'application de la GPO sur `PC-TEST-GRE`, l'auteur indique avoir **constaté le verrouillage automatique du poste à l'issue d'une période d'inactivité**. Ce contrôle de comportement a été confirmé lors de l'échange du **03/11/2026**.
+Après la validation de l'application de la GPO sur `PC-TEST-GRE`, le **verrouillage automatique du poste à l'issue d'une période d'inactivité** a été constaté le **03/11/2026**.
 
-- **État :** fonctionnement observé et déclaré par l'auteur.
+- **État :** fonctionnement observé, sans preuve visuelle.
 - **Preuves existantes :** les captures 36 à 40 attestent la configuration et l'application de la GPO à 900 secondes.
 - **Limites :** aucune capture de l'écran verrouillé et aucun relevé de chronométrage exact n'ont été fournis. L'observation n'est donc **pas présentée comme une preuve visuelle ni comme une mesure précise des 900 secondes**.
 
@@ -382,7 +382,7 @@ La lecture du contenu du fichier de la **Default Domain Policy** via SYSVOL est 
 | `ping 10.10.10.1` (pfSense LAN) | 4 | 4 | **0 %** | min 0 ms, max 1 ms, moyenne 0 ms |
 | `ping 8.8.8.8` (destination externe) | 4 | 4 | **0 %** | min 20 ms, max 24 ms, moyenne 21 ms |
 
-Les deux sorties de commande ont été transmises par l'auteur sous forme de captures d'écran.
+Les deux sorties de commande sont conservées sous forme de captures d'écran.
 
 **Conclusion limitée au test :** les réponses ICMP prouvent l'accès à la passerelle et la connectivité IPv4 vers `8.8.8.8` depuis la VM Windows, à travers pfSense. Elles ne prouvent pas à elles seules le fonctionnement du DNS, d'Active Directory ou de tous les protocoles applicatifs.
 
@@ -444,7 +444,7 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 
 [Parcourir le dossier d'images et son inventaire](images/README.md).
 
-**Limites des preuves :** le bail DHCP, le domaine et le paramètre de GPO sont désormais confirmés sur un client. **Restent à documenter :** un éventuel relevé chronométré/capture du verrouillage (le fonctionnement a été déclaré observé), la lecture détaillée des autres fichiers de stratégies, l'état de réplication et un audit de fonctionnement multi-postes (`GPT.INI` de la Default Domain Policy est lisible depuis le client).
+**Limites des preuves :** le bail DHCP, le domaine et le paramètre de GPO sont désormais confirmés sur un client. **Restent à documenter :** un éventuel relevé chronométré/capture du verrouillage (le fonctionnement a été observé sans preuve visuelle), la lecture détaillée des autres fichiers de stratégies, l'état de réplication et un audit de fonctionnement multi-postes (`GPT.INI` de la Default Domain Policy est lisible depuis le client).
 
 **Confidentialité :** aucun mot de passe administrateur ou DSRM ni export de configuration pfSense n'est publié.
 
@@ -471,7 +471,7 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Vérifier la lecture du fichier `GPT.INI` de la Default Domain Policy depuis Windows 11 : `[General]` et `Version=3` visibles dans le Bloc-notes (capture non publiée).
 - [ ] Approfondir les diagnostics AD DS ; cette lecture ne vaut pas audit des autres fichiers de GPO ni vérification de réplication.
 - [x] Vérifier l'application d'une première GPO ordinateur par `gpupdate`, le Registre et `gpresult`.
-- [x] Observer le verrouillage automatique en situation réelle : fonctionnement déclaré observé par l'auteur le 03/11/2026, sans capture ni mesure précise de la durée (900 s configurées et confirmées séparément).
+- [x] Observer le verrouillage automatique en situation réelle : fonctionnement observé le 03/11/2026, sans capture ni mesure précise de la durée (900 s configurées et confirmées séparément).
 - [x] Vérifier un enregistrement SRV AD DNS : recherche `_ldap._tcp.dc._msdcs.ironman.test` réussie, cible et port LDAP confirmés.
 - [x] Vérifier la résolution directe du nom de DC1 via son serveur DNS à `10.10.10.10` (réponse correcte, avertissement initial à investiguer).
 - [x] Inspecter la zone inversée, créer `10.10.10.in-addr.arpa` et le PTR de `10.10.10.10` puis confirmer la résolution inverse réussie.
@@ -486,7 +486,7 @@ Les **40 captures authentiques** sont maintenant vérifiées dans `docs/episode-
 - [x] Joindre Windows 11 Pro au domaine `ironman.test` ; authentifier un administrateur et l'utilisateur standard `test.gre` ; ranger les objets dans les OU ; vérifier la première GPO côté ordinateur.
 - [x] Publier et documenter **40 captures réelles** (23 initiales et 17 de la séance du 3 novembre 2026), avec résultats observés et limites explicites.
 
-**Traçabilité :** les tests instrumentés et les captures authentiques sont distingués des observations rapportées. Le verrouillage automatique a été **observé selon l'auteur**, sans capture ni relevé chronométré ; l'accès client à `SYSVOL` est démontré par une capture non publiée ; `NETLOGON` est également accessible depuis Windows 11 (capture non publiée).
+**Traçabilité :** les tests instrumentés et les captures authentiques sont distingués des observations rapportées. Le verrouillage automatique a été **observé**, sans capture ni relevé chronométré ; l'accès client à `SYSVOL` est démontré par une capture non publiée ; `NETLOGON` est également accessible depuis Windows 11 (capture non publiée).
 
 ---
 

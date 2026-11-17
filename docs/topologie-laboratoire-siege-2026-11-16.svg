@@ -54,7 +54,7 @@
 <text x="893" y="751" fill="#fbffff" font-size="28" font-weight="735" text-anchor="start">PC-TEST-GRE</text>
 <text x="893" y="782" fill="#cce5f3" font-size="17" font-weight="500" text-anchor="start">Windows 11 Pro  ·  DHCP 10.10.10.100</text>
 <text x="893" y="814" fill="#cfeeea" font-size="17" font-weight="540" text-anchor="start">Domaine ironman.test  ·  Jonction validée</text>
-<text x="893" y="844" fill="#ffd7a0" font-size="17" font-weight="500" text-anchor="start">GPO 900 s appliquée  ·  Verrouillage déclaré observé</text>
+<text x="893" y="844" fill="#ffd7a0" font-size="17" font-weight="500" text-anchor="start">GPO 900 s appliquée  ·  Verrouillage observé</text>
 <path class="route" d="M850 677 V905 H630 V931" marker-end="url(#arr)"/>
 <path class="route" d="M850 905 H1112 V931" marker-end="url(#arr)"/>
 <rect x="417" y="945" width="423" height="171" rx="18" fill="url(#node)" stroke="#4b8aa4" stroke-width="1.8" />
